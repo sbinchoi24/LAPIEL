@@ -695,11 +695,12 @@
   .ch-tab {
     padding: 10px 18px; font-size: 13px; font-weight: 600;
     color: var(--text-muted); cursor: pointer;
-    border-bottom: 3px solid transparent; margin-bottom: -1px;
+    border: none; background: none;
+    border-bottom: 2px solid transparent; margin-bottom: -2px;
     transition: all 0.15s; white-space: nowrap; user-select: none;
   }
   .ch-tab:hover { color: var(--primary); }
-  .ch-tab.active { color: var(--accent); border-bottom-color: var(--primary); }
+  .ch-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
   .chtab-panel { display: none; }
   .chtab-panel.active { display: block; }
 
@@ -1203,7 +1204,7 @@
     <div id="charting-root" style="font-size:13px; color:#1A1A1A;">
 
       <!-- 차팅 탭바 -->
-      <div style="background:#fff; border-bottom:1px solid var(--border); display:flex; padding:0 20px; position:sticky; top:53px; z-index:90;">
+      <div class="tab-bar" style="padding:0 20px; position:sticky; top:53px; z-index:90; background:var(--surface-0); margin-bottom:0;">
         <div class="ch-tab active" onclick="chSwitchTab('근골격계',this)">근골격계</div>
         <div class="ch-tab" onclick="chSwitchTab('피부',this)">피부</div>
         <div class="ch-tab" onclick="chSwitchTab('다이어트',this)">다이어트</div>
