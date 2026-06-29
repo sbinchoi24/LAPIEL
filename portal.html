@@ -666,6 +666,9 @@
   /* 청구 페이지: admin-only-block이 page display:none을 오버라이드하지 않도록 */
   #page-billing { display: none; }
   #page-billing.active { display: block; }
+  /* Q&A 페이지 동일 처리 */
+  #page-qa { display: none; }
+  #page-qa.active { display: block; }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 900px) {
@@ -1075,12 +1078,20 @@
       <span>대시보드</span>
     </div>
     <div class="nav-item admin-only" onclick="showPage('charting')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       <span>차팅</span>
     </div>
     <div class="nav-item admin-only" onclick="showPage('billing')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
       <span>청구</span>
+    </div>
+    <div class="nav-item" onclick="showPage('manual')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span>매뉴얼</span>
+    </div>
+    <div class="nav-item admin-only" onclick="showPage('qa')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Q&A</span>
     </div>
     <div class="nav-section-label">업무</div>
     <div class="nav-item" onclick="showPage('notice')">
@@ -1091,10 +1102,6 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       <span>체크리스트</span>
     </div>
-    <div class="nav-item" onclick="showPage('manual')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-      <span>매뉴얼</span>
-    </div>
     <div class="nav-item" onclick="showPage('schedule')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       <span>스케줄</span>
@@ -1104,8 +1111,11 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
       <span>소모품 재고</span>
     </div>
+    <div class="nav-item" onclick="showPage('skin-inventory')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      <span>피부 재고</span>
+    </div>
 
-  </nav>
   <div class="sidebar-footer">
     <button class="logout-btn" onclick="doLogout()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -1482,44 +1492,13 @@
 
   <!-- ▸ NOTICE -->
   <div id="page-notice" class="page">
-    <div class="tab-bar">
-      <button class="tab-btn active" onclick="switchTab('notice', 'list')">공지 목록</button>
-      <button class="tab-btn admin-only" onclick="switchTab('notice', 'write')">공지 작성 (원장)</button>
-    </div>
-
-    <div id="notice-tab-list" class="tab-content active">
-      <div class="search-bar">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div class="search-bar" style="margin-bottom:0;flex:1;max-width:360px;">
         <input type="text" class="search-input" id="notice-search" placeholder="공지사항 검색..." oninput="filterNotices()">
       </div>
-      <ul class="notice-list" id="notice-list-full"></ul>
+      <button class="btn btn-green btn-sm admin-only" onclick="openNoticeWriteModal()">+ 공지 작성</button>
     </div>
-
-    <div id="notice-tab-write" class="tab-content admin-only-block">
-      <div class="card" style="max-width:600px;">
-        <div class="card-title">새 공지사항 작성</div>
-        <div class="form-section">
-          <label>중요도</label>
-          <select id="notice-type">
-            <option value="urgent">긴급</option>
-            <option value="normal" selected>일반</option>
-            <option value="info">안내</option>
-          </select>
-        </div>
-        <div class="form-section">
-          <label>제목</label>
-          <input type="text" id="notice-title-input" placeholder="공지 제목을 입력하세요">
-        </div>
-        <div class="form-section">
-          <label>내용</label>
-          <textarea id="notice-body-input" placeholder="공지 내용을 입력하세요"></textarea>
-        </div>
-        <input type="hidden" id="notice-edit-idx" value="">
-        <div style="display:flex; gap:10px;">
-          <button class="btn btn-green" id="notice-submit-btn" onclick="submitNotice()">공지 등록</button>
-          <button class="btn btn-outline" onclick="document.getElementById('notice-edit-idx').value='';document.getElementById('notice-submit-btn').textContent='공지 등록';document.getElementById('notice-title-input').value='';document.getElementById('notice-body-input').value='';switchTab('notice','list')">취소</button>
-        </div>
-      </div>
-    </div>
+    <ul class="notice-list" id="notice-list-full"></ul>
   </div>
 
   <!-- ▸ CHECKLIST -->
@@ -1609,6 +1588,47 @@
     </div>
   </div>
 
+
+  <!-- ▸ 피부 재고 -->
+  <div id="page-skin-inventory" class="page">
+    <div class="flex items-center justify-between" style="margin-bottom:20px;">
+      <div class="search-bar" style="margin-bottom:0; flex:1; max-width:320px;">
+        <input type="text" class="search-input" placeholder="피부 소모품 검색..." oninput="filterSkinInventory(this.value)">
+      </div>
+      <button class="btn btn-green btn-sm admin-only" onclick="openSkinInventoryModal()">항목 추가 (원장)</button>
+    </div>
+    <div class="card" style="padding:0; overflow:hidden;">
+      <table class="inventory-table">
+        <thead>
+          <tr>
+            <th>품목</th>
+            <th>분류</th>
+            <th>현재 수량</th>
+            <th>기준 수량</th>
+            <th>상태</th>
+            <th>수량 입력</th>
+            <th>저장</th>
+            <th class="admin-only" style="display:table-cell;">삭제</th>
+          </tr>
+        </thead>
+        <tbody id="skin-inventory-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ▸ Q&A -->
+  <div id="page-qa" class="page">
+    <div class="flex items-center justify-between" style="margin-bottom:16px;">
+      <div class="tab-bar" style="margin-bottom:0; border:none; gap:8px;">
+        <button class="tab-btn active" id="qa-cat-all" onclick="filterQA('all',this)">전체</button>
+        <button class="tab-btn" id="qa-cat-통증" onclick="filterQA('통증',this)">통증</button>
+        <button class="tab-btn" id="qa-cat-피부" onclick="filterQA('피부',this)">피부</button>
+        <button class="tab-btn" id="qa-cat-다이어트" onclick="filterQA('다이어트',this)">다이어트</button>
+      </div>
+      <button class="btn btn-green btn-sm" onclick="openQAModal()">+ Q&A 등록</button>
+    </div>
+    <div id="qa-list"></div>
+  </div>
 
 </div><!-- /main-content -->
 </div><!-- /app -->
@@ -2175,6 +2195,76 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
   </div>
 </div>
 
+<!-- 공지사항 작성/수정 모달 -->
+<div class="modal-overlay" id="modal-notice-write">
+  <div class="modal" style="width:520px;">
+    <div class="modal-title" id="notice-write-modal-title">공지사항 작성</div>
+    <div class="form-section">
+      <label>중요도</label>
+      <select id="notice-type">
+        <option value="urgent">긴급</option>
+        <option value="normal" selected>일반</option>
+        <option value="info">안내</option>
+      </select>
+    </div>
+    <div class="form-section">
+      <label>제목</label>
+      <input type="text" id="notice-title-input" placeholder="공지 제목을 입력하세요">
+    </div>
+    <div class="form-section">
+      <label>내용</label>
+      <textarea id="notice-body-input" placeholder="공지 내용을 입력하세요"></textarea>
+    </div>
+    <input type="hidden" id="notice-edit-idx" value="">
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeNoticeWriteModal()">취소</button>
+      <button class="btn btn-green" id="notice-submit-btn" onclick="submitNotice()">공지 등록</button>
+    </div>
+  </div>
+</div>
+
+<!-- 피부 소모품 추가 모달 -->
+<div class="modal-overlay" id="modal-skin-inventory">
+  <div class="modal">
+    <div class="modal-title">피부 소모품 항목 추가</div>
+    <div class="form-section"><label>품목명</label><input type="text" id="skin-inv-name" placeholder="예: 앰플 A"></div>
+    <div class="form-section">
+      <label>분류</label>
+      <select id="skin-inv-cat">
+        <option>앰플/세럼</option><option>마스크</option><option>크림/로션</option>
+        <option>필링</option><option>기기소모품</option><option>기타</option>
+      </select>
+    </div>
+    <div class="form-section"><label>기준(최소) 수량</label><input type="number" id="skin-inv-min" placeholder="예: 10"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('skin-inventory')">취소</button>
+      <button class="btn btn-green" onclick="saveSkinInventoryItem()">추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- Q&A 등록 모달 -->
+<div class="modal-overlay" id="modal-qa">
+  <div class="modal" style="width:520px;">
+    <div class="modal-title" id="qa-modal-title">Q&A 등록</div>
+    <input type="hidden" id="qa-edit-id">
+    <div class="form-section">
+      <label>분류</label>
+      <select id="qa-cat">
+        <option value="통증">통증</option>
+        <option value="피부">피부</option>
+        <option value="다이어트">다이어트</option>
+      </select>
+    </div>
+    <div class="form-section"><label>질문 (Q)</label><input type="text" id="qa-q" placeholder="환자 질문을 입력하세요"></div>
+    <div class="form-section"><label>답변 (A)</label><textarea id="qa-a" style="min-height:120px;" placeholder="답변을 입력하세요"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('qa')">취소</button>
+      <button class="btn btn-green" onclick="saveQA()">저장</button>
+    </div>
+  </div>
+</div>
+
 <!-- 매뉴얼 편집 모달 -->
 <div class="modal-overlay" id="modal-manual-editor">
   <div class="modal" style="width:580px;">
@@ -2420,8 +2510,6 @@ const STATE = {
 - Q&A 공유하기
 - 특이한 환자의 경우
   - 정규분포 표를 그려 설명하고, 보수적으로 접근하기` },
-- 차트 확인 후 [###님 진료완] 메시지
-- 칠판에 초진 액팅 체크하기
     { id: 2, cat: 'treatment', access: 'all', title: '초진 환자 접수 절차', preview: '초진 환자 도착 시 처리 순서', content: '1. 접수 차트에 이름, 연락처, 주소 기입\n2. 보험 유형 확인 (건강보험 / 의료급여 / 자비)\n3. 초진 문진표 작성 안내\n4. 대기 안내 후 원장 호출\n5. 진료 후 수납 처리\n\n※ 65세 이상 어르신은 작성 도움 제공' },
     { id: 3, cat: 'treatment', access: 'all', title: '탕전 기기 사용법', preview: '탕전 기기 조작 순서 및 주의사항', content: '1. 전원 ON 후 예열 5분 대기\n2. 한약재 투입 전 내부 청결 확인\n3. 가열 온도: 1차 100°C → 2차 80°C 유지\n4. 완료 후 필터 세척 필수\n5. 사용 일지 기록\n\n⚠ 기기 이상 시 즉시 원장에게 보고' },
     { id: 4, cat: 'admin', access: 'admin', title: '보험 청구 마감 절차', preview: '월 보험 청구 마감 체크리스트', content: '청구 마감일: 매월 말일\n\n1. 당월 진료 차트 전수 확인\n2. EDI 프로그램 청구 내용 검토\n3. 청구 오류 항목 수정\n4. 원장 서명 후 제출\n5. 청구 완료 증번호 기록\n\n문의: 심사평가원 1644-2000' },
@@ -2441,6 +2529,8 @@ const STATE = {
   schedule: [],
   metrics: {},
   calendarDate: new Date(),
+  skinInventory: [],
+  qaItems: [],
 };
 
 /* 비밀번호 설정 */
@@ -2551,14 +2641,20 @@ function doLogout() {
 async function initApp() {
   updateTodayDate();
   showLoadingOverlay(true);
-  await Promise.all([
-    loadNotices(),
-    loadManuals(),
-    loadInventory(),
-    loadSchedules(),
-    loadChecklistItems(),
-  ]);
-  await loadChecklistLogs();
+  try {
+    await Promise.all([
+      loadNotices(),
+      loadManuals(),
+      loadInventory(),
+      loadSkinInventory(),
+      loadSchedules(),
+      loadChecklistItems(),
+      loadQAItems(),
+    ]);
+    await loadChecklistLogs();
+  } catch(e) {
+    console.warn('Supabase 로드 오류 (로컬 데이터로 진행):', e);
+  }
   showLoadingOverlay(false);
   renderChecklist();
   renderNotices();
@@ -2585,55 +2681,63 @@ function showLoadingOverlay(show) {
 
 /* ── Supabase 로드 함수들 ── */
 async function loadNotices() {
-  const rows = await sb.select('notices', 'order=id.desc');
-  STATE.notices = (rows || []).map(r => ({
-    _id: r.id, type: r.type, title: r.title,
-    body: r.body || '', author: r.author || '',
-    date: new Date(r.created_at).toLocaleDateString('ko-KR')
-  }));
+  try {
+    const rows = await sb.select('notices', 'order=id.desc');
+    STATE.notices = (rows || []).map(r => ({
+      _id: r.id, type: r.type, title: r.title,
+      body: r.body || '', author: r.author || '',
+      date: new Date(r.created_at).toLocaleDateString('ko-KR')
+    }));
+  } catch(e) { console.warn('loadNotices 오류:', e); }
 }
 
 async function loadManuals() {
-  const rows = await sb.select('manuals', 'order=id.asc');
-  if (rows && rows.length > 0) {
-    STATE.manualItems = rows.map(r => ({
-      id: r.id, cat: r.cat, access: r.access || 'all',
-      title: r.title, preview: r.preview || '', content: r.content || ''
-    }));
-  }
-  // DB가 비어있으면 기본 데이터 유지 (STATE.manualItems 초기값 그대로)
+  try {
+    const rows = await sb.select('manuals', 'order=id.asc');
+    if (rows && rows.length > 0) {
+      STATE.manualItems = rows.map(r => ({
+        id: r.id, cat: r.cat, access: r.access || 'all',
+        title: r.title, preview: r.preview || '', content: r.content || ''
+      }));
+    }
+  } catch(e) { console.warn('loadManuals 오류:', e); }
 }
 
 async function loadInventory() {
-  const rows = await sb.select('inventory');
-  if (rows && rows.length > 0) {
-    STATE.inventory = rows.map(r => ({
-      id: r.id, name: r.name, cat: r.cat, qty: r.qty, min: r.min_qty,
-      updatedBy: r.updated_by || '', updatedAt: r.updated_at || ''
-    }));
-  }
+  try {
+    const rows = await sb.select('inventory');
+    if (rows && rows.length > 0) {
+      STATE.inventory = rows.map(r => ({
+        id: r.id, name: r.name, cat: r.cat, qty: r.qty, min: r.min_qty,
+        updatedBy: r.updated_by || '', updatedAt: r.updated_at || ''
+      }));
+    }
+  } catch(e) { console.warn('loadInventory 오류:', e); }
 }
 
 async function loadSchedules() {
-  const rows = await sb.select('schedules', 'order=date.asc');
-  STATE.schedule = (rows || []).map(r => ({
-    _id: r.id, staff: r.staff, date: r.date, type: r.type, memo: r.memo || ''
-  }));
+  try {
+    const rows = await sb.select('schedules', 'order=date.asc');
+    STATE.schedule = (rows || []).map(r => ({
+      _id: r.id, staff: r.staff, date: r.date, type: r.type, memo: r.memo || ''
+    }));
+  } catch(e) { console.warn('loadSchedules 오류:', e); }
 }
 
 async function loadChecklistItems() {
-  const rows = await sb.select('checklist_items', 'order=section.asc,sort_order.asc');
-  if (rows && rows.length > 0) {
-    STATE.checklist.items = { morning: [], during: [], evening: [] };
-    rows.forEach(r => {
-      if (STATE.checklist.items[r.section] !== undefined) {
-        STATE.checklist.items[r.section].push({ id: r.id, label: r.label });
-      }
-    });
-  } else {
-    // DB 비어있으면 기본 항목을 Supabase에 저장
-    await seedChecklistItems();
-  }
+  try {
+    const rows = await sb.select('checklist_items', 'order=section.asc,sort_order.asc');
+    if (rows && rows.length > 0) {
+      STATE.checklist.items = { morning: [], during: [], evening: [] };
+      rows.forEach(r => {
+        if (STATE.checklist.items[r.section] !== undefined) {
+          STATE.checklist.items[r.section].push({ id: r.id, label: r.label });
+        }
+      });
+    } else {
+      await seedChecklistItems();
+    }
+  } catch(e) { console.warn('loadChecklistItems 오류:', e); }
 }
 
 async function seedChecklistItems() {
@@ -2648,15 +2752,18 @@ async function seedChecklistItems() {
 }
 
 async function loadChecklistLogs() {
-  const today = new Date().toDateString();
-  const rows = await sb.select('checklist_logs', `date=eq.${encodeURIComponent(today)}`);
-  STATE.checklist.checked = {};
-  (rows || []).forEach(r => {
-    STATE.checklist.checked[`${today}-${r.item_id}`] = {
-      done: true, time: r.checked_at, role: r.role
-    };
-  });
+  try {
+    const today = new Date().toDateString();
+    const rows = await sb.select('checklist_logs', `date=eq.${encodeURIComponent(today)}`);
+    STATE.checklist.checked = {};
+    (rows || []).forEach(r => {
+      STATE.checklist.checked[`${today}-${r.item_id}`] = {
+        done: true, time: r.checked_at, role: r.role
+      };
+    });
+  } catch(e) { console.warn('loadChecklistLogs 오류:', e); }
 }
+
 
 function updateTodayDate() {
   const d = new Date();
@@ -2671,7 +2778,7 @@ const PAGE_TITLES = {
   dashboard: '대시보드', charting: '차팅', billing: '청구 수가 조회',
   notice: '공지사항', checklist: '체크리스트',
   manual: '매뉴얼', schedule: '스케줄',
-  inventory: '소모품 재고'
+  inventory: '소모품 재고', 'skin-inventory': '피부 재고', qa: 'Q&A'
 };
 
 function showPage(name) {
@@ -2682,6 +2789,10 @@ function showPage(name) {
   event.currentTarget.classList.add('active');
   if (name === 'billing') {
     renderCQResult();
+  } else if (name === 'skin-inventory') {
+    renderSkinInventory();
+  } else if (name === 'qa') {
+    renderQA();
   } else {
     const pageEl = document.getElementById('cq-result-page');
     if (pageEl) pageEl.innerHTML = '';
@@ -2737,6 +2848,22 @@ function renderNotices() {
     </li>`).join('');
 }
 
+function openNoticeWriteModal() {
+  document.getElementById('notice-write-modal-title').textContent = '공지사항 작성';
+  document.getElementById('notice-edit-idx').value = '';
+  document.getElementById('notice-submit-btn').textContent = '공지 등록';
+  document.getElementById('notice-title-input').value = '';
+  document.getElementById('notice-body-input').value = '';
+  document.getElementById('notice-type').value = 'normal';
+  openModal('notice-write');
+}
+
+function closeNoticeWriteModal() {
+  document.getElementById('notice-edit-idx').value = '';
+  document.getElementById('notice-submit-btn').textContent = '공지 등록';
+  closeModal('notice-write');
+}
+
 function filterNotices() {
   const q = document.getElementById('notice-search').value.toLowerCase();
   document.querySelectorAll('#notice-list-full .notice-item').forEach(li => {
@@ -2766,25 +2893,19 @@ async function submitNotice() {
     }
   }
   renderNotices(); updateDashboard();
-  document.getElementById('notice-title-input').value = '';
-  document.getElementById('notice-body-input').value = '';
-  document.getElementById('notice-edit-idx').value = '';
-  document.getElementById('notice-submit-btn').textContent = '공지 등록';
+  closeModal('notice-write');
   showToast(editIdx !== '' ? '수정되었습니다' : '등록되었습니다');
-  switchTab('notice', 'list');
 }
 
 function openNoticeEditor(idx) {
   const n = STATE.notices[idx];
+  document.getElementById('notice-write-modal-title').textContent = '공지사항 수정';
   document.getElementById('notice-type').value = n.type;
   document.getElementById('notice-title-input').value = n.title;
   document.getElementById('notice-body-input').value = n.body || '';
   document.getElementById('notice-edit-idx').value = idx;
   document.getElementById('notice-submit-btn').textContent = '수정 완료';
-  document.querySelectorAll('#page-notice .tab-content').forEach(el => el.classList.remove('active'));
-  document.getElementById('notice-tab-write').classList.add('active');
-  document.querySelectorAll('#page-notice .tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('#page-notice .tab-btn')[1].classList.add('active');
+  openModal('notice-write');
 }
 
 async function deleteNotice(idx) {
@@ -3228,6 +3349,181 @@ async function saveSchedule() {
 /* ════════════════════════════════════
    DASHBOARD UPDATE
 ════════════════════════════════════ */
+/* ════════════════════════════════════
+   피부 재고
+════════════════════════════════════ */
+async function loadSkinInventory() {
+  try {
+    const rows = await sb.select('skin_inventory');
+    if (rows && rows.length > 0) {
+      STATE.skinInventory = rows.map(r => ({
+        id: r.id, name: r.name, cat: r.cat, qty: r.qty, min: r.min_qty,
+        updatedBy: r.updated_by || '', updatedAt: r.updated_at || ''
+      }));
+    }
+  } catch(e) { console.warn('loadSkinInventory 오류:', e); }
+}
+
+function renderSkinInventory(filter = '') {
+  const tbody = document.getElementById('skin-inventory-tbody');
+  if (!tbody) return;
+  const isAdmin = STATE.user && STATE.user.isAdmin;
+  const items = STATE.skinInventory.filter(i =>
+    !filter || i.name.toLowerCase().includes(filter.toLowerCase())
+  );
+  tbody.innerHTML = items.map(item => {
+    const pct = item.qty / item.min;
+    let status, statusLabel;
+    if (item.qty === 0) { status = 'stock-empty'; statusLabel = '재고 없음'; }
+    else if (pct < 1) { status = 'stock-low'; statusLabel = '부족'; }
+    else { status = 'stock-ok'; statusLabel = '정상'; }
+    const updaterInfo = item.updatedBy
+      ? `<div style="font-size:11px;color:var(--text-muted);">${item.updatedBy} · ${item.updatedAt}</div>` : '';
+    return `<tr>
+      <td><strong>${item.name}</strong>${updaterInfo}</td>
+      <td style="color:var(--text-muted)">${item.cat}</td>
+      <td>${item.qty}</td>
+      <td style="color:var(--text-muted)">${item.min}</td>
+      <td><span class="stock-status ${status}">${statusLabel}</span></td>
+      <td><input type="number" class="qty-input" id="skin-qty-${item.id}" value="${item.qty}" min="0"></td>
+      <td><button class="btn btn-green btn-sm" onclick="updateSkinInventory(${item.id})">저장</button></td>
+      ${isAdmin ? `<td><button class="btn btn-danger btn-sm" onclick="deleteSkinInventoryItem(${item.id})">삭제</button></td>` : '<td></td>'}
+    </tr>`;
+  }).join('');
+}
+
+function filterSkinInventory(q) { renderSkinInventory(q); }
+function openSkinInventoryModal() { openModal('skin-inventory'); }
+
+async function saveSkinInventoryItem() {
+  const name = document.getElementById('skin-inv-name').value.trim();
+  const cat = document.getElementById('skin-inv-cat').value;
+  const min = parseInt(document.getElementById('skin-inv-min').value) || 0;
+  if (!name) { alert('품목명을 입력하세요'); return; }
+  const rows = await sb.insert('skin_inventory', { name, cat, qty: 0, min_qty: min });
+  if (rows && rows[0]) STATE.skinInventory.push({ id: rows[0].id, name, cat, qty: 0, min });
+  renderSkinInventory();
+  closeModal('skin-inventory');
+  document.getElementById('skin-inv-name').value = '';
+  document.getElementById('skin-inv-min').value = '';
+  showToast('항목이 추가되었습니다');
+}
+
+async function updateSkinInventory(id) {
+  const val = parseInt(document.getElementById('skin-qty-' + id).value) || 0;
+  const item = STATE.skinInventory.find(i => i.id === id);
+  const updatedBy = STATE.user ? STATE.user.name : '';
+  const updatedAt = new Date().toLocaleDateString('ko-KR', {month:'numeric',day:'numeric'}) + ' ' +
+    new Date().toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
+  if (item) {
+    item.qty = val; item.updatedBy = updatedBy; item.updatedAt = updatedAt;
+    await sb.update('skin_inventory', id, { qty: val, updated_by: updatedBy, updated_at: updatedAt });
+  }
+  renderSkinInventory();
+  showToast('재고가 저장되었습니다');
+}
+
+async function deleteSkinInventoryItem(id) {
+  if (!confirm('이 품목을 삭제할까요?')) return;
+  await sb.remove('skin_inventory', id);
+  STATE.skinInventory = STATE.skinInventory.filter(i => i.id !== id);
+  renderSkinInventory();
+  showToast('삭제되었습니다');
+}
+
+/* ════════════════════════════════════
+   Q&A
+════════════════════════════════════ */
+async function loadQAItems() {
+  try {
+    const rows = await sb.select('qa_items', 'order=id.desc');
+    STATE.qaItems = (rows || []).map(r => ({
+      id: r.id, cat: r.cat, q: r.q, a: r.a,
+      author: r.author || '', date: r.created_at ? new Date(r.created_at).toLocaleDateString('ko-KR') : ''
+    }));
+  } catch(e) { console.warn('loadQAItems 오류:', e); }
+}
+
+let qaCatFilter = 'all';
+function filterQA(cat, btn) {
+  qaCatFilter = cat;
+  document.querySelectorAll('#page-qa .tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderQA();
+}
+
+function renderQA() {
+  const list = document.getElementById('qa-list');
+  if (!list) return;
+  const items = qaCatFilter === 'all' ? STATE.qaItems : STATE.qaItems.filter(i => i.cat === qaCatFilter);
+  const catColors = { 통증: 'cat-treatment', 피부: 'cat-admin', 다이어트: '#FEF9E7' };
+  if (!items.length) {
+    list.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted);">등록된 Q&A가 없습니다</div>';
+    return;
+  }
+  list.innerHTML = items.map(item => `
+    <div class="card" style="margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <span class="manual-category cat-${item.cat === '통증' ? 'treatment' : item.cat === '피부' ? 'admin' : 'emergency'}">${item.cat}</span>
+        <span style="font-size:11px;color:var(--text-muted);">${item.author} · ${item.date}</span>
+        <div style="margin-left:auto;display:flex;gap:6px;">
+          <button class="btn btn-outline btn-sm" onclick="openQAEditModal(${item.id})">편집</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteQA(${item.id})">삭제</button>
+        </div>
+      </div>
+      <div style="font-size:14px;font-weight:700;color:var(--accent);margin-bottom:8px;">Q. ${item.q}</div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;padding:10px;background:var(--surface-2);border-radius:8px;white-space:pre-line;">A. ${item.a}</div>
+    </div>`).join('');
+}
+
+function openQAModal() {
+  document.getElementById('qa-modal-title').textContent = 'Q&A 등록';
+  document.getElementById('qa-edit-id').value = '';
+  document.getElementById('qa-q').value = '';
+  document.getElementById('qa-a').value = '';
+  openModal('qa');
+}
+
+function openQAEditModal(id) {
+  const item = STATE.qaItems.find(i => i.id === id);
+  if (!item) return;
+  document.getElementById('qa-modal-title').textContent = 'Q&A 편집';
+  document.getElementById('qa-edit-id').value = id;
+  document.getElementById('qa-cat').value = item.cat;
+  document.getElementById('qa-q').value = item.q;
+  document.getElementById('qa-a').value = item.a;
+  openModal('qa');
+}
+
+async function saveQA() {
+  const editId = document.getElementById('qa-edit-id').value;
+  const cat = document.getElementById('qa-cat').value;
+  const q = document.getElementById('qa-q').value.trim();
+  const a = document.getElementById('qa-a').value.trim();
+  if (!q || !a) { alert('질문과 답변을 입력하세요'); return; }
+  if (editId) {
+    await sb.update('qa_items', editId, { cat, q, a });
+    const item = STATE.qaItems.find(i => i.id == editId);
+    if (item) { item.cat = cat; item.q = q; item.a = a; }
+  } else {
+    const rows = await sb.insert('qa_items', { cat, q, a, author: STATE.user.name });
+    if (rows && rows[0]) {
+      STATE.qaItems.unshift({ id: rows[0].id, cat, q, a, author: STATE.user.name, date: new Date().toLocaleDateString('ko-KR') });
+    }
+  }
+  renderQA();
+  closeModal('qa');
+  showToast(editId ? '수정되었습니다' : '등록되었습니다');
+}
+
+async function deleteQA(id) {
+  if (!confirm('이 Q&A를 삭제할까요?')) return;
+  await sb.remove('qa_items', id);
+  STATE.qaItems = STATE.qaItems.filter(i => i.id !== id);
+  renderQA();
+  showToast('삭제되었습니다');
+}
+
 function updateDashboard() {
   updateDashboardChecklist();
   updateInventoryAlerts();
