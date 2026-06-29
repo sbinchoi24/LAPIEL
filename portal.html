@@ -523,7 +523,8 @@
   }
   .stock-ok { background: var(--primary-pale); color: var(--primary); }
   .stock-low { background: var(--warning-pale); color: var(--warning); }
-  .stock-empty { background: var(--danger-pale); color: var(--danger); }
+  .stock-danger { background: #FDE8E8; color: #C0392B; font-weight: 700; }
+  .stock-empty { background: var(--danger-pale); color: var(--danger); font-weight: 700; }
   .qty-input {
     width: 70px; padding: 5px 8px;
     border: 1px solid var(--border-strong);
@@ -666,9 +667,13 @@
   /* 청구 페이지: admin-only-block이 page display:none을 오버라이드하지 않도록 */
   #page-billing { display: none; }
   #page-billing.active { display: block; }
-  /* Q&A 페이지 동일 처리 */
-  #page-qa { display: none; }
-  #page-qa.active { display: block; }
+  /* 직원 로그인 시 청구 페이지 완전 차단 */
+  body:not(.is-admin) #page-billing { display: none !important; }
+  /* Q&A 페이지 */
+  #page-qa-admin { display: none; }
+  #page-qa-admin.active { display: block; }
+  #page-qa-staff { display: none; }
+  #page-qa-staff.active { display: block; }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 900px) {
@@ -953,37 +958,25 @@
     transition: transform 0.15s;
   }
   /* 마크다운 본문 */
-  .md-body { font-size: 13px; line-height: 1.8; color: var(--text-secondary); }
-  .md-section-hd {
-    font-size: 13px; font-weight: 800; color: var(--accent);
-    margin: 14px 0 6px; padding: 5px 10px;
-    background: var(--primary-pale); border-radius: 6px;
+  .md-body { font-size: 13px; line-height: 1.85; color: var(--text-secondary); }
+  .md-num-hd {
+    font-size: 13.5px; font-weight: 800; color: var(--accent);
+    margin: 16px 0 6px; padding: 7px 12px;
+    background: var(--primary-pale); border-radius: 7px;
   }
-  .md-section-hd:first-child { margin-top: 0; }
-  .md-sub-hd {
-    font-size: 13px; font-weight: 700; color: var(--primary);
-    margin: 10px 0 4px; padding-left: 4px;
-  }
-  .md-type-hd {
-    font-size: 12.5px; font-weight: 700; color: var(--accent);
-    margin: 8px 0 3px; padding: 4px 10px;
-    background: var(--surface-2); border-radius: 5px;
-  }
-  .md-li { display:flex; gap:6px; padding: 2px 0 2px 8px; color: var(--text-secondary); }
-  .md-bullet { color: var(--text-muted); flex-shrink:0; }
-  .md-indent { display:flex; gap:6px; padding: 2px 0 2px 22px; color: var(--text-secondary); font-size: 12.5px; }
-  .md-dot { color: var(--text-muted); flex-shrink:0; font-size:11px; margin-top:2px; }
-  .md-sub2 { display:flex; gap:6px; padding: 2px 0 2px 38px; color: var(--text-muted); font-size: 12px; }
-  .md-dot2 { color: var(--text-muted); flex-shrink:0; font-size:10px; margin-top:2px; }
-  .md-branch {
-    display: flex; gap: 8px; align-items: baseline;
-    padding: 2px 0 2px 20px; font-size: 12.5px;
-  }
-  .md-branch-key {
-    font-weight: 700; color: var(--primary);
-    min-width: 28px; flex-shrink: 0;
-  }
-  .md-gap { height: 6px; }
+  .md-num-hd:first-child { margin-top: 4px; }
+  .md-plain { padding: 1px 0; color: var(--text-secondary); }
+  .md-gap { height: 8px; }
+  /* 깊이별 들여쓰기 */
+  .md-d0 { display:flex; gap:8px; padding: 2px 0 2px 4px; }
+  .md-d0 .md-bullet { color: var(--primary); font-size:14px; flex-shrink:0; line-height:1.85; }
+  .md-d1 { display:flex; gap:7px; padding: 2px 0 2px 20px; font-size:13px; }
+  .md-d1 .md-bullet { color: var(--text-muted); flex-shrink:0; line-height:1.85; }
+  .md-d2 { display:flex; gap:6px; padding: 2px 0 2px 36px; font-size:12.5px; color:var(--text-secondary); }
+  .md-d2 .md-bullet { color: var(--text-muted); flex-shrink:0; line-height:1.85; font-size:12px; }
+  .md-d3 { display:flex; gap:6px; padding: 2px 0 2px 52px; font-size:12px; color:var(--text-muted); }
+  .md-d3 .md-bullet { flex-shrink:0; line-height:1.85; }
+  .md-d4 { display:flex; gap:6px; padding: 2px 0 2px 68px; font-size:12px; color:var(--text-muted); }
   /* 청구 필터 버튼 active */
   #page-billing .btn-outline.active {
     background: var(--primary);
@@ -1089,9 +1082,13 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       <span>매뉴얼</span>
     </div>
-    <div class="nav-item admin-only" onclick="showPage('qa')">
+    <div class="nav-item admin-only" onclick="showPage('qa-admin')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <span>Q&A</span>
+      <span>Q&A [원장용]</span>
+    </div>
+    <div class="nav-item" onclick="showPage('qa-staff')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/></svg>
+      <span>Q&A [직원용]</span>
     </div>
     <div class="nav-section-label">업무</div>
     <div class="nav-item" onclick="showPage('notice')">
@@ -1109,13 +1106,13 @@
     <div class="nav-section-label">관리</div>
     <div class="nav-item" onclick="showPage('inventory')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-      <span>소모품 재고</span>
+      <span>일반 소모품 재고</span>
     </div>
     <div class="nav-item" onclick="showPage('skin-inventory')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-      <span>피부 재고</span>
+      <span>피부 소모품 재고</span>
     </div>
-
+  </nav>
   <div class="sidebar-footer">
     <button class="logout-btn" onclick="doLogout()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -1580,6 +1577,7 @@
             <th>상태</th>
             <th>수량 입력</th>
             <th>저장</th>
+            <th>최근 수정</th>
             <th class="admin-only" style="display:table-cell;">삭제</th>
           </tr>
         </thead>
@@ -1608,6 +1606,7 @@
             <th>상태</th>
             <th>수량 입력</th>
             <th>저장</th>
+            <th>최근 수정</th>
             <th class="admin-only" style="display:table-cell;">삭제</th>
           </tr>
         </thead>
@@ -1616,18 +1615,32 @@
     </div>
   </div>
 
-  <!-- ▸ Q&A -->
-  <div id="page-qa" class="page">
+  <!-- ▸ Q&A 원장용 (원장+직원 모두 보임) -->
+  <div id="page-qa-admin" class="page">
     <div class="flex items-center justify-between" style="margin-bottom:16px;">
-      <div class="tab-bar" style="margin-bottom:0; border:none; gap:8px;">
-        <button class="tab-btn active" id="qa-cat-all" onclick="filterQA('all',this)">전체</button>
-        <button class="tab-btn" id="qa-cat-통증" onclick="filterQA('통증',this)">통증</button>
-        <button class="tab-btn" id="qa-cat-피부" onclick="filterQA('피부',this)">피부</button>
-        <button class="tab-btn" id="qa-cat-다이어트" onclick="filterQA('다이어트',this)">다이어트</button>
+      <div class="tab-bar" style="margin-bottom:0;border:none;gap:8px;">
+        <button class="tab-btn active" id="qa-admin-cat-all" onclick="filterQAAdmin('all',this)">전체</button>
+        <button class="tab-btn" id="qa-admin-cat-통증" onclick="filterQAAdmin('통증',this)">통증</button>
+        <button class="tab-btn" id="qa-admin-cat-피부" onclick="filterQAAdmin('피부',this)">피부</button>
+        <button class="tab-btn" id="qa-admin-cat-다이어트" onclick="filterQAAdmin('다이어트',this)">다이어트</button>
       </div>
-      <button class="btn btn-green btn-sm" onclick="openQAModal()">+ Q&A 등록</button>
+      <button class="btn btn-green btn-sm" onclick="openQAModal('admin')">+ Q&A 등록</button>
     </div>
-    <div id="qa-list"></div>
+    <div id="qa-admin-list"></div>
+  </div>
+
+  <!-- ▸ Q&A 직원용 -->
+  <div id="page-qa-staff" class="page">
+    <div class="flex items-center justify-between" style="margin-bottom:16px;">
+      <div class="tab-bar" style="margin-bottom:0;border:none;gap:8px;">
+        <button class="tab-btn active" id="qa-staff-cat-all" onclick="filterQAStaff('all',this)">전체</button>
+        <button class="tab-btn" id="qa-staff-cat-통증" onclick="filterQAStaff('통증',this)">통증</button>
+        <button class="tab-btn" id="qa-staff-cat-피부" onclick="filterQAStaff('피부',this)">피부</button>
+        <button class="tab-btn" id="qa-staff-cat-다이어트" onclick="filterQAStaff('다이어트',this)">다이어트</button>
+      </div>
+      <button class="btn btn-green btn-sm admin-only" onclick="openQAModal('staff')">+ Q&A 등록</button>
+    </div>
+    <div id="qa-staff-list"></div>
   </div>
 
 </div><!-- /main-content -->
@@ -2248,6 +2261,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
   <div class="modal" style="width:520px;">
     <div class="modal-title" id="qa-modal-title">Q&A 등록</div>
     <input type="hidden" id="qa-edit-id">
+    <input type="hidden" id="qa-access">
     <div class="form-section">
       <label>분류</label>
       <select id="qa-cat">
@@ -2510,11 +2524,6 @@ const STATE = {
 - Q&A 공유하기
 - 특이한 환자의 경우
   - 정규분포 표를 그려 설명하고, 보수적으로 접근하기` },
-    { id: 2, cat: 'treatment', access: 'all', title: '초진 환자 접수 절차', preview: '초진 환자 도착 시 처리 순서', content: '1. 접수 차트에 이름, 연락처, 주소 기입\n2. 보험 유형 확인 (건강보험 / 의료급여 / 자비)\n3. 초진 문진표 작성 안내\n4. 대기 안내 후 원장 호출\n5. 진료 후 수납 처리\n\n※ 65세 이상 어르신은 작성 도움 제공' },
-    { id: 3, cat: 'treatment', access: 'all', title: '탕전 기기 사용법', preview: '탕전 기기 조작 순서 및 주의사항', content: '1. 전원 ON 후 예열 5분 대기\n2. 한약재 투입 전 내부 청결 확인\n3. 가열 온도: 1차 100°C → 2차 80°C 유지\n4. 완료 후 필터 세척 필수\n5. 사용 일지 기록\n\n⚠ 기기 이상 시 즉시 원장에게 보고' },
-    { id: 4, cat: 'admin', access: 'admin', title: '보험 청구 마감 절차', preview: '월 보험 청구 마감 체크리스트', content: '청구 마감일: 매월 말일\n\n1. 당월 진료 차트 전수 확인\n2. EDI 프로그램 청구 내용 검토\n3. 청구 오류 항목 수정\n4. 원장 서명 후 제출\n5. 청구 완료 증번호 기록\n\n문의: 심사평가원 1644-2000' },
-    { id: 5, cat: 'emergency', access: 'all', title: '응급 환자 발생 시 대처', preview: '원내 응급 상황 발생 시 행동 요령', content: '1. 119 즉시 신고 (주소 안내 준비)\n2. 원장 즉시 호출\n3. 환자 눕히기 / 의식 확인\n4. AED 위치: 원무과 왼쪽 벽면\n5. 환자 보호자 연락\n\n⚠ 절대 환자를 혼자 두지 마세요\n한의원 주소: [주소 입력 필요]' },
-    { id: 6, cat: 'admin', access: 'all', title: '전화 응대 매뉴얼', preview: '전화 응대 표준 스크립트', content: '수신: "안녕하세요, 경희 라피엘 한의원입니다 :)"\n\n예약 접수:\n- 성함, 연락처, 증상, 원하는 일시 확인\n- 가능 시간대 안내 후 확정\n- "내원 시 보험증 지참 부탁드립니다"\n\n문의 응대:\n- 진료비: "진료 후 정확한 금액 안내 가능합니다"\n- 주차: 건물 지하 1층 이용 가능\n\n마무리: "감사합니다, 좋은 하루 되세요 :)"' },
   ],
   inventory: [
     { id: 1, name: '침 (0.20×40)', cat: '침구류', qty: 800, min: 200 },
@@ -2599,7 +2608,7 @@ function doLogin() {
   if (!selectedRole) return;
   if (pw === PASSWORDS[selectedRole] || (Array.isArray(PASSWORDS[selectedRole]) && PASSWORDS[selectedRole].includes(pw))) {
     const isAdmin = selectedRole === 'director';
-    const displayName = isAdmin ? selectedName : '직원';
+    const displayName = selectedName || (isAdmin ? '원장' : '직원');
     STATE.user = { name: displayName, role: isAdmin ? '원장' : '직원', isAdmin };
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
@@ -2778,7 +2787,8 @@ const PAGE_TITLES = {
   dashboard: '대시보드', charting: '차팅', billing: '청구 수가 조회',
   notice: '공지사항', checklist: '체크리스트',
   manual: '매뉴얼', schedule: '스케줄',
-  inventory: '소모품 재고', 'skin-inventory': '피부 재고', qa: 'Q&A'
+  inventory: '일반 소모품 재고', 'skin-inventory': '피부 소모품 재고',
+  'qa-admin': 'Q&A [원장용]', 'qa-staff': 'Q&A [직원용]'
 };
 
 function showPage(name) {
@@ -2791,8 +2801,10 @@ function showPage(name) {
     renderCQResult();
   } else if (name === 'skin-inventory') {
     renderSkinInventory();
-  } else if (name === 'qa') {
-    renderQA();
+  } else if (name === 'qa-admin') {
+    renderQAAdmin();
+  } else if (name === 'qa-staff') {
+    renderQAStaff();
   } else {
     const pageEl = document.getElementById('cq-result-page');
     if (pageEl) pageEl.innerHTML = '';
@@ -2940,9 +2952,9 @@ function renderChecklist() {
       totalItems++;
       html += `<div class="checklist-item" onclick="toggleCheck('${key}',${itemId},this)">
         <input type="checkbox" id="chk-${key}" ${isChecked ? 'checked' : ''} onchange="toggleCheck('${key}',${itemId},this.parentElement)">
-        <div style="flex:1;">
-          <label for="chk-${key}" class="${isChecked ? 'checked' : ''}">${label}</label>
-          ${isChecked ? `<div class="checklist-meta">${record.role} · ${record.time}</div>` : ''}
+        <div style="flex:1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <label for="chk-${key}" class="${isChecked ? 'checked' : ''}" style="margin:0;">${label}</label>
+          ${isChecked ? `<span style="font-size:11px;color:var(--primary);font-weight:600;background:var(--primary-pale);padding:1px 8px;border-radius:10px;white-space:nowrap;">${record.role} · ${record.time}</span>` : ''}
         </div>
       </div>`;
     });
@@ -3076,25 +3088,66 @@ let manualSearchQuery = '';
 
 /* 마크다운 → HTML 변환 (경량) */
 function mdToHtml(text) {
+  const lines = text.split('\n');
+  let html = '';
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    
+    // 빈 줄
+    if (!line.trim()) { html += '<div class="md-gap"></div>'; continue; }
+    
+    // 숫자. 제목 (1. 2. 3. ...)
+    if (/^\d+\.\s+\*\*(.+?)\*\*/.test(line)) {
+      const m = line.match(/^\d+\.\s+\*\*(.+?)\*\*/);
+      html += `<div class="md-num-hd">${line.match(/^\d+/)[0]}. <strong>${m[1]}</strong></div>`;
+      continue;
+    }
+    if (/^\d+\.\s+.+/.test(line)) {
+      const m = line.match(/^(\d+)\.\s+(.+)/);
+      html += `<div class="md-num-hd">${m[1]}. ${renderInline(m[2])}</div>`;
+      continue;
+    }
+    
+    // 들여쓰기 깊이 측정 (스페이스 2개 = 1단계)
+    const indent = line.match(/^(\s*)/)[1].length;
+    const trimmed = line.trimStart();
+    
+    // - 항목
+    if (trimmed.startsWith('- ')) {
+      const content = renderInline(trimmed.slice(2));
+      if (indent === 0) {
+        html += `<div class="md-d0"><span class="md-bullet">•</span><span>${content}</span></div>`;
+      } else if (indent <= 2) {
+        html += `<div class="md-d1"><span class="md-bullet">◦</span><span>${content}</span></div>`;
+      } else if (indent <= 4) {
+        html += `<div class="md-d2"><span class="md-bullet">–</span><span>${content}</span></div>`;
+      } else if (indent <= 6) {
+        html += `<div class="md-d3"><span class="md-bullet">·</span><span>${content}</span></div>`;
+      } else {
+        html += `<div class="md-d4"><span class="md-bullet">·</span><span>${content}</span></div>`;
+      }
+      continue;
+    }
+    
+    // 1) 2) 3) 번호 하위항목
+    if (/^\s*\d+\)\s+/.test(line)) {
+      const m = trimmed.match(/^(\d+\))\s+(.+)/);
+      html += `<div class="md-d2" style="padding-left:${38 + indent*4}px;"><span class="md-bullet" style="color:var(--primary);font-weight:700;">${m[1]}</span><span>${renderInline(m[2])}</span></div>`;
+      continue;
+    }
+
+    // 일반 텍스트
+    html += `<div class="md-plain">${renderInline(trimmed)}</div>`;
+  }
+  
+  return html;
+}
+
+function renderInline(text) {
   return text
-    // 【제목】 → 섹션 헤더
-    .replace(/【(.+?)】/g, '<div class="md-section-hd">$1</div>')
-    // ▸ → 소제목
-    .replace(/^▸\s*(.+)$/gm, '<div class="md-sub-hd">▸ $1</div>')
-    // 굵게 **text**
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    // D/I/S/C형 헤더
-    .replace(/^([DISC]형\s.+)$/gm, '<div class="md-type-hd">$1</div>')
-    // YES/NO/아이 분기
-    .replace(/^  · (YES|NO|아이)\s*→\s*(.+)$/gm, '<div class="md-branch"><span class="md-branch-key">$1</span><span>→ $2</span></div>')
-    // · 들여쓰기 항목
-    .replace(/^  · (.+)$/gm, '<div class="md-indent"><span class="md-dot">◦</span> $1</div>')
-    // - 하위 항목 (두 단계 이상 들여쓰기)
-    .replace(/^    - (.+)$/gm, '<div class="md-sub2"><span class="md-dot2">▪</span> $1</div>')
-    // - 일반 항목
-    .replace(/^- (.+)$/gm, '<div class="md-li"><span class="md-bullet">•</span> $1</div>')
-    // 빈 줄 → 간격
-    .replace(/^\s*$/gm, '<div class="md-gap"></div>');
+    .replace(/`(.+?)`/g, '<code style="background:var(--surface-2);padding:1px 5px;border-radius:4px;font-size:12px;">$1</code>');
 }
 
 let manualOpenIds = new Set();
@@ -3211,18 +3264,21 @@ function renderInventory(filter = '') {
     const pct = item.qty / item.min;
     let status, statusLabel;
     if (item.qty === 0) { status = 'stock-empty'; statusLabel = '재고 없음'; }
+    else if (pct < 0.5) { status = 'stock-danger'; statusLabel = '위험'; }
     else if (pct < 1) { status = 'stock-low'; statusLabel = '부족'; }
     else { status = 'stock-ok'; statusLabel = '정상'; }
     const updaterInfo = item.updatedBy
-      ? `<div style="font-size:11px;color:var(--text-muted);">${item.updatedBy} · ${item.updatedAt || ''}</div>` : '';
+      ? `<span style="font-size:11px;color:var(--text-muted);">${item.updatedBy}<br>${item.updatedAt}</span>`
+      : '<span style="font-size:11px;color:var(--border-strong);">-</span>';
     return `<tr>
-      <td><strong>${item.name}</strong>${updaterInfo}</td>
+      <td><strong>${item.name}</strong></td>
       <td style="color:var(--text-muted)">${item.cat}</td>
       <td>${item.qty}</td>
       <td style="color:var(--text-muted)">${item.min}</td>
       <td><span class="stock-status ${status}">${statusLabel}</span></td>
       <td><input type="number" class="qty-input" id="qty-${item.id}" value="${item.qty}" min="0"></td>
       <td><button class="btn btn-green btn-sm" onclick="updateInventory(${item.id})">저장</button></td>
+      <td>${updaterInfo}</td>
       <td class="admin-only" style="display:table-cell;"><button class="btn btn-danger btn-sm" onclick="deleteInventoryItem(${item.id})">삭제</button></td>
     </tr>`;
   }).join('');
@@ -3256,8 +3312,11 @@ function updateInventoryAlerts() {
   } else {
     el.innerHTML = low.map(i => {
       const isOut = i.qty === 0;
+      const isDanger = !isOut && i.qty < i.min * 0.5;
+      const cls = isOut ? 'stock-empty' : isDanger ? 'stock-danger' : 'stock-low';
+      const lbl = isOut ? '재고 없음' : isDanger ? '위험' : '부족';
       return `<div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border);">
-        <span class="stock-status ${isOut ? 'stock-empty' : 'stock-low'}">${isOut ? '재고 없음' : '부족'}</span>
+        <span class="stock-status ${cls}">${lbl}</span>
         <span style="font-size:14px; font-weight:600;">${i.name}</span>
         <span class="text-muted">현재 ${i.qty} / 기준 ${i.min}</span>
       </div>`;
@@ -3375,18 +3434,21 @@ function renderSkinInventory(filter = '') {
     const pct = item.qty / item.min;
     let status, statusLabel;
     if (item.qty === 0) { status = 'stock-empty'; statusLabel = '재고 없음'; }
+    else if (pct < 0.5) { status = 'stock-danger'; statusLabel = '위험'; }
     else if (pct < 1) { status = 'stock-low'; statusLabel = '부족'; }
     else { status = 'stock-ok'; statusLabel = '정상'; }
     const updaterInfo = item.updatedBy
-      ? `<div style="font-size:11px;color:var(--text-muted);">${item.updatedBy} · ${item.updatedAt}</div>` : '';
+      ? `<span style="font-size:11px;color:var(--text-muted);">${item.updatedBy}<br>${item.updatedAt}</span>`
+      : '<span style="font-size:11px;color:var(--border-strong);">-</span>';
     return `<tr>
-      <td><strong>${item.name}</strong>${updaterInfo}</td>
+      <td><strong>${item.name}</strong></td>
       <td style="color:var(--text-muted)">${item.cat}</td>
       <td>${item.qty}</td>
       <td style="color:var(--text-muted)">${item.min}</td>
       <td><span class="stock-status ${status}">${statusLabel}</span></td>
       <td><input type="number" class="qty-input" id="skin-qty-${item.id}" value="${item.qty}" min="0"></td>
       <td><button class="btn btn-green btn-sm" onclick="updateSkinInventory(${item.id})">저장</button></td>
+      <td>${updaterInfo}</td>
       ${isAdmin ? `<td><button class="btn btn-danger btn-sm" onclick="deleteSkinInventoryItem(${item.id})">삭제</button></td>` : '<td></td>'}
     </tr>`;
   }).join('');
@@ -3439,46 +3501,69 @@ async function loadQAItems() {
     const rows = await sb.select('qa_items', 'order=id.desc');
     STATE.qaItems = (rows || []).map(r => ({
       id: r.id, cat: r.cat, q: r.q, a: r.a,
+      access: r.access || 'admin',
       author: r.author || '', date: r.created_at ? new Date(r.created_at).toLocaleDateString('ko-KR') : ''
     }));
   } catch(e) { console.warn('loadQAItems 오류:', e); }
 }
 
-let qaCatFilter = 'all';
-function filterQA(cat, btn) {
-  qaCatFilter = cat;
-  document.querySelectorAll('#page-qa .tab-btn').forEach(b => b.classList.remove('active'));
+let qaCatFilterAdmin = 'all';
+let qaCatFilterStaff = 'all';
+
+function filterQAAdmin(cat, btn) {
+  qaCatFilterAdmin = cat;
+  document.querySelectorAll('#page-qa-admin .tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderQA();
+  renderQAAdmin();
+}
+function filterQAStaff(cat, btn) {
+  qaCatFilterStaff = cat;
+  document.querySelectorAll('#page-qa-staff .tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderQAStaff();
 }
 
-function renderQA() {
-  const list = document.getElementById('qa-list');
+function renderQAList(listId, items, showEdit) {
+  const list = document.getElementById(listId);
   if (!list) return;
-  const items = qaCatFilter === 'all' ? STATE.qaItems : STATE.qaItems.filter(i => i.cat === qaCatFilter);
-  const catColors = { 통증: 'cat-treatment', 피부: 'cat-admin', 다이어트: '#FEF9E7' };
   if (!items.length) {
     list.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted);">등록된 Q&A가 없습니다</div>';
     return;
   }
+  const catClass = { '통증': 'cat-treatment', '피부': 'cat-admin', '다이어트': 'cat-emergency' };
   list.innerHTML = items.map(item => `
     <div class="card" style="margin-bottom:12px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-        <span class="manual-category cat-${item.cat === '통증' ? 'treatment' : item.cat === '피부' ? 'admin' : 'emergency'}">${item.cat}</span>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <span class="manual-category ${catClass[item.cat] || 'cat-treatment'}">${item.cat}</span>
         <span style="font-size:11px;color:var(--text-muted);">${item.author} · ${item.date}</span>
-        <div style="margin-left:auto;display:flex;gap:6px;">
+        ${showEdit ? `<div style="margin-left:auto;display:flex;gap:6px;">
           <button class="btn btn-outline btn-sm" onclick="openQAEditModal(${item.id})">편집</button>
           <button class="btn btn-danger btn-sm" onclick="deleteQA(${item.id})">삭제</button>
-        </div>
+        </div>` : ''}
       </div>
-      <div style="font-size:14px;font-weight:700;color:var(--accent);margin-bottom:8px;">Q. ${item.q}</div>
-      <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;padding:10px;background:var(--surface-2);border-radius:8px;white-space:pre-line;">A. ${item.a}</div>
+      <div style="font-size:14px;font-weight:700;color:var(--accent);margin-bottom:8px;line-height:1.6;">Q. ${item.q}</div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.85;padding:12px;background:var(--surface-2);border-radius:8px;white-space:pre-line;">A. ${item.a}</div>
     </div>`).join('');
 }
 
-function openQAModal() {
+function renderQAAdmin() {
+  // 원장용: admin + staff 모두 표시
+  let items = STATE.qaItems;
+  if (qaCatFilterAdmin !== 'all') items = items.filter(i => i.cat === qaCatFilterAdmin);
+  renderQAList('qa-admin-list', items, true);
+}
+
+function renderQAStaff() {
+  // 직원용: access='staff'인 것만
+  let items = STATE.qaItems.filter(i => i.access === 'staff');
+  if (qaCatFilterStaff !== 'all') items = items.filter(i => i.cat === qaCatFilterStaff);
+  renderQAList('qa-staff-list', items, false);
+}
+
+function openQAModal(access) {
   document.getElementById('qa-modal-title').textContent = 'Q&A 등록';
   document.getElementById('qa-edit-id').value = '';
+  document.getElementById('qa-access').value = access || 'admin';
   document.getElementById('qa-q').value = '';
   document.getElementById('qa-a').value = '';
   openModal('qa');
@@ -3489,6 +3574,7 @@ function openQAEditModal(id) {
   if (!item) return;
   document.getElementById('qa-modal-title').textContent = 'Q&A 편집';
   document.getElementById('qa-edit-id').value = id;
+  document.getElementById('qa-access').value = item.access || 'admin';
   document.getElementById('qa-cat').value = item.cat;
   document.getElementById('qa-q').value = item.q;
   document.getElementById('qa-a').value = item.a;
@@ -3497,21 +3583,22 @@ function openQAEditModal(id) {
 
 async function saveQA() {
   const editId = document.getElementById('qa-edit-id').value;
+  const access = document.getElementById('qa-access').value || 'admin';
   const cat = document.getElementById('qa-cat').value;
   const q = document.getElementById('qa-q').value.trim();
   const a = document.getElementById('qa-a').value.trim();
   if (!q || !a) { alert('질문과 답변을 입력하세요'); return; }
   if (editId) {
-    await sb.update('qa_items', editId, { cat, q, a });
+    await sb.update('qa_items', editId, { cat, q, a, access });
     const item = STATE.qaItems.find(i => i.id == editId);
-    if (item) { item.cat = cat; item.q = q; item.a = a; }
+    if (item) { item.cat = cat; item.q = q; item.a = a; item.access = access; }
   } else {
-    const rows = await sb.insert('qa_items', { cat, q, a, author: STATE.user.name });
+    const rows = await sb.insert('qa_items', { cat, q, a, access, author: STATE.user.name });
     if (rows && rows[0]) {
-      STATE.qaItems.unshift({ id: rows[0].id, cat, q, a, author: STATE.user.name, date: new Date().toLocaleDateString('ko-KR') });
+      STATE.qaItems.unshift({ id: rows[0].id, cat, q, a, access, author: STATE.user.name, date: new Date().toLocaleDateString('ko-KR') });
     }
   }
-  renderQA();
+  renderQAAdmin(); renderQAStaff();
   closeModal('qa');
   showToast(editId ? '수정되었습니다' : '등록되었습니다');
 }
@@ -3520,7 +3607,7 @@ async function deleteQA(id) {
   if (!confirm('이 Q&A를 삭제할까요?')) return;
   await sb.remove('qa_items', id);
   STATE.qaItems = STATE.qaItems.filter(i => i.id !== id);
-  renderQA();
+  renderQAAdmin(); renderQAStaff();
   showToast('삭제되었습니다');
 }
 
