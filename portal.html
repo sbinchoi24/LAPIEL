@@ -6,24 +6,25 @@
 <title>경희 라피엘 한의원 포털</title>
 <style>
   :root {
-    --primary: #2D6A4F;
-    --primary-light: #52B788;
-    --primary-pale: #D8F3DC;
-    --accent: #1B4332;
+    /* 로고 컬러 기반 — 딥 버건디 + 아이보리 */
+    --primary: #8B1E3F;        /* 버건디 메인 */
+    --primary-light: #B85470;  /* 버건디 라이트 */
+    --primary-pale: #F5E8ED;   /* 버건디 페일 */
+    --accent: #4A1020;         /* 딥 버건디 (사이드바, 헤더) */
     --danger: #C0392B;
     --danger-pale: #FDEDEC;
-    --warning: #D4A017;
-    --warning-pale: #FEF9E7;
-    --surface-0: #F5F5F0;
+    --warning: #C07D2A;
+    --warning-pale: #FEF3E2;
+    --surface-0: #F7F4F1;      /* 아이보리 배경 */
     --surface-1: #FFFFFF;
-    --surface-2: #F0F4F1;
-    --text-primary: #1A1A1A;
-    --text-secondary: #4A4A4A;
-    --text-muted: #888;
-    --border: #E0E0DA;
-    --border-strong: #C0C0BA;
+    --surface-2: #F2ECE9;      /* 아이보리 서피스 */
+    --text-primary: #2C1A1A;   /* 로고 텍스트 색 */
+    --text-secondary: #4A3030;
+    --text-muted: #9A8080;
+    --border: #E5D8D0;
+    --border-strong: #C8B4AA;
     --radius: 8px;
-    --shadow: 0 1px 4px rgba(0,0,0,0.08);
+    --shadow: 0 1px 4px rgba(74,16,32,0.08);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -159,41 +160,44 @@
   /* ── LOGIN ── */
   #login-screen {
     position: fixed; inset: 0;
-    background: var(--accent);
+    background: linear-gradient(145deg, #4A1020 0%, #6B1A30 50%, #4A1020 100%);
     display: flex; align-items: center; justify-content: center;
     z-index: 999;
   }
   .login-card {
-    background: var(--surface-1);
-    border-radius: 14px;
-    padding: 40px 36px;
-    width: 340px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    background: #FDFAF7;
+    border-radius: 16px;
+    padding: 44px 40px;
+    width: 360px;
+    box-shadow: 0 16px 48px rgba(74,16,32,0.4);
+    border: 1px solid rgba(139,30,63,0.1);
   }
   .login-card h1 {
     font-size: 20px; font-weight: 800;
     color: var(--accent); margin-bottom: 4px;
+    letter-spacing: -0.5px;
   }
   .login-card p { color: var(--text-muted); font-size: 13px; margin-bottom: 28px; }
   .form-group { margin-bottom: 14px; }
   .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
   .form-group input {
     width: 100%; padding: 10px 12px;
-    border: 1px solid var(--border-strong);
+    border: 1.5px solid var(--border-strong);
     border-radius: var(--radius);
     font-size: 14px; color: var(--text-primary);
     outline: none; transition: border-color 0.15s;
     background: var(--surface-0);
   }
-  .form-group input:focus { border-color: var(--primary-light); }
+  .form-group input:focus { border-color: var(--primary); }
   .btn-primary {
-    width: 100%; padding: 11px;
+    width: 100%; padding: 12px;
     background: var(--primary);
     color: #fff; border: none;
     border-radius: var(--radius);
     font-size: 14px; font-weight: 700;
     cursor: pointer; transition: background 0.15s;
     margin-top: 8px;
+    letter-spacing: 0.3px;
   }
   .btn-primary:hover { background: var(--accent); }
   .login-hint { font-size: 11px; color: var(--text-muted); margin-top: 14px; text-align: center; }
@@ -230,7 +234,7 @@
     padding: 5px 14px; border-radius: 20px;
   }
   .role-chip-admin { background: var(--primary-pale); color: var(--primary); }
-  .role-chip-staff { background: #EEF2FF; color: #3730A3; }
+  .role-chip-staff { background: #F5E8ED; color: #8B1E3F; }
 
   .btn-back {
     display: block; width: 100%; margin-top: 10px;
@@ -316,7 +320,7 @@
   }
   .badge-urgent { background: var(--danger-pale); color: var(--danger); }
   .badge-normal { background: var(--primary-pale); color: var(--primary); }
-  .badge-info { background: #EEF2FF; color: #3730A3; }
+  .badge-info { background: #EDF2F7; color: #4A6080; }
   .notice-content .notice-title { font-size: 14px; font-weight: 600; }
   .notice-content .notice-date { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
@@ -402,7 +406,7 @@
     border-radius: 20px;
     margin-bottom: 8px;
   }
-  .cat-treatment { background: #EEF2FF; color: #3730A3; }
+  .cat-treatment { background: #F5E8ED; color: #8B1E3F; }
   .cat-admin { background: var(--primary-pale); color: var(--primary); }
   .cat-emergency { background: var(--danger-pale); color: var(--danger); }
 
@@ -415,7 +419,7 @@
     cursor: pointer;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
-  .manual-item:hover { border-color: var(--primary-light); box-shadow: 0 2px 8px rgba(45,106,79,0.1); }
+  .manual-item:hover { border-color: var(--primary-light); box-shadow: 0 2px 8px rgba(139,30,63,0.1); }
   .manual-item-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
   .manual-item-preview { font-size: 13px; color: var(--text-muted); }
   .manual-content {
@@ -473,7 +477,7 @@
   .day-num { font-size: 13px; font-weight: 600; color: var(--text-primary); }
   .cal-day.today .day-num { color: var(--primary); }
   .cal-day .day-num.sunday { color: #E74C3C; }
-  .cal-day .day-num.saturday { color: #2980B9; }
+  .cal-day .day-num.saturday { color: #4A72A0; }
   .cal-event {
     margin-top: 4px;
     font-size: 10px;
@@ -484,8 +488,8 @@
     text-overflow: ellipsis;
   }
   .event-vacation { background: #FEF9E7; color: #8B6914; }
-  .event-duty { background: #EBF5FB; color: #154360; }
-  .event-seminar { background: #F4ECF7; color: #6C3483; }
+  .event-duty { background: #EDF2F7; color: #2C4A6A; }
+  .event-seminar { background: #F5E8ED; color: #8B1E3F; }
 
   .schedule-legend {
     display: flex; gap: 16px; margin-bottom: 16px;
@@ -900,12 +904,12 @@
   .p-inline-input:focus { border-color: var(--primary-light); }
   .btn-preset {
     padding: 5px 14px; border-radius: 7px;
-    border: 1.5px solid var(--primary);
-    background: var(--primary); color: #fff;
+    border: 1.5px solid #2D6A4F;
+    background: #2D6A4F; color: #fff;
     font-family: inherit; font-size: 12.5px; font-weight: 700;
     cursor: pointer; transition: all 0.15s;
   }
-  .btn-preset:hover { background: var(--accent); border-color: var(--accent); }
+  .btn-preset:hover { background: #1B4332; border-color: #1B4332; }
   .p-section-divider { height: 1px; background: var(--border); margin: 8px 0 10px; }
   .ch-pe-part { margin-bottom: 16px; }
   .ch-pe-part-title {
@@ -984,6 +988,23 @@
     color: #fff;
     font-weight: 700;
   }
+  /* 체크리스트 날짜 선택 */
+  .cl-date-dot {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .cl-date-circle {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    border: 2px solid var(--border-strong);
+    background: var(--surface-1); color: var(--text-secondary);
+    transition: all 0.15s;
+  }
+  .cl-date-dot:hover .cl-date-circle { border-color: var(--primary); color: var(--primary); background: var(--primary-pale); }
+  .cl-date-circle.today { border-color: var(--primary); background: var(--primary); color: #fff; }
+  .cl-date-circle.selected { border-color: var(--accent); background: var(--accent); color: #fff; }
+  .cl-date-label { font-size: 10px; color: var(--text-muted); text-align:center; }
 </style>
 </head>
 <body>
@@ -992,6 +1013,7 @@
 <div id="login-screen">
   <div class="login-card">
     <h1>경희 라피엘 한의원</h1>
+    <div style="width:32px;height:3px;background:var(--primary);border-radius:2px;margin:8px 0 16px;"></div>
     <p>로그인 유형을 선택하세요</p>
 
     <!-- STEP 1: 역할 선택 -->
@@ -1088,7 +1110,7 @@
     </div>
     <div class="nav-item" onclick="showPage('qa-staff')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/></svg>
-      <span>Q&A [직원용]</span>
+      <span id="qa-staff-nav-label">Q&A</span>
     </div>
     <div class="nav-section-label">업무</div>
     <div class="nav-item" onclick="showPage('notice')">
@@ -1177,7 +1199,7 @@
   </div>
 
   <!-- ▸ CHARTING -->
-  <div id="page-charting" class="page" style="padding:0; max-width:100%;">
+  <div id="page-charting" class="page" style="padding:0; max-width:1400px;">
     <div id="charting-root" style="font-size:13px; color:#1A1A1A;">
 
       <!-- 차팅 탭바 -->
@@ -1500,6 +1522,9 @@
 
   <!-- ▸ CHECKLIST -->
   <div id="page-checklist" class="page">
+    <!-- 2주 날짜 선택 -->
+    <div id="checklist-date-strip" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:12px;margin-bottom:16px;"></div>
+
     <div class="flex items-center justify-between" style="margin-bottom:20px;">
       <div>
         <div class="progress-label">
@@ -1545,8 +1570,8 @@
     <div class="flex items-center justify-between" style="margin-bottom:16px;">
       <div class="schedule-legend">
         <div class="legend-item"><div class="legend-dot" style="background:#FEF9E7; border:1px solid #D4A017;"></div> 연차</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#EBF5FB; border:1px solid #2980B9;"></div> 반차</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#F4ECF7; border:1px solid #8E44AD;"></div> OFF</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#EDF2F7; border:1px solid #4A72A0;"></div> 반차</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#F5E8ED; border:1px solid #8B1E3F;"></div> OFF</div>
       </div>
       <button class="btn btn-green btn-sm admin-only" onclick="openScheduleModal()">일정 추가 (원장)</button>
     </div>
@@ -1577,8 +1602,8 @@
             <th>상태</th>
             <th>수량 입력</th>
             <th>저장</th>
+            <th class="admin-only" style="display:table-cell;">관리</th>
             <th>최근 수정</th>
-            <th class="admin-only" style="display:table-cell;">삭제</th>
           </tr>
         </thead>
         <tbody id="inventory-tbody"></tbody>
@@ -1606,8 +1631,8 @@
             <th>상태</th>
             <th>수량 입력</th>
             <th>저장</th>
+            <th class="admin-only" style="display:table-cell;">관리</th>
             <th>최근 수정</th>
-            <th class="admin-only" style="display:table-cell;">삭제</th>
           </tr>
         </thead>
         <tbody id="skin-inventory-tbody"></tbody>
@@ -1632,12 +1657,7 @@
   <!-- ▸ Q&A 직원용 -->
   <div id="page-qa-staff" class="page">
     <div class="flex items-center justify-between" style="margin-bottom:16px;">
-      <div class="tab-bar" style="margin-bottom:0;border:none;gap:8px;">
-        <button class="tab-btn active" id="qa-staff-cat-all" onclick="filterQAStaff('all',this)">전체</button>
-        <button class="tab-btn" id="qa-staff-cat-통증" onclick="filterQAStaff('통증',this)">통증</button>
-        <button class="tab-btn" id="qa-staff-cat-피부" onclick="filterQAStaff('피부',this)">피부</button>
-        <button class="tab-btn" id="qa-staff-cat-다이어트" onclick="filterQAStaff('다이어트',this)">다이어트</button>
-      </div>
+      <div style="font-size:13px;color:var(--text-muted);">직원용 Q&A</div>
       <button class="btn btn-green btn-sm admin-only" onclick="openQAModal('staff')">+ Q&A 등록</button>
     </div>
     <div id="qa-staff-list"></div>
@@ -2082,7 +2102,7 @@ var ANF_MOTOR_ITEMS=['안정시 비대칭','이마 주름','가벼운 눈감기'
 var ANF_AUTO_ITEMS=['눈이나 코가 건조하다','소리가 크게 들린다','맛이 느껴지지 않는다'];
 var ANF_SENSORY_ITEMS=['이마 부위','광대 부위','턱 부위'];
 var ANF_GRADES=[{key:'normal',label:'정상'},{key:'mild',label:'경증'},{key:'moderate',label:'중등도'},{key:'severe',label:'중증'}];
-var ANF_GRADE_COLORS={normal:{active:'#2E7D32',text:'#2E7D32'},mild:{active:'#F57F17',text:'#F57F17'},moderate:{active:'#E65100',text:'#E65100'},severe:{active:'#B71C1C',text:'#B71C1C'}};
+var ANF_GRADE_COLORS={normal:{active:'#5A8A5A',text:'#5A8A5A'},mild:{active:'#F57F17',text:'#F57F17'},moderate:{active:'#E65100',text:'#E65100'},severe:{active:'#B71C1C',text:'#B71C1C'}};
 var ANF_GRADE_KO={normal:'정상(normal)',mild:'경증(mild)',moderate:'중등도(moderate)',severe:'중증(severe)'};
 function anfRenderTable(containerId,items,stateObj){var el=document.getElementById(containerId);if(!el)return;var html='<table style="width:100%;border-collapse:collapse;font-size:12px"><colgroup><col style="width:auto"><col style="width:38px"><col style="width:38px"><col style="width:46px"><col style="width:38px"></colgroup><tr><th style="text-align:left;padding:3px 5px;font-weight:500;color:var(--text-muted);border-bottom:1.5px solid var(--border);font-size:11px"></th>';ANF_GRADES.forEach(function(g){var c=ANF_GRADE_COLORS[g.key];html+='<th style="text-align:center;padding:3px 2px;font-size:11px;font-weight:700;color:'+c.text+';border-bottom:1.5px solid var(--border)">'+g.label+'</th>';});html+='</tr>';items.forEach(function(item,ri){html+='<tr style="background:'+(ri%2===0?'transparent':'rgba(45,106,79,0.04)')+'">';html+='<td style="padding:5px 6px;color:var(--text-primary);font-size:12px;white-space:nowrap">'+item+'</td>';ANF_GRADES.forEach(function(g){var isActive=stateObj[item]===g.key;var c=ANF_GRADE_COLORS[g.key];html+='<td style="text-align:center;padding:3px"><button data-container="'+containerId+'" data-item="'+ri+'" data-grade="'+g.key+'" onclick="anfSetGradeByIndex(this)" style="width:28px;height:28px;border-radius:50%;border:2px solid '+(isActive?c.active:'#ddd')+';background:'+(isActive?c.active:'var(--surface-1)')+';color:'+(isActive?'#fff':c.text)+';cursor:pointer;font-size:9px;font-weight:700;transition:all 0.12s;display:block;margin:0 auto">●</button></td>';});html+='</tr>';});html+='</table>';el.innerHTML=html;}
 function anfSetGradeByIndex(btn){var containerId=btn.getAttribute('data-container');var idx=parseInt(btn.getAttribute('data-item'));var grade=btn.getAttribute('data-grade');var items=containerId==='anf-motor-table'?ANF_MOTOR_ITEMS:(containerId==='anf-sensory-table'?ANF_SENSORY_ITEMS:ANF_AUTO_ITEMS);var stateObj=containerId==='anf-motor-table'?anfMotor:(containerId==='anf-sensory-table'?anfSensory:anfAuto);var item=items[idx];if(stateObj[item]===grade)delete stateObj[item];else stateObj[item]=grade;anfRenderTable(containerId,items,stateObj);}
@@ -2232,6 +2252,48 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeNoticeWriteModal()">취소</button>
       <button class="btn btn-green" id="notice-submit-btn" onclick="submitNotice()">공지 등록</button>
+    </div>
+  </div>
+</div>
+
+<!-- 일반 소모품 편집 모달 -->
+<div class="modal-overlay" id="modal-inventory-edit">
+  <div class="modal">
+    <div class="modal-title">품목 편집</div>
+    <input type="hidden" id="inv-edit-id">
+    <div class="form-section"><label>품목명</label><input type="text" id="inv-edit-name" placeholder="품목명"></div>
+    <div class="form-section">
+      <label>분류</label>
+      <select id="inv-edit-cat">
+        <option>침구류</option><option>한약재</option><option>사무용품</option><option>의료소모품</option><option>기타</option>
+      </select>
+    </div>
+    <div class="form-section"><label>현재 수량</label><input type="number" id="inv-edit-qty" min="0"></div>
+    <div class="form-section"><label>기준(최소) 수량</label><input type="number" id="inv-edit-min" min="0"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('inventory-edit')">취소</button>
+      <button class="btn btn-green" onclick="saveInventoryEdit()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 피부 소모품 편집 모달 -->
+<div class="modal-overlay" id="modal-skin-inventory-edit">
+  <div class="modal">
+    <div class="modal-title">피부 소모품 편집</div>
+    <input type="hidden" id="skin-inv-edit-id">
+    <div class="form-section"><label>품목명</label><input type="text" id="skin-inv-edit-name" placeholder="품목명"></div>
+    <div class="form-section">
+      <label>분류</label>
+      <select id="skin-inv-edit-cat">
+        <option>앰플/세럼</option><option>마스크</option><option>크림/로션</option><option>필링</option><option>기기소모품</option><option>기타</option>
+      </select>
+    </div>
+    <div class="form-section"><label>현재 수량</label><input type="number" id="skin-inv-edit-qty" min="0"></div>
+    <div class="form-section"><label>기준(최소) 수량</label><input type="number" id="skin-inv-edit-min" min="0"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('skin-inventory-edit')">취소</button>
+      <button class="btn btn-green" onclick="saveSkinInventoryEdit()">저장</button>
     </div>
   </div>
 </div>
@@ -2665,6 +2727,9 @@ async function initApp() {
     console.warn('Supabase 로드 오류 (로컬 데이터로 진행):', e);
   }
   showLoadingOverlay(false);
+  // 직원 입장 시 Q&A 탭 이름 단순화
+  const qaLabel = document.getElementById('qa-staff-nav-label');
+  if (qaLabel) qaLabel.textContent = STATE.user.isAdmin ? 'Q&A [직원용]' : 'Q&A';
   renderChecklist();
   renderNotices();
   renderManual();
@@ -2762,11 +2827,12 @@ async function seedChecklistItems() {
 
 async function loadChecklistLogs() {
   try {
-    const today = new Date().toDateString();
-    const rows = await sb.select('checklist_logs', `date=eq.${encodeURIComponent(today)}`);
+    // 2주치 로그 모두 불러오기
+    const rows = await sb.select('checklist_logs', 'order=id.desc');
     STATE.checklist.checked = {};
     (rows || []).forEach(r => {
-      STATE.checklist.checked[`${today}-${r.item_id}`] = {
+      const key = `${r.date}-${r.item_id}`;
+      STATE.checklist.checked[key] = {
         done: true, time: r.checked_at, role: r.role
       };
     });
@@ -2934,34 +3000,93 @@ async function deleteNotice(idx) {
    CHECKLIST
 ════════════════════════════════════ */
 const SECTION_LABELS = { morning: '오전 준비', during: '진료 중', evening: '마감' };
+let selectedCheckDate = new Date().toDateString(); // 현재 선택된 날짜
+
+/* 2주 날짜 동그라미 렌더 */
+function renderDateStrip() {
+  const strip = document.getElementById('checklist-date-strip');
+  if (!strip) return;
+  const days = ['일','월','화','수','목','금','토'];
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  let html = '';
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const ds = d.toDateString();
+    const isToday = i === 0;
+    const isSelected = ds === selectedCheckDate;
+    // 해당 날 체크된 항목 있는지 확인
+    const hasCheck = Object.keys(STATE.checklist.checked).some(k => k.startsWith(ds + '-'));
+    const dateNum = d.getDate();
+    const dayStr = days[d.getDay()];
+    let cls = '';
+    if (isSelected) cls = 'selected';
+    else if (isToday) cls = 'today';
+    else if (hasCheck) cls = 'has-check';
+    html += `<div class="cl-date-dot" onclick="selectCheckDate('${ds}')">
+      <div class="cl-date-circle ${cls}">${dateNum}</div>
+      <div class="cl-date-label">${dayStr}</div>
+    </div>`;
+  }
+  strip.innerHTML = html;
+}
+
+function selectCheckDate(ds) {
+  selectedCheckDate = ds;
+  renderDateStrip();
+  renderChecklist();
+}
 
 function renderChecklist() {
   const container = document.getElementById('checklist-container');
-  const today = new Date().toDateString();
+  const viewDate = selectedCheckDate;
+  const isToday = viewDate === new Date().toDateString();
   let totalItems = 0, checkedCount = 0;
   let html = '';
+
+  // 과거 날짜 보기일 때 안내
+  if (!isToday) {
+    const d = new Date(viewDate);
+    html += `<div style="padding:8px 12px;background:var(--surface-2);border-radius:8px;font-size:13px;color:var(--text-muted);margin-bottom:16px;">
+      📅 ${d.getMonth()+1}월 ${d.getDate()}일 체크리스트 (읽기 전용)
+    </div>`;
+  }
+
   for (const [sec, items] of Object.entries(STATE.checklist.items)) {
     html += `<div class="checklist-section"><div class="checklist-section-title">${SECTION_LABELS[sec]}</div>`;
     items.forEach((item) => {
       const itemId = item.id || item;
       const label = item.label || item;
-      const key = `${today}-${itemId}`;
+      const key = `${viewDate}-${itemId}`;
       const record = STATE.checklist.checked[key];
       const isChecked = !!record;
       if (isChecked) checkedCount++;
       totalItems++;
-      html += `<div class="checklist-item" onclick="toggleCheck('${key}',${itemId},this)">
-        <input type="checkbox" id="chk-${key}" ${isChecked ? 'checked' : ''} onchange="toggleCheck('${key}',${itemId},this.parentElement)">
-        <div style="flex:1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <label for="chk-${key}" class="${isChecked ? 'checked' : ''}" style="margin:0;">${label}</label>
-          ${isChecked ? `<span style="font-size:11px;color:var(--primary);font-weight:600;background:var(--primary-pale);padding:1px 8px;border-radius:10px;white-space:nowrap;">${record.role} · ${record.time}</span>` : ''}
-        </div>
-      </div>`;
+      if (isToday) {
+        html += `<div class="checklist-item" onclick="toggleCheck('${key}',${itemId},this)">
+          <input type="checkbox" id="chk-${key}" ${isChecked ? 'checked' : ''} onchange="toggleCheck('${key}',${itemId},this.parentElement)">
+          <div style="flex:1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <label for="chk-${key}" class="${isChecked ? 'checked' : ''}" style="margin:0;">${label}</label>
+            ${isChecked ? `<span style="font-size:11px;color:var(--primary);font-weight:600;background:var(--primary-pale);padding:1px 8px;border-radius:10px;white-space:nowrap;">${record.role} · ${record.time}</span>` : ''}
+          </div>
+        </div>`;
+      } else {
+        // 과거 날짜: 읽기 전용
+        html += `<div class="checklist-item" style="cursor:default;opacity:${isChecked?1:0.5};">
+          <input type="checkbox" ${isChecked ? 'checked' : ''} disabled style="width:18px;height:18px;flex-shrink:0;">
+          <div style="flex:1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <label class="${isChecked ? 'checked' : ''}" style="margin:0;">${label}</label>
+            ${isChecked ? `<span style="font-size:11px;color:var(--primary);font-weight:600;background:var(--primary-pale);padding:1px 8px;border-radius:10px;white-space:nowrap;">${record.role} · ${record.time}</span>` : ''}
+          </div>
+        </div>`;
+      }
     });
     html += '</div>';
   }
   container.innerHTML = html;
   updateChecklistProgress(checkedCount, totalItems);
+  renderDateStrip();
 }
 
 async function toggleCheck(key, itemId, row) {
@@ -3278,8 +3403,13 @@ function renderInventory(filter = '') {
       <td><span class="stock-status ${status}">${statusLabel}</span></td>
       <td><input type="number" class="qty-input" id="qty-${item.id}" value="${item.qty}" min="0"></td>
       <td><button class="btn btn-green btn-sm" onclick="updateInventory(${item.id})">저장</button></td>
+      <td class="admin-only" style="display:table-cell;">
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-outline btn-sm" onclick="openInventoryEditModal(${item.id})">품목 편집</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteInventoryItem(${item.id})">품목 삭제</button>
+        </div>
+      </td>
       <td>${updaterInfo}</td>
-      <td class="admin-only" style="display:table-cell;"><button class="btn btn-danger btn-sm" onclick="deleteInventoryItem(${item.id})">삭제</button></td>
     </tr>`;
   }).join('');
   updateInventoryAlerts();
@@ -3322,6 +3452,60 @@ function updateInventoryAlerts() {
       </div>`;
     }).join('');
   }
+}
+
+function openInventoryModal() { openModal('inventory'); }
+
+function openInventoryEditModal(id) {
+  const item = STATE.inventory.find(i => i.id === id);
+  if (!item) return;
+  document.getElementById('inv-edit-id').value = id;
+  document.getElementById('inv-edit-name').value = item.name;
+  document.getElementById('inv-edit-cat').value = item.cat;
+  document.getElementById('inv-edit-qty').value = item.qty;
+  document.getElementById('inv-edit-min').value = item.min;
+  openModal('inventory-edit');
+}
+
+async function saveInventoryEdit() {
+  const id = parseInt(document.getElementById('inv-edit-id').value);
+  const name = document.getElementById('inv-edit-name').value.trim();
+  const cat = document.getElementById('inv-edit-cat').value;
+  const qty = parseInt(document.getElementById('inv-edit-qty').value) || 0;
+  const min = parseInt(document.getElementById('inv-edit-min').value) || 0;
+  if (!name) { alert('품목명을 입력하세요'); return; }
+  await sb.update('inventory', id, { name, cat, qty, min_qty: min });
+  const item = STATE.inventory.find(i => i.id === id);
+  if (item) { item.name = name; item.cat = cat; item.qty = qty; item.min = min; }
+  renderInventory();
+  closeModal('inventory-edit');
+  showToast('수정되었습니다');
+}
+
+function openSkinInventoryEditModal(id) {
+  const item = STATE.skinInventory.find(i => i.id === id);
+  if (!item) return;
+  document.getElementById('skin-inv-edit-id').value = id;
+  document.getElementById('skin-inv-edit-name').value = item.name;
+  document.getElementById('skin-inv-edit-cat').value = item.cat;
+  document.getElementById('skin-inv-edit-qty').value = item.qty;
+  document.getElementById('skin-inv-edit-min').value = item.min;
+  openModal('skin-inventory-edit');
+}
+
+async function saveSkinInventoryEdit() {
+  const id = parseInt(document.getElementById('skin-inv-edit-id').value);
+  const name = document.getElementById('skin-inv-edit-name').value.trim();
+  const cat = document.getElementById('skin-inv-edit-cat').value;
+  const qty = parseInt(document.getElementById('skin-inv-edit-qty').value) || 0;
+  const min = parseInt(document.getElementById('skin-inv-edit-min').value) || 0;
+  if (!name) { alert('품목명을 입력하세요'); return; }
+  await sb.update('skin_inventory', id, { name, cat, qty, min_qty: min });
+  const item = STATE.skinInventory.find(i => i.id === id);
+  if (item) { item.name = name; item.cat = cat; item.qty = qty; item.min = min; }
+  renderSkinInventory();
+  closeModal('skin-inventory-edit');
+  showToast('수정되었습니다');
 }
 
 async function deleteInventoryItem(id) {
@@ -3448,8 +3632,13 @@ function renderSkinInventory(filter = '') {
       <td><span class="stock-status ${status}">${statusLabel}</span></td>
       <td><input type="number" class="qty-input" id="skin-qty-${item.id}" value="${item.qty}" min="0"></td>
       <td><button class="btn btn-green btn-sm" onclick="updateSkinInventory(${item.id})">저장</button></td>
+      ${isAdmin ? `<td>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-outline btn-sm" onclick="openSkinInventoryEditModal(${item.id})">품목 편집</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteSkinInventoryItem(${item.id})">품목 삭제</button>
+        </div>
+      </td>` : '<td></td>'}
       <td>${updaterInfo}</td>
-      ${isAdmin ? `<td><button class="btn btn-danger btn-sm" onclick="deleteSkinInventoryItem(${item.id})">삭제</button></td>` : '<td></td>'}
     </tr>`;
   }).join('');
 }
@@ -3554,9 +3743,7 @@ function renderQAAdmin() {
 }
 
 function renderQAStaff() {
-  // 직원용: access='staff'인 것만
   let items = STATE.qaItems.filter(i => i.access === 'staff');
-  if (qaCatFilterStaff !== 'all') items = items.filter(i => i.cat === qaCatFilterStaff);
   renderQAList('qa-staff-list', items, false);
 }
 
