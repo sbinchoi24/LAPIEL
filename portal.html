@@ -1025,6 +1025,20 @@
       <button class="btn-back" onclick="backToStep1()">← 다시 선택</button>
     </div>
 
+    <!-- STEP 1.5: 직원 이름 선택 -->
+    <div id="login-step-name-staff" style="display:none;">
+      <div class="login-role-selected"><span class="role-chip role-chip-staff">직원 선택</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin:14px 0;">
+        <button class="login-name-btn" onclick="selectStaffName('김다은')">김다은</button>
+        <button class="login-name-btn" onclick="selectStaffName('김유빈')">김유빈</button>
+        <button class="login-name-btn" onclick="selectStaffName('남서연')">남서연</button>
+        <button class="login-name-btn" onclick="selectStaffName('박채린')">박채린</button>
+        <button class="login-name-btn" onclick="selectStaffName('이지예')">이지예</button>
+        <button class="login-name-btn" onclick="selectStaffName('장아름')">장아름</button>
+      </div>
+      <button class="btn-back" onclick="backToStep1()">← 다시 선택</button>
+    </div>
+
     <!-- STEP 2: 비밀번호 입력 -->
     <div id="login-step2" style="display:none;">
       <div class="login-role-selected" id="login-role-indicator"></div>
@@ -1242,8 +1256,8 @@
                       <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
                         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                           <button class="chbtn-gold chbtn-sm" id="none-allergy" onclick="setAllergyNone()">없음</button>
-                          <button class="toggle-btn" id="allergy-pas" onclick="toggleAllergy('파스','allergy-pas',this)">파스</button>
-                          <button class="toggle-btn" id="allergy-tape" onclick="toggleAllergy('테이프','allergy-tape',this)">테이프</button>
+                          <button class="chbtn-gold chbtn-sm" id="allergy-pas" onclick="toggleAllergy('파스','allergy-pas',this)">파스</button>
+                          <button class="chbtn-gold chbtn-sm" id="allergy-tape" onclick="toggleAllergy('테이프','allergy-tape',this)">테이프</button>
                         </div>
                         <input type="text" class="ch-input" id="ph-allergy-extra" placeholder="기타 알러지 입력">
                       </div>
@@ -1587,6 +1601,7 @@
             <th>상태</th>
             <th>수량 입력</th>
             <th>저장</th>
+            <th class="admin-only" style="display:table-cell;">삭제</th>
           </tr>
         </thead>
         <tbody id="inventory-tbody"></tbody>
@@ -1783,7 +1798,7 @@ function toggleNone(fieldId,btnId){
   else{noneState[fieldId]=true;field.value='(-)';field.classList.add('ch-input-gold');btn.classList.add('active');}
 }
 function togglePH(key,btn){phState[key]=!phState[key];btn.classList.toggle('on',phState[key]);btn.textContent=phState[key]?'+':'-';}
-function toggleAllergy(key,btnId,btn){allergyState[key]=!allergyState[key];btn.classList.toggle('on',allergyState[key]);}
+function toggleAllergy(key,btnId,btn){allergyState[key]=!allergyState[key];btn.classList.toggle('active',allergyState[key]);}
 function setAllergyNone(){
   allergyState['파스']=false;allergyState['테이프']=false;
   var pb=document.getElementById('allergy-pas');var tb=document.getElementById('allergy-tape');
@@ -1903,35 +1918,40 @@ function renderP(){
   body.appendChild(row4);
 
   if(pActive['보험약']){
-    var bRow=document.createElement('div');bRow.className='p-row';bRow.style.paddingLeft='8px';
+    var bBox=document.createElement('div');bBox.style.cssText='background:#FEF9E7;border:1.5px solid #D4B080;border-radius:9px;padding:10px 12px;margin-bottom:8px;';
+    var bRow=document.createElement('div');bRow.style.cssText='display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
+    var bLbl=document.createElement('span');bLbl.textContent='보험약';bLbl.style.cssText='font-size:12px;font-weight:700;color:#8B6914;min-width:40px;';
+    bRow.appendChild(bLbl);
     bRow.appendChild(makeInput('bh-company','회사',80,pBohumyak,'company'));
     bRow.appendChild(makeInput('bh-name','약 이름',120,pBohumyak,'name'));
     bRow.appendChild(makeNumInput('bh-days','일분',pBohumyak,'days'));
-    var dayLbl=document.createElement('span');dayLbl.textContent='일분';dayLbl.style.cssText='font-size:12px;color:var(--text-muted);';
+    var dayLbl=document.createElement('span');dayLbl.textContent='일분';dayLbl.style.cssText='font-size:12px;color:#8B6914;';
     bRow.appendChild(dayLbl);
-    body.appendChild(bRow);
+    bBox.appendChild(bRow);body.appendChild(bBox);
   }
   if(pActive['치료한약']){
-    var chRow=document.createElement('div');chRow.className='p-row';chRow.style.paddingLeft='8px';
+    var chBox=document.createElement('div');chBox.style.cssText='background:#FEF9E7;border:1.5px solid #D4B080;border-radius:9px;padding:10px 12px;margin-bottom:8px;';
+    var chRow=document.createElement('div');chRow.style.cssText='display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
+    var chLblH=document.createElement('span');chLblH.textContent='치료한약';chLblH.style.cssText='font-size:12px;font-weight:700;color:#8B6914;min-width:40px;';
+    chRow.appendChild(chLblH);
     chRow.appendChild(makeInput('ch-name','약 이름',120,pChiyohanyak,'name'));
     chRow.appendChild(makeNumInput('ch-cheop','첩수',pChiyohanyak,'cheop'));
-    var chLbl=document.createElement('span');chLbl.textContent='첩';chLbl.style.cssText='font-size:12px;color:var(--text-muted);';
-    chRow.appendChild(chLbl);
+    var chLbl=document.createElement('span');chLbl.textContent='첩';chLbl.style.cssText='font-size:12px;color:#8B6914;';chRow.appendChild(chLbl);
     chRow.appendChild(makeNumInput('ch-days','일수',pChiyohanyak,'days'));
-    var chLbl2=document.createElement('span');chLbl2.textContent='일';chLbl2.style.cssText='font-size:12px;color:var(--text-muted);';
-    chRow.appendChild(chLbl2);
-    body.appendChild(chRow);
+    var chLbl2=document.createElement('span');chLbl2.textContent='일';chLbl2.style.cssText='font-size:12px;color:#8B6914;';chRow.appendChild(chLbl2);
+    chBox.appendChild(chRow);body.appendChild(chBox);
   }
   if(pActive['TA탕약']){
-    var taRow=document.createElement('div');taRow.className='p-row';taRow.style.paddingLeft='8px';
+    var taBox=document.createElement('div');taBox.style.cssText='background:#FEF9E7;border:1.5px solid #D4B080;border-radius:9px;padding:10px 12px;margin-bottom:8px;';
+    var taRow=document.createElement('div');taRow.style.cssText='display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
+    var taLblH=document.createElement('span');taLblH.textContent='TA 탕약';taLblH.style.cssText='font-size:12px;font-weight:700;color:#8B6914;min-width:40px;';
+    taRow.appendChild(taLblH);
     taRow.appendChild(makeInput('ta-name','약 이름',120,pTAtanyak,'name'));
     taRow.appendChild(makeNumInput('ta-cheop','첩수',pTAtanyak,'cheop'));
-    var taLbl=document.createElement('span');taLbl.textContent='첩';taLbl.style.cssText='font-size:12px;color:var(--text-muted);';
-    taRow.appendChild(taLbl);
+    var taLbl=document.createElement('span');taLbl.textContent='첩';taLbl.style.cssText='font-size:12px;color:#8B6914;';taRow.appendChild(taLbl);
     taRow.appendChild(makeNumInput('ta-days','일수',pTAtanyak,'days'));
-    var taLbl2=document.createElement('span');taLbl2.textContent='일';taLbl2.style.cssText='font-size:12px;color:var(--text-muted);';
-    taRow.appendChild(taLbl2);
-    body.appendChild(taRow);
+    var taLbl2=document.createElement('span');taLbl2.textContent='일';taLbl2.style.cssText='font-size:12px;color:#8B6914;';taRow.appendChild(taLbl2);
+    taBox.appendChild(taRow);body.appendChild(taBox);
   }
 }
 
@@ -1990,7 +2010,7 @@ function generateResult(){
   parts.forEach(function(kor){var pe=PE_MAP[kor];if(!pe)return;var s=ccState[kor],en=CC_EN_OUT[kor];var sideStr='';if(s.noSide)sideStr='';else if(s.side==='Lt.')sideStr='Lt. ';else if(s.side==='Rt.')sideStr='Rt. ';else if(s.side==='Both')sideStr='Both ';else if(!s.noBoth)sideStr='Both ';out+='■ '+sideStr+en+'\n';out+='- ADL '+(peAdl[kor]?': '+peAdl[kor]:'(-)')+'\n';var romSel=peRom[kor]||[],ns=pe.noSuffix||[];var romLine;if(!romSel.length){romLine='- ROM (-)';}else{romLine='- ROM :';var ordered=pe.rom.filter(function(r){return romSel.indexOf(r)>=0;});var withS=ordered.filter(function(r){return ns.indexOf(r)<0;});var woS=ordered.filter(function(r){return ns.indexOf(r)>=0;});var pts=[];withS.forEach(function(r){var deg=peRomDeg[kor]&&peRomDeg[kor][r]?'('+peRomDeg[kor][r]+'°)':'';pts.push(r+deg);});if(pts.length)romLine+=' '+pts.join(', ')+' 시 통증';if(woS.length)romLine+=(pts.length?', ':' ')+woS.join(', ');}out+=romLine+'\n';out+='- Td '+(peTend[kor]?': '+peTend[kor]:'(-)')+'\n';if(pe.extra.length){pe.extra.forEach(function(t){var k=kor+'__'+t;var sx=peExtra[k]||{Rt:'-',Lt:'-'};out+='- '+t+' ('+(sx.Rt?'+':'-')+'/'+(sx.Lt?'+':'-')+')\n';});}});
   var phKeys=['HTN','DM','HL','Hepa','Tb','Osteoporosis'];
   out+='\nP/H : HTN/DM/HL/Hepa/Tb/Osteoporosis ('+phKeys.map(function(k){return phState[k]?'+':'-';}).join('/')+')\n';
-  var _ph_etc=document.getElementById('ph-etc').value.trim();out+='- 기타 '+(_ph_etc&&_ph_etc!='(-)'?': '+_ph_etc:'(-)')+'\n';
+  var _ph_etc=document.getElementById('ph-etc').value.trim();if(_ph_etc&&_ph_etc!='(-)')out+='- 기타 : '+_ph_etc+'\n';
   var allergyPas=allergyState['파스'],allergyTape=allergyState['테이프'];
   var allergyExtra=document.getElementById('ph-allergy-extra').value.trim();
   var allergyLine='파스('+(allergyPas?'+':'-')+') 테이프('+(allergyTape?'+':'-')+')';
@@ -2260,106 +2280,148 @@ const STATE = {
     checked: {}
   },
   manualItems: [
-    { id: 1, cat: 'treatment', access: 'admin', title: '통증 진료 매뉴얼', preview: '환자 접수·진료·유형별 대응·치료 순서 전체 가이드', content: `【환자 접수 시】
-- 차트 확인 후 [###님 진료완] 메시지
+    { id: 1, cat: 'treatment', access: 'admin', title: '통증 진료 매뉴얼', preview: '환자 접수·진료·유형별 대응·치료 순서 전체 가이드', content: `1. 환자 접수 시
+- 차트 확인
+- [###님 진료완] 메시지
 - 칠판에 초진 액팅 체크하기
 
-【환자 진료 시】
-- 3~5분 내 진료하되 환자 성향에 맞추어 루틴하게 하지 않기
-  · 반드시 환자를 향해 앉기
-  · 너무 가까이/멀리 앉지 않기
-- 이학적 검사는 세세하게 하지 않고, 질환에 따라 ROM 체크 정도
-- 한의원 치료 경험 여부 확인
-  · "침 맞아보신 적 있으세요?"
-  · YES → "첫 날이시니 최대한 조절하면서 치료 들어갈게요." / "베드에서 확인하면서 맞춰서 치료할게요."
-  · NO  → "처음이신 분들은 긴장해서 더 아플 수 있어요. 최대한 안 아프게 들어가겠습니다."
-  · 아이 → "하나도 안 아프게 들어갈게요. 약속~"
-- 치료 계획 안내
-  · "오늘은 찜질, 물리치료, 침치료, 피 빼는 부항 하시고 2주 정도는 매일 오시는 게 좋겠네요."
-- 약침 안내 (기본 포함)
-  · "여기는 [##약침] 들어가는 게 좋아요. 주변부도 같이 치료하겠습니다."
-  · 약침 싫어하는 환자 → 억지로 밀지 않기 / 유형 파악
-    - 모르거나 효과 미경험 → 한 번 더 설명 후 유도 (단, 비용 문제인지 주의)
-    - 비급여 부담 → 권유하지 않기
-    - "네. 추후에 필요하다 싶으면 다시 말씀드릴게요."
-- 치료실 이동
-  · "치료실로 모실게요." → "###님 오셨어요. 베드 안내해주세요."
-  · 약침 있는 경우 체크리스트/칠판에 약침 적고 진료실로 복귀
+2. 환자 진료 시
+- 3~5분 내 진료하되 환자 성향 맞추어서 루틴하게 하지 않기
+- 반드시 환자를 향해 앉기
+  - 너무 가까이 앉지도 말고, 너무 멀리 앉지도 말기
+- 한의원 치료 경험 여부 확인하기
+  - "침 맞아보신 적 있으세요?"
+    - YES
+      - "그래도 첫 날이시니 최대한 조절하면서 치료 들어갈게요."
+      - "베드에서 확인하면서 맞춰서 치료할게요."
+    - NO
+      - "처음이신 분들은 긴장해서 더 아플 수 있어요. 최대한 안 아프게 들어가겠습니다."
+    - 아이
+      - "하나도 안 아프게 할게요. 약속."
+- 이학적 검사는 세세하기 하지 않고, 질환에 따라서 ROM 체크 정도
+- 치료 계획
+  - "오늘은 찜질, 물리치료, 침치료, 피 빼는 부항 하시고 2주 정도는 매일 오시는 게 좋겠네요. 치료 후 베드에서 한 번 더 설명드릴게요."
+- 기본적으로 약침+
+  - "여기는 약침 들어가는 게 좋아요. 여기는 약침 쓰고, 주변부도 같이 치료하겠습니다."
+  - 약침 싫어하는 환자 억지로 밀지 않기 → 유형 파악
+    - 약침이 잘 몰라서 싫은 경우
+      - 모르거나 효과를 보지 못한 환자는 한 번 더 설명하고 유도하기
+      - 단, 비싸서 싫은데 이렇게 이야기하는 경우가 있으니 주의하기
+    - 약침이 비급여라서 싫은 경우
+      - 억지로 권유하지 않기
+  - "네. 그래도 추후에 정 필요하다 싶으면 다시 한 번 말씀드릴게요."
+- 환자 안내
+  - "치료실로 모실게요." → "###님 오셨어요. 베드 안내해주세요."
+  - 약침 있는 경우 칠판에 약침 적고 진료실로 돌아가기 (상황에 따라서 메신저 O)
 
-【환자 유형 파악】
-D형 주도형 (강호동)
-  - 환자 니즈대로 / 결정권은 환자에게 / 권유·반박 금지
-  - 용건만 간단히 / 진료 시간 ASAP
+3. 환자 유형 파악하기
+  1) 주도형 d (강호동)
+    - 환자의 니즈대로 해주기 / 결정권은 환자에게 / 권유 X / 반박금지
+    - 용건만 간단히 말하기 / 진료 시간 ASAP
+  2) 사교형 i (노홍철)
+    - 수다스럽고 빨리 친해지는 경향
+    - 경청 + 친절 + 칭찬 / 무관심 무표정 X
+  3) 신중형 s
+    - 말이 장황 / 의사 결정이 느리고 결정 번복 / 절대 재촉하지 말고 기다려주기
+    - 인내심과 확신을 가지고 분명한 치료법을 제시하기
+    - 침 아프게 X / 아기 대하듯 하기
+  4) 안정형 c
+    - 논리적, 분석적, 집요하게 파고 들어가는
+    - 전문성과 논리를 가지고 간단 명료하게 설명 / 장황 X / 정확한 자료와 정보를 가급적 많이 제공
+    - 갑자기 날씨 이야기 하거나 서비스 이야기 절대 금지
 
-I형 사교형 (노홍철)
-  - 수다스럽고 빨리 친해지는 경향
-  - 경청 + 친절 + 칭찬 / 무관심·무표정 금지
+4. 치료 관련
+  1) 시간
+    - 7분 넘기지 않기 (4분 내 best)
+    - 불가피하게 7분 이상 소요되는 경우 치료실에 몇 분 정도 소요되는지 메신저
+  2) 순서
+    - 핫팩 → ICT → 침 (전침) → 습부 → BC (테이핑)
+    - 핫팩 순서는 경우에 따라 변경 가능
+    - 초음파 가이딩 약침은 BC 순서에
+    - 간혹 환자가 베드에서 "원장님 저 약침 맞고 싶어요." 라고 하면 되도록 2 OR 3
+      1. ICT → 침 (+약침) → 습부 → BC
+      2. ICT → 침 → 습부 (+약침) + BC
+      3. ICT → 침 → 습부 → BC (+약침)
+    - 커튼은 1. 끝까지 닫고 2. 세게 닫지 않기
+  3) 침 치료
+    - 반드시 침관 사용 (MPS 부위에 따라 침관 없이 할 수 있으나 주의 필요)
+    - 침 규격 → 16*15 / 16*30 / 20*30 / 25*30 / 30*40 / 40*50 / 40*60
+      - 기본 16*30 OR 20*30 / 필요 시 원장이 추가하여 가져가기
+    - 침 + 알콜솜 + 지혈고 / 남은 침은 침관을 같이 둘 것
+    - 여러 부위 치료를 원하는 경우
+      - 원칙적으로 앞/뒤 치료를 하지 않고, 환자 유형 또는 상황에 맞추어 하기
+      - 예시
+        - "한 번에 너무 많은 자극이 들어가기 보다는, 몸이 이완된 상태에서 나누어서 치료하는 게 오히려 더 도움이 됩니다."
+        - "오늘은 목을 치료하고, 내일 오시면 무릎 치료해드릴게요."
+    - 기타 멘트
+      - 30*40 이상: "침이 좀 뻐근해요. 너무 아프시면 말씀하세요."
+      - 혈종 가능성: "이 부위는 조직 자체가 치료 후에 일시적으로 부을 수 있어요. 며칠 내로 괜찮아지는데 불편하시면 냉찜질 해주세요."
+  4) 전침
+    - 침병에 부착 / 침이 심하게 휘어질 때는 지혈고로 선 고정하기
+    - 전침 부위 설명: "여기 전기 자극 들어갈게요."
+    - 약하게: "전기 자극 약하게 들어갈 거라서 느낌 없을 수 있어요."
+    - 강하게: 한 번에 확 올리면 X / 서서히 확인하면서 걸기
+    - 10분 타이머 (필요 시 15~20분)
+      - "움직이시면 아플 수 있어요." / "불편하시면 벨 눌러주세요."
+  e) 부항
+    - 부항 개수, 세기는 환자 니즈에 맞게
+    - 커튼 살살, 살짝 열고 옆 베드 보이지 않게 들어가기
+    - 바깥으로 보이는 부분: "부항 자국 남아도 괜찮을까요?"
+    - 사혈: 세게 → 직자/많이/촘촘하게 / 살살 → 횡자/적게
+    - 굴곡 부위 바세린 바르기
+    - 부항 부위 IR 금지 (화상 위험)
+    - 3분 타이머: "이렇게 3분 계실게요."
+  f) BC (베드체크)
+    - 테이핑 루틴: "테이핑하거나 파스 붙였다 뗄 때 상처 나신 적 있을까요?"
+      - 있다 → 붙이지 말고 티칭 + 예약
+      - 없다 → "오늘은 1~2시간 후 떼주세요."
+    - 여름철이나 피부 얇고 건조한 환자는 주의
+    - 예약 고지
+      - 달력에 요일 표시 OR 치료실 전달 OR 데스크 메시지
+      - "이번주는 매일/주3회 시간 되시는 만큼 내원하세요."
+      - "내일 경과를 바로 보는 게 좋으니 내일 꼭 오세요."
+    - Q&A
+      - 토요일 문의 → "그날은 다른 원장님께서 진료해주실 거에요."
+      - 바빠서 못 온다 → "다음주에 경과 보도록 하겠습니다."
+      - 예약 안 하겠다 → 차트에 예약 X 메모 / "예약하시면 조금 더 편하게 오실 수 있어서요."` },
+    { id: 7, cat: 'treatment', access: 'admin', title: '다이어트 진료 매뉴얼', preview: '프로그램 구성·비움기·감량기·복용 증상 대응 가이드', content: `1. 프로그램
+- 1개월 : 3일 비움기 + TEST + 14일 감량기 + 14일 감량기 = 31일
 
-S형 신중형
-  - 말이 장황 / 결정 느리고 번복 多 → 절대 재촉 금지
-  - 인내심 + 확신을 가지고 분명한 치료법 제시
-  - 침 아프게 X / 아기 대하듯
+2. 비움기
+- 우리 몸에 다이어트 시작할 거라는 신호를 주는 것이다
+- 안 먹을 수 있으면 가장 좋고, 아니면 선식 먹기
+  - 물에 타서 먹는 게 맛이 없으면 아몬드브리즈 또는 귀리 우유
+- 물 충분히 마시기
+- 커피는 디카페인 아메리카노
+- 저혈당/어지러움/메스꺼움 → 토마토주스 100ml (목 축일 정도)
 
-C형 안정형
-  - 논리적·분석적·집요함
-  - 전문성과 논리로 간단 명료하게 / 장황 X / 정확한 자료 제공
-  - 갑자기 날씨 이야기·서비스 이야기 절대 금지
+3. TEST
+- 실증인지 허증인지
 
-【치료 관련】
-▸ 시간
-  - 7분 넘기지 않기 (4분 내 best)
-  - 불가피하게 7분 이상 소요 시 치료실에 소요 시간 메신저
+4. 감량기
+- 식사량 줄이기 (종류 상관 없이 양을 줄여서 먹기)
+- 식사는 걸러도 약은 거르지 말 것
+- 1차 감량기 후 2차 감량기 전 상담
+  - 인바디 상담
+  - 약이 잘 맞는지
 
-▸ 순서
-  핫팩 → ICT → 침(전침) → 습부 → BC(테이핑)
-  - 핫팩 순서는 경우에 따라 변경 가능
-  - 초음파 가이딩 약침은 BC 순서에
-  - 베드에서 약침 요청 시:
-    ① ICT → 침(+약침) → 습부 → BC
-    ② ICT → 침 → 습부(+약침) → BC
-    ③ ICT → 침 → 습부 → BC(+약침)
-  - 커튼: ① 끝까지 닫기 ② 세게 닫지 않기
+5. 복용 중 생길 수 있는 증상
+- 속이 쓰리고 메스꺼워요 (울렁울렁)
+  - 3일 간은 약 적응기
+  - 복용 직후 꾸덕한 주스 100ml (어린이용 ABC주스, 토마토주스 등)
+  - 토하는 경우도 있음 → "저도 토 해봤어요"
+  - 양치가 도움이 되는 경우도 있음
+- 앉아있다가 일어나면 어지러워요 & 머리가 빠져요
+  - 비타민&미네랄 권장량 복용하기
+- 가슴이 두근거려요
+  - 운동을 안 하지만 운동 하는 효과를 내고 있는 거다
 
-▸ 침 치료
-  - 반드시 침관 사용 (MPS 부위 예외 주의)
-  - 규격: 16×15 / 16×30 / 20×30 / 25×30 / 30×40 / 40×50 / 40×60
-    (기본 16×30 또는 20×30)
-  - 여러 부위 치료 시: 앞/뒤 동시 원칙 X → 환자 유형에 맞추어 조율
-    예시 멘트:
-    "한 번에 너무 많은 자극보다 몸이 이완된 상태에서 나누어 치료하는 게 더 효과적입니다."
-    "오늘은 목 치료하고, 내일 오시면 무릎 치료해드릴게요."
-  - 30×40 이상 시: "침이 좀 뻐근해요. 너무 아프시면 말씀하세요."
-  - 혈종 가능 부위: "이 부위는 일시적으로 부을 수 있어요. 며칠 내로 괜찮아집니다."
-
-▸ 전침
-  - 침병에 부착 / 심하게 휘면 지혈고로 선 고정
-  - 부위 설명: "여기 전기 자극 들어갈게요."
-  - 약하게 걸 때: "전기 자극 약하게 들어갈 거라 느낌 없을 수 있어요."
-  - 강하게 걸 때: 서서히 확인하며 조절
-  - 10분 타이머 (필요 시 15~20분)
-    안내: "움직이시면 아플 수 있어요." / "불편하시면 벨 눌러주세요."
-
-▸ 부항
-  - 개수·세기는 환자 니즈에 맞게
-  - 바깥에서 보이는 부위: "부항 자국 남아도 괜찮을까요?"
-  - 사혈: 세게 원하면 직자/많이, 살살 원하면 횡자/적게
-  - 굴곡 부위 바세린 바르기
-  - 부항 위 IR 금지 (화상 위험) → IR 꺼두기
-  - 3분 타이머: "이렇게 3분 계실게요."
-
-▸ BC (베드체크)
-  - 테이핑 루틴: "테이핑/파스 붙였다 뗄 때 상처 나신 적 있으세요?"
-    있음 → 붙이지 않고 티칭 + 예약
-    없음 → "오늘은 1~2시간 후 떼주세요."
-  - 여름철·피부 얇고 건조한 환자 주의
-  - 예약 고지
-    · 달력에 요일 표시 또는 데스크 메시지
-    · "이번주는 최대한 매일/주3회 내원하세요."
-    · "내일 경과를 바로 보는 게 좋으니 내일 꼭 오세요."
-  - Q&A
-    · 토요일 문의 → "그날은 다른 원장님께서 진료해주실 거에요."
-    · 바빠서 못 온다 → "다음주에 경과 보도록 하겠습니다."
-    · 예약 안 하겠다 → 차트에 예약 X 메모 / "예약하시면 조금 더 편하게 오실 수 있어서요."` },
+6. 기타
+- Q&A 공유하기
+- 특이한 환자의 경우
+  - 정규분포 표를 그려 설명하고, 보수적으로 접근하기` },
+- 차트 확인 후 [###님 진료완] 메시지
+- 칠판에 초진 액팅 체크하기
     { id: 2, cat: 'treatment', access: 'all', title: '초진 환자 접수 절차', preview: '초진 환자 도착 시 처리 순서', content: '1. 접수 차트에 이름, 연락처, 주소 기입\n2. 보험 유형 확인 (건강보험 / 의료급여 / 자비)\n3. 초진 문진표 작성 안내\n4. 대기 안내 후 원장 호출\n5. 진료 후 수납 처리\n\n※ 65세 이상 어르신은 작성 도움 제공' },
     { id: 3, cat: 'treatment', access: 'all', title: '탕전 기기 사용법', preview: '탕전 기기 조작 순서 및 주의사항', content: '1. 전원 ON 후 예열 5분 대기\n2. 한약재 투입 전 내부 청결 확인\n3. 가열 온도: 1차 100°C → 2차 80°C 유지\n4. 완료 후 필터 세척 필수\n5. 사용 일지 기록\n\n⚠ 기기 이상 시 즉시 원장에게 보고' },
     { id: 4, cat: 'admin', access: 'admin', title: '보험 청구 마감 절차', preview: '월 보험 청구 마감 체크리스트', content: '청구 마감일: 매월 말일\n\n1. 당월 진료 차트 전수 확인\n2. EDI 프로그램 청구 내용 검토\n3. 청구 오류 항목 수정\n4. 원장 서명 후 제출\n5. 청구 완료 증번호 기록\n\n문의: 심사평가원 1644-2000' },
@@ -2384,7 +2446,7 @@ C형 안정형
 /* 비밀번호 설정 */
 const PASSWORDS = {
   director: '1234',
-  staff: '1111',
+  staff: ['라피엘1**', 'fkvldpf1**', 'FKVLDPF1**'],
 };
 
 /* ════════════════════════════════════
@@ -2396,13 +2458,11 @@ let selectedName = null;
 function selectRole(role) {
   selectedRole = role;
   if (role === 'director') {
-    // 원장 → 이름 선택 step
     document.getElementById('login-step1').style.display = 'none';
     document.getElementById('login-step-name').style.display = 'block';
   } else {
-    // 직원 → 바로 비번
     document.getElementById('login-step1').style.display = 'none';
-    showPasswordStep('직원');
+    document.getElementById('login-step-name-staff').style.display = 'block';
   }
 }
 
@@ -2410,6 +2470,12 @@ function selectDirectorName(name) {
   selectedName = name;
   document.getElementById('login-step-name').style.display = 'none';
   showPasswordStep(name + ' 원장');
+}
+
+function selectStaffName(name) {
+  selectedName = name;
+  document.getElementById('login-step-name-staff').style.display = 'none';
+  showPasswordStep(name);
 }
 
 function showPasswordStep(label) {
@@ -2421,9 +2487,9 @@ function showPasswordStep(label) {
 }
 
 function backToStep1() {
-  selectedRole = null;
-  selectedName = null;
+  selectedRole = null; selectedName = null;
   document.getElementById('login-step-name').style.display = 'none';
+  document.getElementById('login-step-name-staff').style.display = 'none';
   document.getElementById('login-step2').style.display = 'none';
   document.getElementById('login-step1').style.display = 'block';
 }
@@ -2431,13 +2497,17 @@ function backToStep1() {
 function backToNameStep() {
   selectedName = null;
   document.getElementById('login-step2').style.display = 'none';
-  document.getElementById('login-step-name').style.display = 'block';
+  if (selectedRole === 'director') {
+    document.getElementById('login-step-name').style.display = 'block';
+  } else {
+    document.getElementById('login-step-name-staff').style.display = 'block';
+  }
 }
 
 function doLogin() {
   const pw = document.getElementById('login-pw').value;
   if (!selectedRole) return;
-  if (pw === PASSWORDS[selectedRole]) {
+  if (pw === PASSWORDS[selectedRole] || (Array.isArray(PASSWORDS[selectedRole]) && PASSWORDS[selectedRole].includes(pw))) {
     const isAdmin = selectedRole === 'director';
     const displayName = isAdmin ? selectedName : '직원';
     STATE.user = { name: displayName, role: isAdmin ? '원장' : '직원', isAdmin };
@@ -2464,14 +2534,13 @@ document.addEventListener('keydown', e => {
 });
 
 function doLogout() {
-  STATE.user = null;
-  selectedRole = null;
-  selectedName = null;
+  STATE.user = null; selectedRole = null; selectedName = null;
   document.body.classList.remove('is-admin');
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-step1').style.display = 'block';
   document.getElementById('login-step-name').style.display = 'none';
+  document.getElementById('login-step-name-staff').style.display = 'none';
   document.getElementById('login-step2').style.display = 'none';
   document.getElementById('login-pw').value = '';
 }
@@ -2539,7 +2608,8 @@ async function loadInventory() {
   const rows = await sb.select('inventory');
   if (rows && rows.length > 0) {
     STATE.inventory = rows.map(r => ({
-      id: r.id, name: r.name, cat: r.cat, qty: r.qty, min: r.min_qty
+      id: r.id, name: r.name, cat: r.cat, qty: r.qty, min: r.min_qty,
+      updatedBy: r.updated_by || '', updatedAt: r.updated_at || ''
     }));
   }
 }
@@ -2924,7 +2994,7 @@ function renderManual() {
     let rendered = mdToHtml(m.content);
     if (q) rendered = rendered.replace(new RegExp(manualSearchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), match => `<mark class="highlight">${match}</mark>`);
     const accessLabel = (m.access || 'all') === 'admin'
-      ? '<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:#FEF9E7;color:#8B6914;font-weight:700;flex-shrink:0;">원장 전용</span>' : '';
+      ? '<span class="manual-category" style="background:#FEF9E7;color:#8B6914;flex-shrink:0;">원장 전용</span>' : '';
     const adminBtns = isAdmin ? `
       <div style="display:flex;gap:6px;flex-shrink:0;" onclick="event.stopPropagation()">
         <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();openManualEditor(${m.id})">편집</button>
@@ -3022,14 +3092,17 @@ function renderInventory(filter = '') {
     if (item.qty === 0) { status = 'stock-empty'; statusLabel = '재고 없음'; }
     else if (pct < 1) { status = 'stock-low'; statusLabel = '부족'; }
     else { status = 'stock-ok'; statusLabel = '정상'; }
+    const updaterInfo = item.updatedBy
+      ? `<div style="font-size:11px;color:var(--text-muted);">${item.updatedBy} · ${item.updatedAt || ''}</div>` : '';
     return `<tr>
-      <td><strong>${item.name}</strong></td>
+      <td><strong>${item.name}</strong>${updaterInfo}</td>
       <td style="color:var(--text-muted)">${item.cat}</td>
       <td>${item.qty}</td>
       <td style="color:var(--text-muted)">${item.min}</td>
       <td><span class="stock-status ${status}">${statusLabel}</span></td>
       <td><input type="number" class="qty-input" id="qty-${item.id}" value="${item.qty}" min="0"></td>
       <td><button class="btn btn-green btn-sm" onclick="updateInventory(${item.id})">저장</button></td>
+      <td class="admin-only" style="display:table-cell;"><button class="btn btn-danger btn-sm" onclick="deleteInventoryItem(${item.id})">삭제</button></td>
     </tr>`;
   }).join('');
   updateInventoryAlerts();
@@ -3040,9 +3113,14 @@ function filterInventory(q) { renderInventory(q); }
 async function updateInventory(id) {
   const val = parseInt(document.getElementById('qty-' + id).value) || 0;
   const item = STATE.inventory.find(i => i.id === id);
+  const updatedBy = STATE.user ? STATE.user.name : '';
+  const updatedAt = new Date().toLocaleDateString('ko-KR', {month:'numeric',day:'numeric'}) + ' ' +
+    new Date().toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
   if (item) {
     item.qty = val;
-    await sb.update('inventory', id, { qty: val });
+    item.updatedBy = updatedBy;
+    item.updatedAt = updatedAt;
+    await sb.update('inventory', id, { qty: val, updated_by: updatedBy, updated_at: updatedAt });
   }
   renderInventory();
   updateDashboard();
@@ -3066,7 +3144,13 @@ function updateInventoryAlerts() {
   }
 }
 
-function openInventoryModal() { openModal('inventory'); }
+async function deleteInventoryItem(id) {
+  if (!confirm('이 품목을 삭제할까요?')) return;
+  await sb.remove('inventory', id);
+  STATE.inventory = STATE.inventory.filter(i => i.id !== id);
+  renderInventory();
+  showToast('삭제되었습니다');
+}
 
 async function saveInventoryItem() {
   const name = document.getElementById('inv-name').value.trim();
