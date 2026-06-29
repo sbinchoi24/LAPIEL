@@ -1727,22 +1727,12 @@
 </div>
 
 <div class="modal-overlay" id="modal-checklist-editor">
-  <div class="modal" style="width:520px;">
-    <div class="modal-title">체크리스트 항목 편집</div>
-    <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">항목은 쉼표(,)로 구분해 입력하세요</p>
-    <div class="form-section">
-      <label>오전 준비</label>
-      <textarea id="cl-morning" style="min-height:70px;"></textarea>
-    </div>
-    <div class="form-section">
-      <label>진료 중</label>
-      <textarea id="cl-during" style="min-height:70px;"></textarea>
-    </div>
-    <div class="form-section">
-      <label>마감</label>
-      <textarea id="cl-evening" style="min-height:70px;"></textarea>
-    </div>
-    <div class="modal-actions">
+  <div class="modal" style="width:580px;max-height:80vh;display:flex;flex-direction:column;">
+    <div class="modal-title">체크리스트 편집</div>
+    <div style="overflow-y:auto;flex:1;padding-right:4px;" id="cl-editor-body"></div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-outline btn-sm" onclick="addClSection()">+ 섹션 추가</button>
+      <div style="flex:1;"></div>
       <button class="btn btn-outline" onclick="closeModal('checklist-editor')">취소</button>
       <button class="btn btn-green" onclick="saveChecklistItems()">저장</button>
     </div>
@@ -2366,13 +2356,13 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
       <label>제목</label>
       <input type="text" id="me-title" placeholder="매뉴얼 제목">
     </div>
-    <div class="form-section">
-      <label>한줄 설명</label>
-      <input type="text" id="me-preview" placeholder="목록에 표시될 짧은 설명">
-    </div>
+
     <div class="form-section">
       <label>내용</label>
-      <textarea id="me-content" style="min-height:240px; font-size:13px; line-height:1.7;" placeholder="매뉴얼 내용을 입력하세요 (줄바꿈 그대로 표시됩니다)"></textarea>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">
+        📄 일반 텍스트 입력 또는 구글 닥스 임베드: <code style="background:var(--surface-2);padding:1px 6px;border-radius:4px;">[GDOCS:구글닥스_웹게시_URL]</code>
+      </div>
+      <textarea id="me-content" style="min-height:240px; font-size:13px; line-height:1.7;" placeholder="내용을 입력하거나&#10;구글 닥스 임베드: [GDOCS:https://docs.google.com/document/d/.../pub]"></textarea>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('manual-editor')">취소</button>
@@ -3000,7 +2990,7 @@ async function deleteNotice(idx) {
 /* ════════════════════════════════════
    CHECKLIST
 ════════════════════════════════════ */
-const SECTION_LABELS = { morning: '오전 준비', during: '진료 중', evening: '마감' };
+let SECTION_LABELS = { morning: '오전 준비', during: '진료 중', evening: '마감' };
 let selectedCheckDate = new Date().toDateString(); // 현재 선택된 날짜
 
 /* 2주 날짜 동그라미 렌더 */
@@ -3142,15 +3132,88 @@ function openChecklistEditor() {
   openModal('checklist-editor');
 }
 
-function saveChecklistItems() {
-  for (const sec of ['morning', 'during', 'evening']) {
-    const val = document.getElementById('cl-' + sec).value;
-    STATE.checklist.items[sec] = val.split(',').map(s => s.trim()).filter(Boolean);
-  }
+// 편집용 임시 데이터
+let clEditorSections = [];
+
+function openChecklistEditor() {
+  // 현재 섹션 구조를 편집용 배열로 복사
+  clEditorSections = Object.entries(STATE.checklist.items).map(([key, items]) => ({
+    key,
+    label: SECTION_LABELS[key] || key,
+    items: items.map(i => i.label || i).join(', ')
+  }));
+  renderClEditor();
+  openModal('checklist-editor');
+}
+
+function renderClEditor() {
+  const body = document.getElementById('cl-editor-body');
+  if (!body) return;
+  body.innerHTML = clEditorSections.map((sec, idx) => `
+    <div style="background:var(--surface-2);border-radius:10px;padding:14px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <input type="text" value="${sec.label}"
+          oninput="clEditorSections[${idx}].label=this.value"
+          style="flex:1;padding:6px 10px;border:1.5px solid var(--border-strong);border-radius:var(--radius);font-size:13px;font-weight:700;color:var(--accent);outline:none;background:var(--surface-1);">
+        <button class="btn btn-danger btn-sm" onclick="clRemoveSection(${idx})">섹션 삭제</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:5px;">항목은 쉼표(,)로 구분</div>
+      <textarea style="width:100%;min-height:70px;padding:8px 10px;border:1.5px solid var(--border-strong);border-radius:var(--radius);font-family:inherit;font-size:13px;resize:vertical;outline:none;"
+        oninput="clEditorSections[${idx}].items=this.value">${sec.items}</textarea>
+    </div>
+  `).join('');
+}
+
+function addClSection() {
+  clEditorSections.push({ key: 'section_' + Date.now(), label: '새 섹션', items: '' });
+  renderClEditor();
+}
+
+function clRemoveSection(idx) {
+  if (clEditorSections.length <= 1) { alert('섹션은 최소 1개 이상 필요합니다'); return; }
+  clEditorSections.splice(idx, 1);
+  renderClEditor();
+}
+
+async function saveChecklistItems() {
+  // 새 섹션 구조로 STATE 업데이트
+  const newItems = {};
+  const newLabels = {};
+  clEditorSections.forEach(sec => {
+    const key = sec.key;
+    newLabels[key] = sec.label;
+    newItems[key] = sec.items.split(',').map(s => s.trim()).filter(Boolean);
+  });
+
+  // Supabase에서 기존 항목 삭제 후 재삽입
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/checklist_items`, {
+      method: 'DELETE',
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+    });
+    let sortOrder = 0;
+    for (const sec of clEditorSections) {
+      for (const label of sec.items.split(',').map(s => s.trim()).filter(Boolean)) {
+        const row = await sb.insert('checklist_items', { section: sec.key, label, sort_order: sortOrder++ });
+        if (row && row[0]) {
+          if (!newItems[sec.key]) newItems[sec.key] = [];
+          // id 반영
+          const idx = newItems[sec.key].indexOf(label);
+          if (idx >= 0) newItems[sec.key][idx] = { id: row[0].id, label };
+        }
+      }
+    }
+  } catch(e) { console.warn('체크리스트 저장 오류:', e); }
+
+  STATE.checklist.items = newItems;
+  // SECTION_LABELS 동적 업데이트
+  Object.assign(SECTION_LABELS, newLabels);
+  Object.keys(SECTION_LABELS).forEach(k => { if (!newLabels[k]) delete SECTION_LABELS[k]; });
+
   STATE.checklist.checked = {};
   renderChecklist();
   closeModal('checklist-editor');
-  showToast('체크리스트 항목이 저장되었습니다');
+  showToast('저장되었습니다');
 }
 
 function updateDashboardChecklist() {
@@ -3270,6 +3333,24 @@ function mdToHtml(text) {
   return html;
 }
 
+function renderManualContent(m) {
+  const text = m.content || '';
+  // [GDOCS:URL] 패턴 감지 → iframe 렌더
+  const gdocsMatch = text.match(/^\[GDOCS:(https?:\/\/[^\]]+)\]$/s);
+  if (gdocsMatch) {
+    const url = gdocsMatch[1].trim();
+    // 구글 닥스 publish URL로 변환 (edit → preview)
+    const embedUrl = url.replace('/edit', '/preview').replace('/pub', '/preview');
+    return `<div style="width:100%;height:600px;border-radius:8px;overflow:hidden;border:1px solid var(--border);">
+      <iframe src="${embedUrl}" style="width:100%;height:100%;border:none;" allowfullscreen></iframe>
+    </div>
+    <div style="margin-top:8px;font-size:12px;color:var(--text-muted);">
+      <a href="${url}" target="_blank" style="color:var(--primary);">↗ 구글 닥스에서 열기</a>
+    </div>`;
+  }
+  return `<div class="md-body">${mdToHtml(text)}</div>`;
+}
+
 function renderInline(text) {
   return text
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -3291,8 +3372,10 @@ function renderManual() {
   const catClasses = { treatment: 'cat-treatment', admin: 'cat-admin', emergency: 'cat-emergency' };
   list.innerHTML = items.map(m => {
     const isOpen = manualOpenIds.has(m.id);
-    let rendered = mdToHtml(m.content);
-    if (q) rendered = rendered.replace(new RegExp(manualSearchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), match => `<mark class="highlight">${match}</mark>`);
+    let rendered = renderManualContent(m);
+    if (q && !m.content.startsWith('[GDOCS:')) {
+      rendered = rendered.replace(new RegExp(manualSearchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), match => `<mark class="highlight">${match}</mark>`);
+    }
     const accessLabel = (m.access || 'all') === 'admin'
       ? '<span class="manual-category" style="background:#FEF9E7;color:#8B6914;flex-shrink:0;">원장 전용</span>' : '';
     const adminBtns = isAdmin ? `
@@ -3307,7 +3390,7 @@ function renderManual() {
           ${accessLabel}
           <div style="flex:1;">
             <div class="manual-item-title">${m.title}</div>
-            <div class="manual-item-preview">${m.preview}</div>
+
           </div>
           <span class="manual-chevron">${isOpen ? '▲' : '▼'}</span>
         </div>
@@ -3341,7 +3424,6 @@ function openManualEditor(id) {
   document.getElementById('me-cat').value = m ? m.cat : 'treatment';
   document.getElementById('me-access').value = m ? (m.access || 'all') : 'all';
   document.getElementById('me-title').value = m ? m.title : '';
-  document.getElementById('me-preview').value = m ? m.preview : '';
   document.getElementById('me-content').value = m ? m.content : '';
   document.getElementById('manual-editor-modal-title').textContent = m ? '매뉴얼 편집' : '새 매뉴얼 추가';
   openModal('manual-editor');
@@ -3352,17 +3434,16 @@ async function saveManualEditor() {
   const cat = document.getElementById('me-cat').value;
   const access = document.getElementById('me-access').value;
   const title = document.getElementById('me-title').value.trim();
-  const preview = document.getElementById('me-preview').value.trim();
   const content = document.getElementById('me-content').value.trim();
   if (!title) { alert('제목을 입력하세요'); return; }
   if (id) {
-    await sb.update('manuals', id, { cat, access, title, preview, content });
+    await sb.update('manuals', id, { cat, access, title, content });
     const m = STATE.manualItems.find(x => x.id == id);
-    if (m) { m.cat = cat; m.access = access; m.title = title; m.preview = preview; m.content = content; }
+    if (m) { m.cat = cat; m.access = access; m.title = title; m.content = content; }
   } else {
-    const rows = await sb.insert('manuals', { cat, access, title, preview, content });
+    const rows = await sb.insert('manuals', { cat, access, title, content });
     if (rows && rows[0]) {
-      STATE.manualItems.push({ id: rows[0].id, cat, access, title, preview, content });
+      STATE.manualItems.push({ id: rows[0].id, cat, access, title, content });
     }
   }
   renderManual();
