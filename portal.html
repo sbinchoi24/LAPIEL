@@ -1016,9 +1016,6 @@
 
 <!-- ══ LOGIN SCREEN ══ -->
 <div id="login-screen">
-  <div style="position:fixed;bottom:16px;left:20px;font-size:11px;color:rgba(255,255,255,0.4);">
-    버전: 2026-06-30 22:25
-  </div>
   <div class="login-card">
     <h1>경희 라피엘 한의원</h1>
     <div style="width:32px;height:3px;background:var(--primary);border-radius:2px;margin:8px 0 16px;"></div>
@@ -1372,6 +1369,8 @@
                 <div class="ch-card">
                   <div class="ch-card-hd">A)</div>
                   <div class="ch-card-bd">
+                    <div class="ch-sub-hd" style="margin-bottom:6px;">추정진단</div>
+                    <input type="text" class="ch-input" id="a-presumed-diag" placeholder="예: 극상근 건염" style="width:100%;margin-bottom:14px;">
                     <div class="ch-sub-hd" style="margin-bottom:10px;">변증</div>
                     <div class="bijeung-grid">
                       <button class="bijeung-btn" id="bj-寒凝血瘀" onclick="selectBijeung('寒凝血瘀','脈沈','舌暗苔白',this)">寒凝血瘀</button>
@@ -2048,7 +2047,9 @@ function renderP(){
 
   // 테이핑
   var row1=document.createElement('div');row1.className='p-row';
-  row1.appendChild(makeBtn('테이핑','테이핑',false));
+  var tapBtn=makeBtn('테이핑','테이핑',false);
+  tapBtn.textContent=(pActive['테이핑']?'☑ ':'☐ ')+'테이핑';
+  row1.appendChild(tapBtn);
   if(pActive['테이핑']){
     var tapInp=makeInput('taping-buyi','부위',120,pTaping,'buyi');
     row1.appendChild(tapInp);
@@ -2184,10 +2185,13 @@ function generateResult(){
   var lmpN=document.getElementById('lmp-num').value,lmpU=document.getElementById('lmp-unit').value;
   if(lmpMeno)out+='LMP : 폐경 (임신 가능성 없음)\n';else if(lmpN)out+='LMP : '+lmpN+lmpU+' 전 ('+(lmpPreg?'임신 가능성 있음':'임신 가능성 없음')+')\n';
   var seen=new Set(),diagArr=[];CC_ORDER.forEach(function(kor){if(!ccState[kor])return;(DIAG_MAP[kor]||[]).forEach(function(pair){var code=pair[0],name=pair[1];if(diagSelected.has(code)&&!seen.has(code)){diagArr.push(code+'('+name+')');seen.add(code);}});});customDiags.forEach(function(d){diagArr.push(d.code?d.code+'('+d.name+')':d.name);});
-  out+='\nA) '+diagArr.join(', ')+'\n';if(bijeungSel)out+=bijeungInfo.name+' / '+bijeungInfo.maek+' / '+bijeungInfo.seol+'\n';out+='- 초기 통증 증가 가능성 및 경과에 따라서 추가 검사 필요성 설명함\n- 추정 진단, 치료 계획, 치료에 따른 효과 및 예상되는 부작용에 대해서 설명함\n';
+  var _presumedDiag=document.getElementById('a-presumed-diag').value.trim();
+  out+='\nA) '+(_presumedDiag?_presumedDiag+' 추정됨을 환자에게 설명함':'')+'\n';
+  if(bijeungSel)out+=bijeungInfo.name+' / '+bijeungInfo.maek+' / '+bijeungInfo.seol+'\n';
+  out+='- 초기 통증 증가 가능성 및 경과에 따라서 추가 검사 필요성 설명함\n- 추정 진단, 치료 계획, 치료에 따른 효과 및 예상되는 부작용에 대해서 설명함\n';
   var pParts=[];
-  if(pActive['테이핑'])pParts.push('테이핑'+(pTaping.buyi?'('+pTaping.buyi+')':''));
-  out+='\nP) '+pParts.join(', ')+'\n';
+  out+='\nP)\n';
+  if(pActive['테이핑'])out+='■ 테이핑 : '+(pTaping.buyi?pTaping.buyi:'')+'\n';
   if(pActive['약침']){var 약종류=pInputVals['약침-종류']||'',약cc=pInputVals['약침-cc']||'',약부위=pInputVals['약침-부위']||'';var 약detail=[약종류+(약cc?' '+약cc:''),약부위].filter(Boolean).join(', ');out+='■ 약침 : '+약detail+'\n';}
   var chunaOut2=[],cs2={},ct2={};try{cs2=JSON.parse(pInputVals['chunaSelected']||'{}');}catch(e){}try{ct2=JSON.parse(pInputVals['chunaText']||'{}');}catch(e){}
   ['COX','MET','JS123','Lumbar roll','drop','경추 thrust','흉추 thrust','SCS','골타'].forEach(function(btn){if(!cs2[btn])return;var txt=ct2[btn]?'('+ct2[btn]+')':'';chunaOut2.push(btn+txt);});
@@ -2343,14 +2347,6 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
   <div class="modal" style="width:520px;">
     <div class="modal-title" id="notice-write-modal-title">공지사항 작성</div>
     <div class="form-section">
-      <label>중요도</label>
-      <select id="notice-type">
-        <option value="urgent">긴급</option>
-        <option value="normal" selected>일반</option>
-        <option value="info">안내</option>
-      </select>
-    </div>
-    <div class="form-section">
       <label>제목</label>
       <input type="text" id="notice-title-input" placeholder="공지 제목을 입력하세요">
     </div>
@@ -2363,6 +2359,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
       <input type="date" id="notice-event-date">
     </div>
     <input type="hidden" id="notice-edit-idx" value="">
+    <input type="hidden" id="notice-type" value="normal">
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeNoticeWriteModal()">취소</button>
       <button class="btn btn-green" id="notice-submit-btn" onclick="submitNotice()">공지 등록</button>
@@ -2841,7 +2838,7 @@ function renderResources() {
   }
 
   el.innerHTML = items.map(r => `
-    <div class="card" style="padding:12px;display:flex;flex-direction:column;gap:8px;">
+    <div class="card" style="padding:12px;display:flex;flex-direction:column;gap:8px;cursor:pointer;" onclick="window.open('${r.url}','_blank')">
       <div style="display:flex;align-items:flex-start;gap:8px;">
         <div style="width:28px;height:28px;background:var(--primary-pale);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
@@ -2852,11 +2849,10 @@ function renderResources() {
         </div>
       </div>
       ${r.desc ? `<div style="font-size:11px;color:var(--text-muted);line-height:1.4;">${r.desc}</div>` : ''}
-      <div style="display:flex;gap:4px;margin-top:auto;">
-        <a href="${r.url}" target="_blank" class="btn btn-green btn-sm" style="flex:1;text-align:center;text-decoration:none;font-size:11px;padding:5px 8px;">열기 ↗</a>
-        ${isAdmin ? `<button class="btn btn-outline btn-sm" style="font-size:11px;padding:5px 8px;" onclick="openResourceEditModal(${r.id})">편집</button>
-        <button class="btn btn-danger btn-sm" style="font-size:11px;padding:5px 8px;" onclick="deleteResource(${r.id})">삭제</button>` : ''}
-      </div>
+      ${isAdmin ? `<div style="display:flex;gap:4px;margin-top:auto;" onclick="event.stopPropagation()">
+        <button class="btn btn-outline btn-sm" style="flex:1;font-size:11px;padding:5px 8px;" onclick="openResourceEditModal(${r.id})">편집</button>
+        <button class="btn btn-danger btn-sm" style="flex:1;font-size:11px;padding:5px 8px;" onclick="deleteResource(${r.id})">삭제</button>
+      </div>` : ''}
     </div>`).join('');
 }
 
@@ -3219,19 +3215,17 @@ function renderNotices() {
   const list = document.getElementById('notice-list-full');
   const dash = document.getElementById('dashboard-notices');
   const isAdmin = STATE.user && STATE.user.isAdmin;
-  const badgeMap = { urgent: 'badge-urgent', normal: 'badge-normal', info: 'badge-info' };
-  const labelMap = { urgent: '긴급', normal: '일반', info: '안내' };
   if (STATE.notices.length === 0) {
     list.innerHTML = '<li style="padding:20px 0; color:var(--text-muted); text-align:center;">등록된 공지사항이 없습니다</li>';
-    dash.innerHTML = '<li class="notice-item"><span class="notice-badge badge-info">안내</span><div class="notice-content"><div class="notice-title">공지사항이 없습니다</div><div class="notice-date">포털 초기 상태</div></div></li>';
+    dash.innerHTML = '<li class="notice-item"><span class="notice-badge badge-normal">-</span><div class="notice-content"><div class="notice-title">공지사항이 없습니다</div><div class="notice-date">포털 초기 상태</div></div></li>';
     return;
   }
   list.innerHTML = STATE.notices.map((n, i) => `
     <li class="notice-item">
-      <span class="notice-badge ${badgeMap[n.type]}">${labelMap[n.type]}</span>
+      <span class="notice-badge badge-normal">${n.author}</span>
       <div class="notice-content" style="flex:1;">
         <div class="notice-title">${n.title}</div>
-        <div class="notice-date">${n.date} · ${n.author}</div>
+        <div class="notice-date">${n.date}</div>
         ${n.body ? `<div style="font-size:13px; color:var(--text-secondary); margin-top:6px; white-space:pre-line;">${n.body}</div>` : ''}
       </div>
       ${isAdmin ? `<div style="display:flex;gap:6px;flex-shrink:0;align-self:flex-start;margin-top:2px;">
@@ -3241,7 +3235,7 @@ function renderNotices() {
     </li>`).join('');
   dash.innerHTML = STATE.notices.slice(0, 5).map(n => `
     <li class="notice-item" onclick="openNoticeDetail(${n._id})" style="cursor:pointer;">
-      <span class="notice-badge ${badgeMap[n.type]}">${labelMap[n.type]}</span>
+      <span class="notice-badge badge-normal">${n.author}</span>
       <div class="notice-content">
         <div class="notice-title">${n.title}</div>
         <div class="notice-date">${n.date}</div>
@@ -3252,12 +3246,10 @@ function renderNotices() {
 function openNoticeDetail(id) {
   const n = STATE.notices.find(x => x._id === id);
   if (!n) return;
-  const badgeMap = { urgent: 'badge-urgent', normal: 'badge-normal', info: 'badge-info' };
-  const labelMap = { urgent: '긴급', normal: '일반', info: '안내' };
-  document.getElementById('notice-detail-badge').className = 'notice-badge ' + (badgeMap[n.type] || 'badge-normal');
-  document.getElementById('notice-detail-badge').textContent = labelMap[n.type] || n.type;
+  document.getElementById('notice-detail-badge').className = 'notice-badge badge-normal';
+  document.getElementById('notice-detail-badge').textContent = n.author;
   document.getElementById('notice-detail-title').textContent = n.title;
-  document.getElementById('notice-detail-meta').textContent = n.date + ' · ' + n.author;
+  document.getElementById('notice-detail-meta').textContent = n.date;
   document.getElementById('notice-detail-body').textContent = n.body || '(내용 없음)';
   openModal('notice-detail');
 }
