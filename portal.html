@@ -2752,14 +2752,18 @@ function doLogin() {
     document.getElementById('user-name-display').textContent = displayName;
     document.getElementById('user-role-display').textContent = isAdmin ? '원장' : '직원';
     document.getElementById('user-avatar').textContent = displayName.charAt(0);
-    // 최수빈 로그인 시 백업 버튼 표시
+    // 최수빈 로그인 시에만 백업 버튼 표시
     const backupWrap = document.getElementById('backup-btn-wrap');
-    if (backupWrap && displayName === '최수빈') {
-      backupWrap.style.display = 'block';
-      const now = new Date();
-      const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      const label = `${prevMonth.getMonth() + 1}월 데이터 추출`;
-      document.getElementById('backup-btn-label').textContent = label;
+    if (backupWrap) {
+      if (displayName === '최수빈') {
+        backupWrap.style.display = 'block';
+        const now = new Date();
+        const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const label = `${prevMonth.getMonth() + 1}월 데이터 추출`;
+        document.getElementById('backup-btn-label').textContent = label;
+      } else {
+        backupWrap.style.display = 'none';
+      }
     }
     initApp();
   } else {
@@ -2979,6 +2983,8 @@ function doLogout() {
   document.getElementById('login-step-name-staff').style.display = 'none';
   document.getElementById('login-step2').style.display = 'none';
   document.getElementById('login-pw').value = '';
+  const backupWrap = document.getElementById('backup-btn-wrap');
+  if (backupWrap) backupWrap.style.display = 'none';
 }
 
 /* ════════════════════════════════════
