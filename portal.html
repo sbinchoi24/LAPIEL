@@ -4635,6 +4635,8 @@ function renderDashboardCalendar() {
     // 공지사항 (날짜 있는 것)
     const notices = STATE.notices.filter(n => n.event_date === dateStr);
 
+    const isAdmin = STATE.user && STATE.user.isAdmin;
+    const dateClick = isAdmin ? `onclick="openEventModal('${dateStr}')" style="cursor:pointer;"` : '';
     html += `<div class="cal-day ${isToday?'today':''}" style="min-height:52px;" ${dateClick}>
       <div class="day-num ${dowClass}" style="font-size:11px;margin-bottom:2px;">${date}</div>
       ${notices.map(n => `<div class="cal-event" style="background:#FDEDEC;color:#C0392B;font-size:9px;padding:1px 4px;border-radius:3px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${n.title}</div>`).join('')}
