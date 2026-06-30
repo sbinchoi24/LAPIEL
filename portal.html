@@ -3145,6 +3145,7 @@ async function initApp() {
   renderManual();
   renderInventory();
   renderCalendar();
+  renderDashboardCalendar();
   updateDashboard();
 }
 
@@ -3213,28 +3214,15 @@ async function loadChecklistItems() {
   try {
     const rows = await sb.select('checklist_items', 'deleted=neq.true&order=sort_order.asc');
     if (rows && rows.length > 0) {
-      // DB에서 섹션 구조를 동적으로 구성
       const items = {};
-      const labels = {};
       rows.forEach(r => {
         if (!items[r.section]) items[r.section] = [];
         items[r.section].push({ id: r.id, label: r.label });
-        // section_label 컬럼이 있으면 사용, 없으면 기존 SECTION_LABELS 유지
-        if (r.section_label) labels[r.section] = r.section_label;
+        if (!SECTION_LABELS[r.section]) SECTION_LABELS[r.section] = r.section;
       });
       STATE.checklist.items = items;
-      // SECTION_LABELS 업데이트 (DB에 없는 건 기존 유지)
-      Object.keys(items).forEach(k => {
-        if (!SECTION_LABELS[k]) SECTION_LABELS[k] = k;
-      });
-    } else {
-      // DB 비어있으면 기본 항목 seed (morning/evening만, during 제외)
-      STATE.checklist.items = {
-        morning: ['진료실 환기', '침대 시트 교체 확인', '소독 기구 준비', '예약 환자 명단 확인', '기기 작동 점검'],
-        evening: ['마감 차트 정리', '기기 전원 OFF', '소독 기구 회수', '냉장고 온도 확인', '문단속 확인']
-      };
-      await seedChecklistItems();
     }
+    // DB 비어있으면 그냥 빈 상태로 둠 (seed 없음)
   } catch(e) { console.warn('loadChecklistItems 오류:', e); }
 }
 
