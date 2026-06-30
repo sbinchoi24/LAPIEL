@@ -673,8 +673,6 @@
   /* 청구 페이지: admin-only-block이 page display:none을 오버라이드하지 않도록 */
   #page-billing { display: none; }
   #page-billing.active { display: block; }
-  /* 직원 로그인 시 청구 페이지 완전 차단 */
-  body:not(.is-admin) #page-billing { display: none !important; }
   /* Q&A 페이지 */
   #page-qa-admin { display: none; }
   #page-qa-admin.active { display: block; }
@@ -1019,7 +1017,7 @@
 <!-- ══ LOGIN SCREEN ══ -->
 <div id="login-screen">
   <div style="position:fixed;bottom:16px;left:20px;font-size:11px;color:rgba(255,255,255,0.4);">
-    버전: 2026-06-30 19:20
+    버전: 2026-06-30 22:25
   </div>
   <div class="login-card">
     <h1>경희 라피엘 한의원</h1>
@@ -1109,7 +1107,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       <span>차팅</span>
     </div>
-    <div class="nav-item admin-only" onclick="showPage('billing')">
+    <div class="nav-item" onclick="showPage('billing')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
       <span>청구</span>
     </div>
@@ -1716,11 +1714,22 @@
 
   <!-- ▸ 자료 -->
   <div id="page-resources" class="page">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <div style="font-size:13px;color:var(--text-muted);">구글 드라이브 링크를 등록하면 포털에서 바로 접근할 수 있습니다</div>
+    <div class="flex items-center justify-between" style="margin-bottom:14px;">
+      <div class="search-bar" style="margin-bottom:0;flex:1;max-width:320px;">
+        <input type="text" class="search-input" id="resource-search" placeholder="자료 검색..." oninput="filterResources(this.value)">
+      </div>
       <button class="btn btn-green btn-sm admin-only" onclick="openResourceModal()">+ 자료 추가</button>
     </div>
-    <div id="resources-list"></div>
+    <div class="tab-bar" style="margin-bottom:16px;border:none;gap:8px;flex-wrap:wrap;">
+      <button class="tab-btn active" id="res-cat-all" onclick="filterResourceCat('all',this)">전체</button>
+      <button class="tab-btn" id="res-cat-설명서" onclick="filterResourceCat('설명서',this)">설명서</button>
+      <button class="tab-btn" id="res-cat-홍보" onclick="filterResourceCat('홍보',this)">홍보</button>
+      <button class="tab-btn" id="res-cat-환자교육" onclick="filterResourceCat('환자교육',this)">환자 교육</button>
+      <button class="tab-btn" id="res-cat-직원교육" onclick="filterResourceCat('직원교육',this)">직원 교육</button>
+      <button class="tab-btn" id="res-cat-서식양식" onclick="filterResourceCat('서식양식',this)">서식/양식</button>
+      <button class="tab-btn" id="res-cat-기타" onclick="filterResourceCat('기타',this)">기타</button>
+    </div>
+    <div id="resources-list" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;"></div>
   </div>
 
   <!-- ▸ 피부 재고 -->
@@ -2484,9 +2493,11 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
     <div class="form-section">
       <label>분류</label>
       <select id="resource-cat">
-        <option value="홍보">홍보자료</option>
-        <option value="교육">교육자료</option>
-        <option value="서식">서식/양식</option>
+        <option value="설명서">설명서</option>
+        <option value="홍보">홍보</option>
+        <option value="환자교육">환자 교육</option>
+        <option value="직원교육">직원 교육</option>
+        <option value="서식양식">서식/양식</option>
         <option value="기타">기타</option>
       </select>
     </div>
@@ -2797,37 +2808,55 @@ function saveResources() {
   localStorage.setItem('lapiel_resources', JSON.stringify(STATE.resources));
 }
 
+let resourceCatFilter = 'all';
+let resourceSearchQuery = '';
+
+function filterResourceCat(cat, btn) {
+  resourceCatFilter = cat;
+  document.querySelectorAll('#page-resources .tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderResources();
+}
+
+function filterResources(q) {
+  resourceSearchQuery = q;
+  renderResources();
+}
+
 function renderResources() {
   const el = document.getElementById('resources-list');
   if (!el) return;
   const isAdmin = STATE.user && STATE.user.isAdmin;
-  const catColors = { '홍보': 'cat-treatment', '교육': 'cat-admin', '서식': 'cat-emergency', '기타': 'cat-admin' };
-  if (!STATE.resources.length) {
-    el.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted);">등록된 자료가 없습니다</div>';
+
+  let items = STATE.resources;
+  if (resourceCatFilter !== 'all') items = items.filter(r => r.cat === resourceCatFilter);
+  if (resourceSearchQuery.trim()) {
+    const q = resourceSearchQuery.toLowerCase();
+    items = items.filter(r => r.name.toLowerCase().includes(q) || (r.desc || '').toLowerCase().includes(q));
+  }
+
+  if (!items.length) {
+    el.innerHTML = '<div style="grid-column:1/-1;padding:32px;text-align:center;color:var(--text-muted);">등록된 자료가 없습니다</div>';
     return;
   }
-  // 분류별 그룹핑
-  const groups = {};
-  STATE.resources.forEach(r => {
-    if (!groups[r.cat]) groups[r.cat] = [];
-    groups[r.cat].push(r);
-  });
-  el.innerHTML = Object.entries(groups).map(([cat, items]) => `
-    <div style="margin-bottom:20px;">
-      <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">${cat}자료</div>
-      ${items.map(r => `
-        <div class="card" style="margin-bottom:8px;display:flex;align-items:center;gap:14px;">
-          <div style="width:40px;height:40px;background:var(--primary-pale);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-          </div>
-          <div style="flex:1;">
-            <div style="font-size:14px;font-weight:700;color:var(--accent);">${r.name}</div>
-            ${r.desc ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${r.desc}</div>` : ''}
-          </div>
-          <a href="${r.url}" target="_blank" class="btn btn-green btn-sm" style="text-decoration:none;white-space:nowrap;">열기 ↗</a>
-          ${isAdmin ? `<button class="btn btn-outline btn-sm" onclick="openResourceEditModal(${r.id})">편집</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteResource(${r.id})">삭제</button>` : ''}
-        </div>`).join('')}
+
+  el.innerHTML = items.map(r => `
+    <div class="card" style="padding:12px;display:flex;flex-direction:column;gap:8px;">
+      <div style="display:flex;align-items:flex-start;gap:8px;">
+        <div style="width:28px;height:28px;background:var(--primary-pale);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:700;color:var(--accent);line-height:1.3;">${r.name}</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:1px;">${r.cat}</div>
+        </div>
+      </div>
+      ${r.desc ? `<div style="font-size:11px;color:var(--text-muted);line-height:1.4;">${r.desc}</div>` : ''}
+      <div style="display:flex;gap:4px;margin-top:auto;">
+        <a href="${r.url}" target="_blank" class="btn btn-green btn-sm" style="flex:1;text-align:center;text-decoration:none;font-size:11px;padding:5px 8px;">열기 ↗</a>
+        ${isAdmin ? `<button class="btn btn-outline btn-sm" style="font-size:11px;padding:5px 8px;" onclick="openResourceEditModal(${r.id})">편집</button>
+        <button class="btn btn-danger btn-sm" style="font-size:11px;padding:5px 8px;" onclick="deleteResource(${r.id})">삭제</button>` : ''}
+      </div>
     </div>`).join('');
 }
 
@@ -2837,7 +2866,7 @@ function openResourceModal() {
   document.getElementById('resource-name').value = '';
   document.getElementById('resource-url').value = '';
   document.getElementById('resource-desc').value = '';
-  document.getElementById('resource-cat').value = '홍보';
+  document.getElementById('resource-cat').value = '설명서';
   openModal('resource');
 }
 
@@ -2988,6 +3017,14 @@ function doLogout() {
   document.getElementById('login-pw').value = '';
   const backupWrap = document.getElementById('backup-btn-wrap');
   if (backupWrap) backupWrap.style.display = 'none';
+  // 다음 로그인 시 무조건 대시보드부터 시작하도록 페이지 상태 초기화
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-dashboard').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const dashNav = document.querySelector('.nav-item[onclick*="dashboard"]');
+  if (dashNav) dashNav.classList.add('active');
+  const titleEl = document.getElementById('page-title');
+  if (titleEl) titleEl.textContent = '대시보드';
 }
 
 /* ════════════════════════════════════
@@ -3095,7 +3132,8 @@ async function loadChecklistItems() {
       rows.forEach(r => {
         if (!items[r.section]) items[r.section] = [];
         items[r.section].push({ id: r.id, label: r.label });
-        if (!SECTION_LABELS[r.section]) SECTION_LABELS[r.section] = r.section;
+        if (r.section_label) SECTION_LABELS[r.section] = r.section_label;
+        else if (!SECTION_LABELS[r.section]) SECTION_LABELS[r.section] = r.section;
       });
       STATE.checklist.items = items;
     }
@@ -3358,7 +3396,7 @@ function renderChecklist() {
   if (isToday) {
     const todayRecurring = getTodayRecurring();
     if (todayRecurring.length > 0) {
-      html += `<div class="checklist-section"><div class="checklist-section-title" style="color:var(--primary);">📋 정기업무</div>`;
+      html += `<div class="checklist-section"><div class="checklist-section-title" style="color:#2E5C9A;">정기 업무</div>`;
       todayRecurring.forEach(task => {
         const key = `recurring-${viewDate}-${task.id}`;
         const record = STATE.checklist.checked[key];
@@ -3369,7 +3407,7 @@ function renderChecklist() {
           <input type="checkbox" id="chk-${key}" ${isChecked?'checked':''} onchange="toggleRecurringCheck('${key}',this.parentElement)">
           <div style="flex:1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <label for="chk-${key}" class="${isChecked?'checked':''}" style="margin:0;">${task.title}</label>
-            ${isChecked?`<span style="font-size:11px;color:var(--primary);font-weight:600;background:var(--primary-pale);padding:1px 8px;border-radius:10px;white-space:nowrap;">${record.role} · ${record.time}</span>`:''}
+            ${isChecked?`<span style="font-size:11px;color:#2E5C9A;font-weight:600;background:#EBF2FB;padding:1px 8px;border-radius:10px;white-space:nowrap;">${record.role} · ${record.time}</span>`:''}
           </div>
         </div>`;
       });
@@ -3545,7 +3583,7 @@ async function saveChecklistItems() {
     let sortOrder = 0;
     for (const sec of clEditorSections) {
       for (const label of sec.items.split(',').map(s => s.trim()).filter(Boolean)) {
-        const row = await sb.insert('checklist_items', { section: sec.key, label, sort_order: sortOrder++ });
+        const row = await sb.insert('checklist_items', { section: sec.key, section_label: sec.label, label, sort_order: sortOrder++ });
         if (row && row[0]) {
           if (!newItems[sec.key]) newItems[sec.key] = [];
           // id 반영
@@ -3607,7 +3645,7 @@ function updateDashboardChecklist() {
     const recPct = Math.round(recDone / todayRecurring.length * 100);
     const color = recPct === 100 ? 'var(--primary)' : recPct >= 50 ? 'var(--warning)' : 'var(--danger)';
     html += `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;">
-      <span style="font-size:12px;color:var(--text-secondary);flex:1;">📋 정기업무</span>
+      <span style="font-size:12px;color:var(--text-secondary);flex:1;">정기 업무</span>
       <div style="width:80px;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden;">
         <div style="width:${recPct}%;height:100%;background:${color};border-radius:3px;"></div>
       </div>
