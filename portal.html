@@ -461,6 +461,8 @@
     color: var(--text-muted);
     padding: 8px 0;
   }
+  #dashboard-calendar-grid .cal-header { padding: 4px 0; font-size: 11px; }
+  #dashboard-calendar-grid .cal-day { min-height: 52px; }
   .cal-day {
     min-height: 72px;
     border-radius: 8px;
@@ -1186,7 +1188,7 @@
             <button class="btn btn-outline btn-sm" onclick="changeDashboardMonth(1)">→</button>
           </div>
         </div>
-        <div class="calendar-grid" id="dashboard-calendar-grid" style="font-size:11px;"></div>
+        <div class="calendar-grid" id="dashboard-calendar-grid" style="font-size:11px; --cal-min-height:52px;"></div>
       </div>
 
       <!-- 우: 공지 + 체크리스트 완료율 -->
@@ -3226,16 +3228,6 @@ async function loadChecklistItems() {
   } catch(e) { console.warn('loadChecklistItems 오류:', e); }
 }
 
-async function seedChecklistItems() {
-  const sections = STATE.checklist.items;
-  for (const [section, items] of Object.entries(sections)) {
-    for (let i = 0; i < items.length; i++) {
-      const label = typeof items[i] === 'string' ? items[i] : items[i].label;
-      const row = await sb.insert('checklist_items', { section, label, sort_order: i });
-      if (row && row[0]) items[i] = { id: row[0].id, label };
-    }
-  }
-}
 
 async function loadChecklistLogs() {
   try {
@@ -3433,7 +3425,7 @@ async function deleteNotice(idx) {
 /* ════════════════════════════════════
    CHECKLIST
 ════════════════════════════════════ */
-let SECTION_LABELS = { morning: '오전 준비', during: '진료 중', evening: '마감' };
+let SECTION_LABELS = {};
 let selectedCheckDate = new Date().toDateString(); // 현재 선택된 날짜
 
 /* 2주 날짜 동그라미 렌더 */
@@ -4777,8 +4769,8 @@ function renderDashboardCalendar() {
     // 공지사항 (날짜 있는 것)
     const notices = STATE.notices.filter(n => n.event_date === dateStr);
 
-    html += `<div class="cal-day ${isToday?'today':''}" style="min-height:52px;">
-      <div class="day-num ${dowClass}" style="font-size:11px;">${date}</div>
+    html += `<div class="cal-day ${isToday?'today':''}" style="min-height:52px;" ${dateClick}>
+      <div class="day-num ${dowClass}" style="font-size:11px;margin-bottom:2px;">${date}</div>
       ${notices.map(n => `<div class="cal-event" style="background:#FDEDEC;color:#C0392B;font-size:9px;padding:1px 4px;border-radius:3px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">📢 ${n.title}</div>`).join('')}
       ${recurring.map(t => `<div class="cal-event" style="background:var(--primary-pale);color:var(--primary);font-size:9px;padding:1px 4px;border-radius:3px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">🔄 ${t.title}</div>`).join('')}
       ${events.map(e => `<div class="cal-event" style="background:#FEF9E7;color:#7D5A00;font-size:9px;padding:1px 4px;border-radius:3px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">📌 ${e.title}</div>`).join('')}
