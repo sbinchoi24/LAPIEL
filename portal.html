@@ -522,6 +522,8 @@
     border-bottom: 1px solid var(--border);
   }
   .inventory-table tr:hover td { background: var(--surface-0); }
+  .inventory-table td:first-child { white-space: nowrap; }
+  .inventory-table td:last-child { white-space: nowrap; }
   .stock-status {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 12px; font-weight: 700;
@@ -1739,12 +1741,15 @@
   </div>
 
   <!-- ▸ INVENTORY -->
-  <div id="page-inventory" class="page">
+  <div id="page-inventory" class="page" style="max-width:100%;">
     <div class="flex items-center justify-between" style="margin-bottom:20px;">
       <div class="search-bar" style="margin-bottom:0; flex:1; max-width:320px;">
         <input type="text" class="search-input" placeholder="소모품 검색..." oninput="filterInventory(this.value)">
       </div>
-      <button class="btn btn-green btn-sm admin-only" onclick="openInventoryModal()">항목 추가 (원장)</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline btn-sm admin-only" onclick="openCatManageModal('general')">분류 관리</button>
+        <button class="btn btn-green btn-sm admin-only" onclick="openInventoryModal()">항목 추가 (원장)</button>
+      </div>
     </div>
     <div class="card" style="padding:0; overflow:hidden;">
       <table class="inventory-table">
@@ -1758,6 +1763,7 @@
             <th>수량 입력</th>
             <th>저장</th>
             <th class="admin-only" style="display:table-cell;">관리</th>
+            <th class="admin-only" style="display:table-cell;">순서</th>
             <th>최근 수정</th>
           </tr>
         </thead>
@@ -1820,12 +1826,15 @@
   </div>
 
   <!-- ▸ 피부 재고 -->
-  <div id="page-skin-inventory" class="page">
+  <div id="page-skin-inventory" class="page" style="max-width:100%;">
     <div class="flex items-center justify-between" style="margin-bottom:20px;">
       <div class="search-bar" style="margin-bottom:0; flex:1; max-width:320px;">
         <input type="text" class="search-input" placeholder="피부 소모품 검색..." oninput="filterSkinInventory(this.value)">
       </div>
-      <button class="btn btn-green btn-sm admin-only" onclick="openSkinInventoryModal()">항목 추가 (원장)</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline btn-sm admin-only" onclick="openCatManageModal('skin')">분류 관리</button>
+        <button class="btn btn-green btn-sm admin-only" onclick="openSkinInventoryModal()">항목 추가 (원장)</button>
+      </div>
     </div>
     <div class="card" style="padding:0; overflow:hidden;">
       <table class="inventory-table">
@@ -1839,6 +1848,7 @@
             <th>수량 입력</th>
             <th>저장</th>
             <th class="admin-only" style="display:table-cell;">관리</th>
+            <th class="admin-only" style="display:table-cell;">순서</th>
             <th>최근 수정</th>
           </tr>
         </thead>
@@ -1924,13 +1934,7 @@
     </div>
     <div class="form-section">
       <label>분류</label>
-      <select id="inv-cat">
-        <option>침구류</option>
-        <option>한약재</option>
-        <option>사무용품</option>
-        <option>의료소모품</option>
-        <option>기타</option>
-      </select>
+      <select id="inv-cat"></select>
     </div>
     <div class="form-section">
       <label>기준(최소) 수량</label>
@@ -2629,15 +2633,29 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
     <div class="form-section"><label>품목명</label><input type="text" id="inv-edit-name" placeholder="품목명"></div>
     <div class="form-section">
       <label>분류</label>
-      <select id="inv-edit-cat">
-        <option>침구류</option><option>한약재</option><option>사무용품</option><option>의료소모품</option><option>기타</option>
-      </select>
+      <select id="inv-edit-cat"></select>
     </div>
     <div class="form-section"><label>현재 수량</label><input type="number" id="inv-edit-qty" min="0"></div>
     <div class="form-section"><label>기준(최소) 수량</label><input type="number" id="inv-edit-min" min="0"></div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('inventory-edit')">취소</button>
       <button class="btn btn-green" onclick="saveInventoryEdit()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 소모품 분류 관리 모달 -->
+<div class="modal-overlay" id="modal-cat-manage">
+  <div class="modal" style="width:380px;">
+    <div class="modal-title" id="cat-manage-title">분류 관리</div>
+    <input type="hidden" id="cat-manage-type">
+    <div id="cat-manage-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:320px;overflow-y:auto;"></div>
+    <div class="form-section" style="display:flex;gap:6px;align-items:flex-end;">
+      <input type="text" id="cat-manage-new" placeholder="새 분류명" style="flex:1;" onkeydown="if(event.key==='Enter')addInvCategory()">
+      <button class="btn btn-green btn-sm" onclick="addInvCategory()">추가</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('cat-manage')">닫기</button>
     </div>
   </div>
 </div>
@@ -2775,9 +2793,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
     <div class="form-section"><label>품목명</label><input type="text" id="skin-inv-edit-name" placeholder="품목명"></div>
     <div class="form-section">
       <label>분류</label>
-      <select id="skin-inv-edit-cat">
-        <option>앰플/세럼</option><option>마스크</option><option>크림/로션</option><option>필링</option><option>기기소모품</option><option>기타</option>
-      </select>
+      <select id="skin-inv-edit-cat"></select>
     </div>
     <div class="form-section"><label>현재 수량</label><input type="number" id="skin-inv-edit-qty" min="0"></div>
     <div class="form-section"><label>기준(최소) 수량</label><input type="number" id="skin-inv-edit-min" min="0"></div>
@@ -2795,10 +2811,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
     <div class="form-section"><label>품목명</label><input type="text" id="skin-inv-name" placeholder="예: 앰플 A"></div>
     <div class="form-section">
       <label>분류</label>
-      <select id="skin-inv-cat">
-        <option>앰플/세럼</option><option>마스크</option><option>크림/로션</option>
-        <option>필링</option><option>기기소모품</option><option>기타</option>
-      </select>
+      <select id="skin-inv-cat"></select>
     </div>
     <div class="form-section"><label>기준(최소) 수량</label><input type="number" id="skin-inv-min" placeholder="예: 10"></div>
     <div class="modal-actions">
@@ -2941,6 +2954,10 @@ const STATE = {
   recurringTasks: [],
   scheduledEvents: [],
   resources: [],
+  invCats: {
+    general: [],
+    skin: []
+  },
 };
 
 /* 비밀번호 설정 */
@@ -3290,6 +3307,7 @@ async function initApp() {
       loadManuals(),
       loadInventory(),
       loadSkinInventory(),
+      loadInvCategories(),
       loadSchedules(),
       loadChecklistItems(),
       loadQAItems(),
@@ -3359,10 +3377,96 @@ async function loadInventory() {
     if (rows && rows.length > 0) {
       STATE.inventory = rows.map(r => ({
         id: r.id, name: r.name, cat: r.cat, qty: r.qty, min: r.min_qty,
+        sortOrder: r.sort_order ?? null,
         updatedBy: r.updated_by || '', updatedAt: r.updated_at || ''
       }));
     }
   } catch(e) { console.warn('loadInventory 오류:', e); }
+}
+
+async function loadInvCategories() {
+  try {
+    const rows = await sb.select('inventory_categories', 'deleted=neq.true&order=sort_order.asc');
+    const list = rows || [];
+    STATE.invCats.general = list.filter(r => r.type === 'general').map(r => ({ id: r.id, name: r.name }));
+    STATE.invCats.skin = list.filter(r => r.type === 'skin').map(r => ({ id: r.id, name: r.name }));
+  } catch(e) { console.warn('loadInvCategories 오류:', e); }
+}
+function invCatList(type) {
+  // 항목이 {id,name} 객체 또는 기본 문자열 둘 다 지원
+  return STATE.invCats[type].map(c => typeof c === 'string' ? { id: null, name: c } : c);
+}
+function renderCatOptions(selectId, type, selected) {
+  const sel = document.getElementById(selectId);
+  if (!sel) return;
+  sel.innerHTML = invCatList(type).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+  if (selected) sel.value = selected;
+}
+
+function openCatManageModal(type) {
+  document.getElementById('cat-manage-type').value = type;
+  document.getElementById('cat-manage-title').textContent = (type === 'general' ? '일반' : '피부') + ' 소모품 분류 관리';
+  document.getElementById('cat-manage-new').value = '';
+  renderCatManageList(type);
+  openModal('cat-manage');
+}
+
+function renderCatManageList(type) {
+  const list = invCatList(type);
+  const wrap = document.getElementById('cat-manage-list');
+  wrap.innerHTML = list.map((c, i) => `
+    <div style="display:flex;align-items:center;gap:6px;">
+      <input type="text" value="${c.name}" id="cat-manage-input-${i}" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;">
+      <button class="btn btn-outline btn-sm" onclick="renameInvCategory('${type}',${i})">저장</button>
+      <button class="btn btn-outline btn-sm" style="color:#C0392B;border-color:#C0392B;" onclick="deleteInvCategory('${type}',${i})">삭제</button>
+    </div>
+  `).join('');
+}
+
+async function addInvCategory() {
+  const type = document.getElementById('cat-manage-type').value;
+  const name = document.getElementById('cat-manage-new').value.trim();
+  if (!name) return;
+  if (invCatList(type).some(c => c.name === name)) { alert('이미 있는 분류명입니다'); return; }
+  const sortOrder = invCatList(type).length;
+  let newEntry = { id: null, name };
+  try {
+    const rows = await sb.insert('inventory_categories', { type, name, sort_order: sortOrder });
+    if (rows && rows[0]) newEntry = { id: rows[0].id, name };
+  } catch(e) { console.warn('카테고리 저장 실패(테이블 미생성 가능):', e); }
+  STATE.invCats[type] = invCatList(type).concat([newEntry]);
+  document.getElementById('cat-manage-new').value = '';
+  renderCatManageList(type);
+  showToast('분류가 추가되었습니다');
+}
+
+async function renameInvCategory(type, idx) {
+  const list = invCatList(type);
+  const entry = list[idx];
+  const newName = document.getElementById('cat-manage-input-' + idx).value.trim();
+  if (!newName) { alert('분류명을 입력하세요'); return; }
+  if (entry.id != null) {
+    try { await sb.update('inventory_categories', entry.id, { name: newName }); }
+    catch(e) { console.warn('분류 수정 실패:', e); }
+  }
+  list[idx] = { id: entry.id, name: newName };
+  STATE.invCats[type] = list;
+  renderCatManageList(type);
+  showToast('분류명이 수정되었습니다');
+}
+
+async function deleteInvCategory(type, idx) {
+  if (!confirm('이 분류를 삭제할까요? (기존 항목의 분류 값은 그대로 남습니다)')) return;
+  const list = invCatList(type);
+  const entry = list[idx];
+  if (entry.id != null) {
+    try { await sb.update('inventory_categories', entry.id, { deleted: true }); }
+    catch(e) { console.warn('분류 삭제 실패:', e); }
+  }
+  list.splice(idx, 1);
+  STATE.invCats[type] = list;
+  renderCatManageList(type);
+  showToast('분류가 삭제되었습니다');
 }
 
 async function loadSchedules() {
@@ -4120,10 +4224,13 @@ async function deleteManual(id) {
 ════════════════════════════════════ */
 function renderInventory(filter = '') {
   const tbody = document.getElementById('inventory-tbody');
-  const items = STATE.inventory.filter(i =>
-    !filter || i.name.toLowerCase().includes(filter.toLowerCase()) || i.cat.includes(filter)
-  );
-  tbody.innerHTML = items.map(item => {
+  const items = STATE.inventory
+    .slice()
+    .sort((a,b) => (a.sortOrder ?? a.id) - (b.sortOrder ?? b.id))
+    .filter(i =>
+      !filter || i.name.toLowerCase().includes(filter.toLowerCase()) || i.cat.includes(filter)
+    );
+  tbody.innerHTML = items.map((item, idx) => {
     const pct = item.qty / item.min;
     let status, statusLabel;
     if (item.qty === 0) { status = 'stock-empty'; statusLabel = '재고 없음'; }
@@ -4147,10 +4254,31 @@ function renderInventory(filter = '') {
           <button class="btn btn-danger btn-sm" onclick="deleteInventoryItem(${item.id})">품목 삭제</button>
         </div>
       </td>
+      <td class="admin-only" style="display:table-cell;">
+        <div style="display:flex;gap:2px;">
+          <button class="btn btn-outline btn-sm" style="padding:3px 7px;" ${idx===0?'disabled':''} onclick="moveInventoryItem(${item.id},'up')">▲</button>
+          <button class="btn btn-outline btn-sm" style="padding:3px 7px;" ${idx===items.length-1?'disabled':''} onclick="moveInventoryItem(${item.id},'down')">▼</button>
+        </div>
+      </td>
       <td>${updaterInfo}</td>
     </tr>`;
   }).join('');
   updateInventoryAlerts();
+}
+
+async function moveInventoryItem(id, dir) {
+  const sorted = STATE.inventory.slice().sort((a,b) => (a.sortOrder ?? a.id) - (b.sortOrder ?? b.id));
+  const idx = sorted.findIndex(i => i.id === id);
+  const swapIdx = dir === 'up' ? idx - 1 : idx + 1;
+  if (swapIdx < 0 || swapIdx >= sorted.length) return;
+  const a = sorted[idx], b = sorted[swapIdx];
+  const aOrder = a.sortOrder ?? a.id, bOrder = b.sortOrder ?? b.id;
+  a.sortOrder = bOrder; b.sortOrder = aOrder;
+  try {
+    await sb.update('inventory', a.id, { sort_order: a.sortOrder });
+    await sb.update('inventory', b.id, { sort_order: b.sortOrder });
+  } catch(e) { console.warn('순서 저장 실패(sort_order 컬럼 미생성 가능):', e); }
+  renderInventory(document.querySelector('#page-inventory .search-input') ? document.querySelector('#page-inventory .search-input').value : '');
 }
 
 function filterInventory(q) { renderInventory(q); }
@@ -4197,14 +4325,14 @@ function updateInventoryAlerts() {
   renderAlerts(STATE.skinInventory, 'dashboard-skin-inventory-alerts');
 }
 
-function openInventoryModal() { openModal('inventory'); }
+function openInventoryModal() { renderCatOptions('inv-cat','general'); openModal('inventory'); }
 
 function openInventoryEditModal(id) {
   const item = STATE.inventory.find(i => i.id === id);
   if (!item) return;
   document.getElementById('inv-edit-id').value = id;
   document.getElementById('inv-edit-name').value = item.name;
-  document.getElementById('inv-edit-cat').value = item.cat;
+  renderCatOptions('inv-edit-cat','general',item.cat);
   document.getElementById('inv-edit-qty').value = item.qty;
   document.getElementById('inv-edit-min').value = item.min;
   openModal('inventory-edit');
@@ -4230,7 +4358,7 @@ function openSkinInventoryEditModal(id) {
   if (!item) return;
   document.getElementById('skin-inv-edit-id').value = id;
   document.getElementById('skin-inv-edit-name').value = item.name;
-  document.getElementById('skin-inv-edit-cat').value = item.cat;
+  renderCatOptions('skin-inv-edit-cat','skin',item.cat);
   document.getElementById('skin-inv-edit-qty').value = item.qty;
   document.getElementById('skin-inv-edit-min').value = item.min;
   openModal('skin-inventory-edit');
@@ -4345,6 +4473,7 @@ async function loadSkinInventory() {
     if (rows && rows.length > 0) {
       STATE.skinInventory = rows.map(r => ({
         id: r.id, name: r.name, cat: r.cat, qty: r.qty, min: r.min_qty,
+        sortOrder: r.sort_order ?? null,
         updatedBy: r.updated_by || '', updatedAt: r.updated_at || ''
       }));
     }
@@ -4355,10 +4484,13 @@ function renderSkinInventory(filter = '') {
   const tbody = document.getElementById('skin-inventory-tbody');
   if (!tbody) return;
   const isAdmin = STATE.user && STATE.user.isAdmin;
-  const items = STATE.skinInventory.filter(i =>
-    !filter || i.name.toLowerCase().includes(filter.toLowerCase())
-  );
-  tbody.innerHTML = items.map(item => {
+  const items = STATE.skinInventory
+    .slice()
+    .sort((a,b) => (a.sortOrder ?? a.id) - (b.sortOrder ?? b.id))
+    .filter(i =>
+      !filter || i.name.toLowerCase().includes(filter.toLowerCase())
+    );
+  tbody.innerHTML = items.map((item, idx) => {
     const pct = item.qty / item.min;
     let status, statusLabel;
     if (item.qty === 0) { status = 'stock-empty'; statusLabel = '재고 없음'; }
@@ -4382,13 +4514,34 @@ function renderSkinInventory(filter = '') {
           <button class="btn btn-danger btn-sm" onclick="deleteSkinInventoryItem(${item.id})">품목 삭제</button>
         </div>
       </td>` : '<td></td>'}
+      ${isAdmin ? `<td>
+        <div style="display:flex;gap:2px;">
+          <button class="btn btn-outline btn-sm" style="padding:3px 7px;" ${idx===0?'disabled':''} onclick="moveSkinInventoryItem(${item.id},'up')">▲</button>
+          <button class="btn btn-outline btn-sm" style="padding:3px 7px;" ${idx===items.length-1?'disabled':''} onclick="moveSkinInventoryItem(${item.id},'down')">▼</button>
+        </div>
+      </td>` : '<td></td>'}
       <td>${updaterInfo}</td>
     </tr>`;
   }).join('');
 }
 
 function filterSkinInventory(q) { renderSkinInventory(q); }
-function openSkinInventoryModal() { openModal('skin-inventory'); }
+
+async function moveSkinInventoryItem(id, dir) {
+  const sorted = STATE.skinInventory.slice().sort((a,b) => (a.sortOrder ?? a.id) - (b.sortOrder ?? b.id));
+  const idx = sorted.findIndex(i => i.id === id);
+  const swapIdx = dir === 'up' ? idx - 1 : idx + 1;
+  if (swapIdx < 0 || swapIdx >= sorted.length) return;
+  const a = sorted[idx], b = sorted[swapIdx];
+  const aOrder = a.sortOrder ?? a.id, bOrder = b.sortOrder ?? b.id;
+  a.sortOrder = bOrder; b.sortOrder = aOrder;
+  try {
+    await sb.update('skin_inventory', a.id, { sort_order: a.sortOrder });
+    await sb.update('skin_inventory', b.id, { sort_order: b.sortOrder });
+  } catch(e) { console.warn('순서 저장 실패(sort_order 컬럼 미생성 가능):', e); }
+  renderSkinInventory(document.querySelector('#page-skin-inventory .search-input') ? document.querySelector('#page-skin-inventory .search-input').value : '');
+}
+function openSkinInventoryModal() { renderCatOptions('skin-inv-cat','skin'); openModal('skin-inventory'); }
 
 async function saveSkinInventoryItem() {
   const name = document.getElementById('skin-inv-name').value.trim();
