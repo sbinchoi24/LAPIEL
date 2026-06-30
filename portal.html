@@ -1018,6 +1018,9 @@
 
 <!-- ══ LOGIN SCREEN ══ -->
 <div id="login-screen">
+  <div style="position:fixed;bottom:16px;left:20px;font-size:11px;color:rgba(255,255,255,0.4);">
+    버전: 2026-06-30 19:20
+  </div>
   <div class="login-card">
     <h1>경희 라피엘 한의원</h1>
     <div style="width:32px;height:3px;background:var(--primary);border-radius:2px;margin:8px 0 16px;"></div>
@@ -1168,9 +1171,6 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       <span>로그아웃</span>
     </button>
-    <div style="font-size:10px;color:rgba(255,255,255,0.35);text-align:center;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);">
-      v2026.06.30 18:42
-    </div>
   </div>
 </div>
 
@@ -1200,7 +1200,7 @@
         </div>
         <div style="display:flex;gap:14px;margin-bottom:8px;flex-wrap:wrap;">
           <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#FDEDEC;border:1px solid #C0392B;display:inline-block;"></span>공지</span>
-          <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--primary-pale);border:1px solid var(--primary);display:inline-block;"></span>반복 업무</span>
+          <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#EBF2FB;border:1px solid #2E5C9A;display:inline-block;"></span>반복 업무</span>
           <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#FEF9E7;border:1px solid #C07D2A;display:inline-block;"></span>일정</span>
         </div>
         <div class="calendar-grid" id="dashboard-calendar-grid" style="font-size:11px; --cal-min-height:52px;"></div>
@@ -1692,7 +1692,7 @@
         <button onclick="changeRecurringMonth(1)">다음 →</button>
       </div>
       <div style="display:flex;gap:14px;margin-bottom:8px;flex-wrap:wrap;">
-        <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--primary-pale);border:1px solid var(--primary);display:inline-block;"></span>반복 업무</span>
+        <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#EBF2FB;border:1px solid #2E5C9A;display:inline-block;"></span>반복 업무</span>
         <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#FEF9E7;border:1px solid #C07D2A;display:inline-block;"></span>일정</span>
       </div>
       <div class="calendar-grid" id="recurring-calendar-grid"></div>
@@ -4467,7 +4467,7 @@ function renderRecurringCalendar() {
     const dateClick = isAdmin ? `onclick="openEventModal('${dateStr}')" style="cursor:pointer;"` : '';
     html += `<div class="cal-day ${isToday?'today':''}" ${dateClick}>
       <div class="day-num ${dowClass}">${date}</div>
-      ${recurring.map(t => `<div class="cal-event" style="background:var(--primary-pale);color:var(--primary);font-size:10px;padding:2px 4px;border-radius:3px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${t.title}</div>`).join('')}
+      ${recurring.map(t => `<div class="cal-event" style="background:#EBF2FB;color:#2E5C9A;font-size:10px;padding:2px 4px;border-radius:3px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${t.title}</div>`).join('')}
       ${events.map(e => `<div class="cal-event" style="background:#FEF9E7;color:#7D5A00;font-size:10px;padding:2px 4px;border-radius:3px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.title}</div>`).join('')}
     </div>`;
   }
@@ -4649,7 +4649,7 @@ function renderDashboardCalendar() {
     html += `<div class="cal-day ${isToday?'today':''}" style="min-height:52px;" ${dateClick}>
       <div class="day-num ${dowClass}" style="font-size:11px;margin-bottom:2px;">${date}</div>
       ${notices.map(n => `<div class="cal-event" style="background:#FDEDEC;color:#C0392B;font-size:9px;padding:1px 4px;border-radius:3px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${n.title}</div>`).join('')}
-      ${recurring.map(t => `<div class="cal-event" style="background:var(--primary-pale);color:var(--primary);font-size:9px;padding:1px 4px;border-radius:3px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${t.title}</div>`).join('')}
+      ${recurring.map(t => `<div class="cal-event" style="background:#EBF2FB;color:#2E5C9A;font-size:9px;padding:1px 4px;border-radius:3px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${t.title}</div>`).join('')}
       ${events.map(e => `<div class="cal-event" style="background:#FEF9E7;color:#7D5A00;font-size:9px;padding:1px 4px;border-radius:3px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.title}</div>`).join('')}
     </div>`;
   }
