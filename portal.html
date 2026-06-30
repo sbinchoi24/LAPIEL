@@ -1721,11 +1721,11 @@
     </div>
     <div class="tab-bar" style="margin-bottom:16px;border:none;gap:8px;flex-wrap:wrap;">
       <button class="tab-btn active" id="res-cat-all" onclick="filterResourceCat('all',this)">전체</button>
-      <button class="tab-btn" id="res-cat-설명서" onclick="filterResourceCat('설명서',this)">설명서</button>
       <button class="tab-btn" id="res-cat-홍보" onclick="filterResourceCat('홍보',this)">홍보</button>
       <button class="tab-btn" id="res-cat-환자교육" onclick="filterResourceCat('환자교육',this)">환자 교육</button>
       <button class="tab-btn" id="res-cat-직원교육" onclick="filterResourceCat('직원교육',this)">직원 교육</button>
       <button class="tab-btn" id="res-cat-서식양식" onclick="filterResourceCat('서식양식',this)">서식/양식</button>
+      <button class="tab-btn" id="res-cat-설명서" onclick="filterResourceCat('설명서',this)">설명서</button>
       <button class="tab-btn" id="res-cat-기타" onclick="filterResourceCat('기타',this)">기타</button>
     </div>
     <div id="resources-list" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;"></div>
@@ -1791,7 +1791,18 @@
     <div class="modal-title">일정 추가</div>
     <div class="form-section">
       <label>직원명</label>
-      <input type="text" id="sched-staff" placeholder="이름 입력">
+      <select id="sched-staff">
+        <option value="">선택하세요</option>
+        <option value="김다은">김다은</option>
+        <option value="김소리">김소리</option>
+        <option value="김우태">김우태</option>
+        <option value="김유빈">김유빈</option>
+        <option value="남서연">남서연</option>
+        <option value="박채린">박채린</option>
+        <option value="이지예">이지예</option>
+        <option value="장아름">장아름</option>
+        <option value="최윤희">최윤희</option>
+      </select>
     </div>
     <div class="form-section">
       <label>날짜</label>
@@ -2490,11 +2501,11 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
     <div class="form-section">
       <label>분류</label>
       <select id="resource-cat">
-        <option value="설명서">설명서</option>
         <option value="홍보">홍보</option>
         <option value="환자교육">환자 교육</option>
         <option value="직원교육">직원 교육</option>
         <option value="서식양식">서식/양식</option>
+        <option value="설명서">설명서</option>
         <option value="기타">기타</option>
       </select>
     </div>
@@ -2862,7 +2873,7 @@ function openResourceModal() {
   document.getElementById('resource-name').value = '';
   document.getElementById('resource-url').value = '';
   document.getElementById('resource-desc').value = '';
-  document.getElementById('resource-cat').value = '설명서';
+  document.getElementById('resource-cat').value = '홍보';
   openModal('resource');
 }
 
@@ -3464,7 +3475,7 @@ async function toggleCheck(key, itemId, row) {
   if (!cb) return;
   const today = new Date().toDateString();
   const time = new Date().toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
-  const role = STATE.user.isAdmin ? STATE.user.name + ' 원장' : '직원';
+  const role = STATE.user.isAdmin ? STATE.user.name + ' 원장' : STATE.user.name;
   if (cb.checked) {
     STATE.checklist.checked[key] = { done: true, time, role };
     await sb.upsert('checklist_logs', {
@@ -4047,6 +4058,7 @@ function changeMonth(dir) {
 function openScheduleModal() {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('sched-date').value = today;
+  document.getElementById('sched-staff').value = '';
   openModal('schedule');
 }
 
@@ -4055,7 +4067,7 @@ async function saveSchedule() {
   const date = document.getElementById('sched-date').value;
   const type = document.getElementById('sched-type').value;
   const memo = document.getElementById('sched-memo').value.trim();
-  if (!staff || !date) { alert('이름과 날짜를 입력하세요'); return; }
+  if (!staff || !date) { alert('직원을 선택하고 날짜를 입력하세요'); return; }
   const rows = await sb.insert('schedules', { staff, date, type, memo });
   if (rows && rows[0]) {
     STATE.schedule.push({ _id: rows[0].id, staff, date, type, memo });
