@@ -709,12 +709,13 @@
     grid-template-columns: 1fr 300px;
     gap: 12px; padding: 12px; align-items: start;
   }
-  .ch-left { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .ch-left { display: flex; flex-direction: column; gap: 12px; min-width: 520px; }
   .ch-3col {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 12px;
     align-items: start;
+    min-width: 0;
   }
   .ch-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
@@ -1125,9 +1126,17 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       <span>체크리스트</span>
     </div>
+    <div class="nav-item" onclick="showPage('recurring')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+      <span>일정</span>
+    </div>
     <div class="nav-item" onclick="showPage('schedule')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       <span>스케줄</span>
+    </div>
+    <div class="nav-item" onclick="showPage('resources')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      <span>자료</span>
     </div>
     <div class="nav-section-label">관리</div>
     <div class="nav-item" onclick="showPage('inventory')">
@@ -1140,6 +1149,12 @@
     </div>
   </nav>
   <div class="sidebar-footer">
+    <div id="backup-btn-wrap" style="display:none;margin-bottom:8px;">
+      <button class="logout-btn" id="backup-btn" onclick="exportMonthlyData()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;width:100%;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span id="backup-btn-label">데이터 백업</span>
+      </button>
+    </div>
     <button class="logout-btn" onclick="doLogout()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       <span>로그아웃</span>
@@ -1156,54 +1171,81 @@
 
   <!-- ▸ DASHBOARD -->
   <div id="page-dashboard" class="page active">
-    <div class="grid-2">
+    <!-- 상단: 캘린더(좌) + 공지/체크리스트(우) -->
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;margin-bottom:16px;">
+      <!-- 좌: 월 캘린더 -->
       <div class="card">
-        <div class="card-title">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          최근 공지사항
-        </div>
-        <ul class="notice-list" id="dashboard-notices">
-          <li class="notice-item">
-            <span class="notice-badge badge-info">일반</span>
-            <div class="notice-content">
-              <div class="notice-title">공지사항이 없습니다</div>
-              <div class="notice-date">포털 초기 상태</div>
-            </div>
-          </li>
-        </ul>
-      </div>
-      <div class="card">
-        <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
           <span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; vertical-align:-2px; margin-right:6px;"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-            오늘의 체크리스트
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:6px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            일정
           </span>
-          <span id="dashboard-checklist-progress" style="font-size:12px; color:var(--text-muted); font-weight:400;">0 / 0</span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button class="btn btn-outline btn-sm" onclick="changeDashboardMonth(-1)">←</button>
+            <span id="dashboard-cal-month" style="font-size:13px;font-weight:700;color:var(--accent);min-width:72px;text-align:center;"></span>
+            <button class="btn btn-outline btn-sm" onclick="changeDashboardMonth(1)">→</button>
+          </div>
         </div>
-        <div class="checklist-progress">
-          <div class="checklist-progress-bar" id="dashboard-progress-bar" style="width:0%"></div>
+        <div class="calendar-grid" id="dashboard-calendar-grid" style="font-size:11px;"></div>
+      </div>
+
+      <!-- 우: 공지 + 체크리스트 완료율 -->
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <!-- 공지사항 -->
+        <div class="card" style="flex:1;overflow-y:auto;max-height:220px;">
+          <div class="card-title" style="font-size:13px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:4px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            최근 공지사항
+          </div>
+          <ul class="notice-list" id="dashboard-notices">
+            <li class="notice-item">
+              <span class="notice-badge badge-info">일반</span>
+              <div class="notice-content">
+                <div class="notice-title">공지사항이 없습니다</div>
+                <div class="notice-date">포털 초기 상태</div>
+              </div>
+            </li>
+          </ul>
         </div>
-        <div id="dashboard-checklist-items"></div>
+
+        <!-- 체크리스트 완료율 -->
+        <div class="card">
+          <div class="card-title" style="font-size:13px;display:flex;justify-content:space-between;align-items:center;">
+            <span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:4px;"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              오늘의 체크리스트
+            </span>
+            <span id="dashboard-checklist-progress" style="font-size:12px;color:var(--text-muted);font-weight:400;">0 / 0</span>
+          </div>
+          <div class="checklist-progress" style="margin-bottom:10px;">
+            <div class="checklist-progress-bar" id="dashboard-progress-bar" style="width:0%"></div>
+          </div>
+          <div id="dashboard-checklist-items"></div>
+        </div>
       </div>
     </div>
 
-    <div class="section-gap">
+    <!-- 하단: 재고 부족 (일반/피부 나란히) -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
       <div class="card">
-        <div class="card-title flex items-center justify-between" style="display:flex; justify-content:space-between; align-items:center;">
-          <span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; vertical-align:-2px; margin-right:6px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-            재고 부족 알림
-          </span>
+        <div class="card-title" style="font-size:13px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:4px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          일반 소모품 부족
         </div>
-        <div id="dashboard-inventory-alerts">
-          <span class="text-muted">재고 부족 항목이 없습니다 ✓</span>
+        <div id="dashboard-inventory-alerts"><span class="text-muted">부족 항목 없음 ✓</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="font-size:13px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:4px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          피부 소모품 부족
         </div>
+        <div id="dashboard-skin-inventory-alerts"><span class="text-muted">부족 항목 없음 ✓</span></div>
       </div>
     </div>
   </div>
 
   <!-- ▸ CHARTING -->
-  <div id="page-charting" class="page" style="padding:0; max-width:1400px;">
+  <div id="page-charting" class="page" style="padding:0; max-width:100%; min-width:900px;">
     <div id="charting-root" style="font-size:13px; color:#1A1A1A;">
 
       <!-- 차팅 탭바 -->
@@ -1330,6 +1372,13 @@
                 <div class="ch-card">
                   <div class="ch-card-hd">P)</div>
                   <div class="ch-card-bd" id="p-body"></div>
+                </div>
+
+                <div class="ch-card">
+                  <div class="ch-card-hd">치료실 전달</div>
+                  <div class="ch-card-bd" id="tx-body">
+                    <div style="color:var(--text-muted);font-size:12px;padding:8px 0;">버튼은 추후 추가 예정</div>
+                  </div>
                 </div>
               </div>
 
@@ -1615,6 +1664,43 @@
     </div>
   </div>
 
+
+  <!-- ▸ 일정 -->
+  <div id="page-recurring" class="page">
+    <!-- 월간 캘린더 -->
+    <div class="card" style="margin-bottom:20px;">
+      <div class="calendar-nav">
+        <button onclick="changeRecurringMonth(-1)">← 이전</button>
+        <span class="calendar-month" id="recurring-cal-month"></span>
+        <button onclick="changeRecurringMonth(1)">다음 →</button>
+      </div>
+      <div class="calendar-grid" id="recurring-calendar-grid"></div>
+    </div>
+
+    <!-- 일정 -->
+    <div class="flex items-center justify-between" style="margin-bottom:14px;">
+      <div style="font-size:14px;font-weight:700;color:var(--accent);">일정</div>
+      <button class="btn btn-green btn-sm admin-only" onclick="openEventModal()">+ 일정 추가</button>
+    </div>
+    <div id="events-list" style="margin-bottom:24px;"></div>
+
+    <!-- 정기 업무 -->
+    <div class="flex items-center justify-between" style="margin-bottom:14px;">
+      <div style="font-size:14px;font-weight:700;color:var(--accent);">정기 업무</div>
+      <button class="btn btn-outline btn-sm admin-only" onclick="openRecurringModal()">+ 정기 업무 추가</button>
+    </div>
+    <div id="recurring-list"></div>
+  </div>
+
+
+  <!-- ▸ 자료 -->
+  <div id="page-resources" class="page">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:13px;color:var(--text-muted);">구글 드라이브 링크를 등록하면 포털에서 바로 접근할 수 있습니다</div>
+      <button class="btn btn-green btn-sm admin-only" onclick="openResourceModal()">+ 자료 추가</button>
+    </div>
+    <div id="resources-list"></div>
+  </div>
 
   <!-- ▸ 피부 재고 -->
   <div id="page-skin-inventory" class="page">
@@ -2242,6 +2328,10 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
       <label>내용</label>
       <textarea id="notice-body-input" placeholder="공지 내용을 입력하세요"></textarea>
     </div>
+    <div class="form-section">
+      <label>캘린더 날짜 <span style="font-size:11px;color:var(--text-muted);">(선택 — 입력 시 일정 캘린더에 표시됩니다)</span></label>
+      <input type="date" id="notice-event-date">
+    </div>
     <input type="hidden" id="notice-edit-idx" value="">
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeNoticeWriteModal()">취소</button>
@@ -2267,6 +2357,129 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('inventory-edit')">취소</button>
       <button class="btn btn-green" onclick="saveInventoryEdit()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 공지 상세 팝업 -->
+<div class="modal-overlay" id="modal-notice-detail">
+  <div class="modal" style="width:520px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+      <span id="notice-detail-badge" class="notice-badge"></span>
+      <div class="modal-title" id="notice-detail-title" style="margin:0;"></div>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;" id="notice-detail-meta"></div>
+    <div style="font-size:14px;color:var(--text-secondary);line-height:1.85;white-space:pre-line;padding:14px;background:var(--surface-2);border-radius:8px;min-height:60px;" id="notice-detail-body"></div>
+    <div class="modal-actions">
+      <button class="btn btn-green" onclick="closeModal('notice-detail')">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 단발성 일정 추가 모달 -->
+<div class="modal-overlay" id="modal-event">
+  <div class="modal" style="width:420px;">
+    <div class="modal-title" id="event-modal-title">일정 추가</div>
+    <input type="hidden" id="event-edit-id">
+    <div class="form-section">
+      <label>날짜</label>
+      <input type="date" id="event-date">
+    </div>
+    <div class="form-section">
+      <label>내용</label>
+      <input type="text" id="event-title" placeholder="예: 베드 패드 세탁">
+    </div>
+    <div class="form-section">
+      <label>메모 (선택)</label>
+      <input type="text" id="event-memo" placeholder="추가 메모">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('event')">취소</button>
+      <button class="btn btn-green" onclick="saveEvent()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 정기업무 추가/편집 모달 -->
+<div class="modal-overlay" id="modal-recurring">
+  <div class="modal" style="width:500px;">
+    <div class="modal-title" id="recurring-modal-title">정기업무 추가</div>
+    <input type="hidden" id="recurring-edit-id">
+
+    <div id="recurring-ai-section">
+      <div class="form-section">
+        <label>업무 입력 <span style="font-size:11px;color:var(--text-muted);">(자유롭게 입력하면 AI가 파악합니다)</span></label>
+        <input type="text" id="recurring-natural-input"
+          placeholder="예: 매주 월요일 소모품 재고 확인 / 매월 1~5일 베드 패드 세탁 / 마지막 금요일 청소"
+          style="font-size:13px;">
+      </div>
+      <button class="btn btn-outline btn-sm" id="recurring-ai-btn" onclick="parseRecurringWithAI()" style="margin-bottom:14px;">
+        🔍 파싱
+      </button>
+    </div>
+
+    <!-- AI 파싱 결과 미리보기 -->
+    <div id="recurring-parsed-preview" style="display:none;background:var(--primary-pale);border-radius:8px;padding:12px;margin-bottom:14px;font-size:13px;">
+      <div style="font-weight:700;color:var(--accent);margin-bottom:6px;">파싱 결과</div>
+      <div id="recurring-parsed-text" style="color:var(--text-secondary);"></div>
+    </div>
+
+    <!-- 수동 입력 (폴백) -->
+    <details style="margin-bottom:14px;">
+      <summary style="font-size:12px;color:var(--text-muted);cursor:pointer;">직접 설정하기</summary>
+      <div style="margin-top:10px;">
+        <div class="form-section">
+          <label>업무명</label>
+          <input type="text" id="recurring-title" placeholder="업무명">
+        </div>
+        <div class="form-section">
+          <label>주기</label>
+          <select id="recurring-type" onchange="renderRecurringTypeFields()">
+            <option value="weekly">매주 특정 요일</option>
+            <option value="monthly_date">매월 특정 날짜</option>
+            <option value="monthly_last_weekday">매월 마지막 특정 요일</option>
+          </select>
+        </div>
+        <div id="recurring-type-fields"></div>
+      </div>
+    </details>
+
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('recurring')">취소</button>
+      <button class="btn btn-green" onclick="saveRecurring()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 자료 추가 모달 -->
+<div class="modal-overlay" id="modal-resource">
+  <div class="modal" style="width:480px;">
+    <div class="modal-title" id="resource-modal-title">자료 추가</div>
+    <input type="hidden" id="resource-edit-id">
+    <div class="form-section">
+      <label>자료명</label>
+      <input type="text" id="resource-name" placeholder="예: 한의원 홍보 브로셔">
+    </div>
+    <div class="form-section">
+      <label>분류</label>
+      <select id="resource-cat">
+        <option value="홍보">홍보자료</option>
+        <option value="교육">교육자료</option>
+        <option value="서식">서식/양식</option>
+        <option value="기타">기타</option>
+      </select>
+    </div>
+    <div class="form-section">
+      <label>구글 드라이브 링크</label>
+      <input type="text" id="resource-url" placeholder="https://drive.google.com/...">
+    </div>
+    <div class="form-section">
+      <label>설명 (선택)</label>
+      <input type="text" id="resource-desc" placeholder="간단한 설명">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('resource')">취소</button>
+      <button class="btn btn-green" onclick="saveResource()">저장</button>
     </div>
   </div>
 </div>
@@ -2432,11 +2645,7 @@ const STATE = {
   user: null,
   notices: [],
   checklist: {
-    items: {
-      morning: ['진료실 환기', '침대 시트 교체 확인', '소독 기구 준비', '예약 환자 명단 확인', '기기 작동 점검'],
-      during: ['차트 정리 (진료 직후)', '탕전실 확인', '전화 응대 기록', '보험 청구 서류 확인'],
-      evening: ['마감 차트 정리', '기기 전원 OFF', '소독 기구 회수', '냉장고 온도 확인', '문단속 확인']
-    },
+    items: {},
     checked: {}
   },
   manualItems: [
@@ -2596,6 +2805,9 @@ const STATE = {
   calendarDate: new Date(),
   skinInventory: [],
   qaItems: [],
+  recurringTasks: [],
+  scheduledEvents: [],
+  resources: [],
 };
 
 /* 비밀번호 설정 */
@@ -2672,6 +2884,15 @@ function doLogin() {
     document.getElementById('user-name-display').textContent = displayName;
     document.getElementById('user-role-display').textContent = isAdmin ? '원장' : '직원';
     document.getElementById('user-avatar').textContent = displayName.charAt(0);
+    // 최수빈 로그인 시 백업 버튼 표시
+    const backupWrap = document.getElementById('backup-btn-wrap');
+    if (backupWrap && displayName === '최수빈') {
+      backupWrap.style.display = 'block';
+      const now = new Date();
+      const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const label = `${prevMonth.getMonth() + 1}월 데이터 추출`;
+      document.getElementById('backup-btn-label').textContent = label;
+    }
     initApp();
   } else {
     const pw_input = document.getElementById('login-pw');
@@ -2687,6 +2908,198 @@ function doLogin() {
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && selectedRole) doLogin();
 });
+
+/* ════════════════════════════════════
+   자료
+════════════════════════════════════ */
+function loadResources() {
+  try {
+    STATE.resources = JSON.parse(localStorage.getItem('lapiel_resources') || '[]');
+  } catch(e) { STATE.resources = []; }
+}
+
+function saveResources() {
+  localStorage.setItem('lapiel_resources', JSON.stringify(STATE.resources));
+}
+
+function renderResources() {
+  const el = document.getElementById('resources-list');
+  if (!el) return;
+  const isAdmin = STATE.user && STATE.user.isAdmin;
+  const catColors = { '홍보': 'cat-treatment', '교육': 'cat-admin', '서식': 'cat-emergency', '기타': 'cat-admin' };
+  if (!STATE.resources.length) {
+    el.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted);">등록된 자료가 없습니다</div>';
+    return;
+  }
+  // 분류별 그룹핑
+  const groups = {};
+  STATE.resources.forEach(r => {
+    if (!groups[r.cat]) groups[r.cat] = [];
+    groups[r.cat].push(r);
+  });
+  el.innerHTML = Object.entries(groups).map(([cat, items]) => `
+    <div style="margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">${cat}자료</div>
+      ${items.map(r => `
+        <div class="card" style="margin-bottom:8px;display:flex;align-items:center;gap:14px;">
+          <div style="width:40px;height:40px;background:var(--primary-pale);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:700;color:var(--accent);">${r.name}</div>
+            ${r.desc ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${r.desc}</div>` : ''}
+          </div>
+          <a href="${r.url}" target="_blank" class="btn btn-green btn-sm" style="text-decoration:none;white-space:nowrap;">열기 ↗</a>
+          ${isAdmin ? `<button class="btn btn-outline btn-sm" onclick="openResourceEditModal(${r.id})">편집</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteResource(${r.id})">삭제</button>` : ''}
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function openResourceModal() {
+  document.getElementById('resource-modal-title').textContent = '자료 추가';
+  document.getElementById('resource-edit-id').value = '';
+  document.getElementById('resource-name').value = '';
+  document.getElementById('resource-url').value = '';
+  document.getElementById('resource-desc').value = '';
+  document.getElementById('resource-cat').value = '홍보';
+  openModal('resource');
+}
+
+function openResourceEditModal(id) {
+  const r = STATE.resources.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('resource-modal-title').textContent = '자료 편집';
+  document.getElementById('resource-edit-id').value = id;
+  document.getElementById('resource-name').value = r.name;
+  document.getElementById('resource-url').value = r.url;
+  document.getElementById('resource-desc').value = r.desc || '';
+  document.getElementById('resource-cat').value = r.cat;
+  openModal('resource');
+}
+
+function saveResource() {
+  const editId = document.getElementById('resource-edit-id').value;
+  const name = document.getElementById('resource-name').value.trim();
+  const url = document.getElementById('resource-url').value.trim();
+  const desc = document.getElementById('resource-desc').value.trim();
+  const cat = document.getElementById('resource-cat').value;
+  if (!name || !url) { alert('자료명과 링크를 입력하세요'); return; }
+  if (editId) {
+    const r = STATE.resources.find(x => x.id == editId);
+    if (r) { r.name = name; r.url = url; r.desc = desc; r.cat = cat; }
+  } else {
+    STATE.resources.push({ id: Date.now(), name, url, desc, cat });
+  }
+  saveResources();
+  renderResources();
+  closeModal('resource');
+  showToast('저장되었습니다');
+}
+
+function deleteResource(id) {
+  if (!confirm('이 자료를 삭제할까요?')) return;
+  STATE.resources = STATE.resources.filter(x => x.id !== id);
+  saveResources();
+  renderResources();
+  showToast('삭제되었습니다');
+}
+
+/* ════════════════════════════════════
+   데이터 백업
+════════════════════════════════════ */
+async function exportMonthlyData() {
+  const now = new Date();
+  const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const year = prevMonth.getFullYear();
+  const month = prevMonth.getMonth() + 1;
+  const monthStr = `${year}-${String(month).padStart(2,'0')}`;
+  const monthLabel = `${month}월`;
+
+  showToast(`${monthLabel} 데이터 추출 중...`);
+
+  // 1. 체크리스트 기록 (항목 이름 포함)
+  try {
+    // 모든 체크리스트 항목 (삭제된 것 포함)
+    const allItems = await sb.select('checklist_items', 'order=id.asc');
+    const itemMap = {};
+    (allItems || []).forEach(i => { itemMap[i.id] = i.label; });
+
+    const logs = await sb.select('checklist_logs', `date=like.${monthStr.replace('-','_')}*`);
+    // date 컬럼이 toDateString() 형식이라 다르게 필터
+    const allLogs = await sb.select('checklist_logs', 'order=id.desc');
+    const monthLogs = (allLogs || []).filter(r => {
+      const d = new Date(r.date);
+      return d.getFullYear() === year && d.getMonth() + 1 === month;
+    });
+
+    if (monthLogs.length) {
+      const rows = monthLogs.map(r => ({
+        id: r.id,
+        항목명: itemMap[r.item_id] || `(항목 ${r.item_id})`,
+        item_id: r.item_id,
+        날짜: r.date,
+        체크한사람: r.role,
+        체크시간: r.checked_at
+      }));
+      downloadCSV(rows, `라피엘_체크리스트_기록_${monthLabel}_${year}.csv`);
+    }
+  } catch(e) { console.warn('체크리스트 백업 실패:', e); }
+
+  await new Promise(r => setTimeout(r, 300));
+
+  // 2. 나머지 테이블 (삭제된 것 포함 전체 내보내기)
+  const tasks = [
+    { name: 'notices', label: '공지사항', dateCol: 'created_at', isTimestamp: true },
+    { name: 'inventory', label: '일반소모품', dateCol: null },
+    { name: 'skin_inventory', label: '피부소모품', dateCol: null },
+    { name: 'schedules', label: '스케줄', dateCol: 'date' },
+    { name: 'qa_items', label: 'QA', dateCol: null },
+    { name: 'recurring_tasks', label: '정기업무', dateCol: null },
+    { name: 'scheduled_events', label: '단발일정', dateCol: 'date' },
+  ];
+
+  for (const t of tasks) {
+    try {
+      // 삭제된 것 포함 전체 조회 (백업용)
+      const rows = await fetch(`${SUPABASE_URL}/rest/v1/${t.name}?order=id.asc`, {
+        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+      }).then(r => r.json());
+
+      let filtered = rows || [];
+      if (t.dateCol && t.isTimestamp) {
+        filtered = filtered.filter(r => {
+          const d = new Date(r[t.dateCol]);
+          return d.getFullYear() === year && d.getMonth() + 1 === month;
+        });
+      } else if (t.dateCol) {
+        filtered = filtered.filter(r => r[t.dateCol] && r[t.dateCol].startsWith(monthStr));
+      }
+
+      if (!filtered.length) continue;
+      downloadCSV(filtered, `라피엘_${t.label}_${monthLabel}_${year}.csv`);
+      await new Promise(r => setTimeout(r, 300));
+    } catch(e) { console.warn(`${t.name} 백업 실패:`, e); }
+  }
+
+  showToast(`${monthLabel} 데이터 추출 완료!`);
+}
+
+function downloadCSV(rows, filename) {
+  const headers = Object.keys(rows[0]);
+  const csv = [
+    headers.join(','),
+    ...rows.map(row => headers.map(h => {
+      const v = row[h] == null ? '' : String(row[h]);
+      return `"${v.replace(/"/g, '""')}"`;
+    }).join(','))
+  ].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
 
 function doLogout() {
   STATE.user = null; selectedRole = null; selectedName = null;
@@ -2705,6 +3118,7 @@ function doLogout() {
 ════════════════════════════════════ */
 async function initApp() {
   updateTodayDate();
+  loadResources();
   showLoadingOverlay(true);
   try {
     await Promise.all([
@@ -2715,6 +3129,8 @@ async function initApp() {
       loadSchedules(),
       loadChecklistItems(),
       loadQAItems(),
+      loadRecurringTasks(),
+      loadScheduledEvents(),
     ]);
     await loadChecklistLogs();
   } catch(e) {
@@ -2750,10 +3166,11 @@ function showLoadingOverlay(show) {
 /* ── Supabase 로드 함수들 ── */
 async function loadNotices() {
   try {
-    const rows = await sb.select('notices', 'order=id.desc');
+    const rows = await sb.select('notices', 'deleted=neq.true&order=id.desc');
     STATE.notices = (rows || []).map(r => ({
       _id: r.id, type: r.type, title: r.title,
       body: r.body || '', author: r.author || '',
+      event_date: r.event_date || null,
       date: new Date(r.created_at).toLocaleDateString('ko-KR')
     }));
   } catch(e) { console.warn('loadNotices 오류:', e); }
@@ -2761,7 +3178,7 @@ async function loadNotices() {
 
 async function loadManuals() {
   try {
-    const rows = await sb.select('manuals', 'order=id.asc');
+    const rows = await sb.select('manuals', 'deleted=neq.true&order=id.asc');
     if (rows && rows.length > 0) {
       STATE.manualItems = rows.map(r => ({
         id: r.id, cat: r.cat, access: r.access || 'all',
@@ -2773,7 +3190,7 @@ async function loadManuals() {
 
 async function loadInventory() {
   try {
-    const rows = await sb.select('inventory');
+    const rows = await sb.select('inventory', 'deleted=neq.true');
     if (rows && rows.length > 0) {
       STATE.inventory = rows.map(r => ({
         id: r.id, name: r.name, cat: r.cat, qty: r.qty, min: r.min_qty,
@@ -2794,15 +3211,28 @@ async function loadSchedules() {
 
 async function loadChecklistItems() {
   try {
-    const rows = await sb.select('checklist_items', 'order=section.asc,sort_order.asc');
+    const rows = await sb.select('checklist_items', 'deleted=neq.true&order=sort_order.asc');
     if (rows && rows.length > 0) {
-      STATE.checklist.items = { morning: [], during: [], evening: [] };
+      // DB에서 섹션 구조를 동적으로 구성
+      const items = {};
+      const labels = {};
       rows.forEach(r => {
-        if (STATE.checklist.items[r.section] !== undefined) {
-          STATE.checklist.items[r.section].push({ id: r.id, label: r.label });
-        }
+        if (!items[r.section]) items[r.section] = [];
+        items[r.section].push({ id: r.id, label: r.label });
+        // section_label 컬럼이 있으면 사용, 없으면 기존 SECTION_LABELS 유지
+        if (r.section_label) labels[r.section] = r.section_label;
+      });
+      STATE.checklist.items = items;
+      // SECTION_LABELS 업데이트 (DB에 없는 건 기존 유지)
+      Object.keys(items).forEach(k => {
+        if (!SECTION_LABELS[k]) SECTION_LABELS[k] = k;
       });
     } else {
+      // DB 비어있으면 기본 항목 seed (morning/evening만, during 제외)
+      STATE.checklist.items = {
+        morning: ['진료실 환기', '침대 시트 교체 확인', '소독 기구 준비', '예약 환자 명단 확인', '기기 작동 점검'],
+        evening: ['마감 차트 정리', '기기 전원 OFF', '소독 기구 회수', '냉장고 온도 확인', '문단속 확인']
+      };
       await seedChecklistItems();
     }
   } catch(e) { console.warn('loadChecklistItems 오류:', e); }
@@ -2845,10 +3275,11 @@ function updateTodayDate() {
 ════════════════════════════════════ */
 const PAGE_TITLES = {
   dashboard: '대시보드', charting: '차팅', billing: '청구 수가 조회',
-  notice: '공지사항', checklist: '체크리스트',
+  notice: '공지사항', checklist: '체크리스트', recurring: '일정',
   manual: '매뉴얼', schedule: '스케줄',
   inventory: '일반 소모품 재고', 'skin-inventory': '피부 소모품 재고',
-  'qa-admin': 'Q&A [원장용]', 'qa-staff': 'Q&A [직원용]'
+  'qa-admin': 'Q&A [원장용]', 'qa-staff': 'Q&A [직원용]',
+  resources: '자료'
 };
 
 function showPage(name) {
@@ -2859,8 +3290,14 @@ function showPage(name) {
   event.currentTarget.classList.add('active');
   if (name === 'billing') {
     renderCQResult();
+  } else if (name === 'recurring') {
+    renderRecurringCalendar();
+    renderRecurringList();
+    renderEventsList();
   } else if (name === 'skin-inventory') {
     renderSkinInventory();
+  } else if (name === 'resources') {
+    renderResources();
   } else if (name === 'qa-admin') {
     renderQAAdmin();
   } else if (name === 'qa-staff') {
@@ -2868,7 +3305,6 @@ function showPage(name) {
   } else {
     const pageEl = document.getElementById('cq-result-page');
     if (pageEl) pageEl.innerHTML = '';
-    // 필터 버튼 active 초기화
     CQ = {visit:null, cupping:null, chuna:null};
     document.querySelectorAll('#page-billing button').forEach(b => b.classList.remove('active'));
   }
@@ -2910,14 +3346,27 @@ function renderNotices() {
         <button class="btn btn-danger btn-sm" onclick="deleteNotice(${i})">삭제</button>
       </div>` : ''}
     </li>`).join('');
-  dash.innerHTML = STATE.notices.slice(0, 3).map(n => `
-    <li class="notice-item">
+  dash.innerHTML = STATE.notices.slice(0, 5).map(n => `
+    <li class="notice-item" onclick="openNoticeDetail(${n._id})" style="cursor:pointer;">
       <span class="notice-badge ${badgeMap[n.type]}">${labelMap[n.type]}</span>
       <div class="notice-content">
         <div class="notice-title">${n.title}</div>
         <div class="notice-date">${n.date}</div>
       </div>
     </li>`).join('');
+}
+
+function openNoticeDetail(id) {
+  const n = STATE.notices.find(x => x._id === id);
+  if (!n) return;
+  const badgeMap = { urgent: 'badge-urgent', normal: 'badge-normal', info: 'badge-info' };
+  const labelMap = { urgent: '긴급', normal: '일반', info: '안내' };
+  document.getElementById('notice-detail-badge').className = 'notice-badge ' + (badgeMap[n.type] || 'badge-normal');
+  document.getElementById('notice-detail-badge').textContent = labelMap[n.type] || n.type;
+  document.getElementById('notice-detail-title').textContent = n.title;
+  document.getElementById('notice-detail-meta').textContent = n.date + ' · ' + n.author;
+  document.getElementById('notice-detail-body').textContent = n.body || '(내용 없음)';
+  openModal('notice-detail');
 }
 
 function openNoticeWriteModal() {
@@ -2927,6 +3376,7 @@ function openNoticeWriteModal() {
   document.getElementById('notice-title-input').value = '';
   document.getElementById('notice-body-input').value = '';
   document.getElementById('notice-type').value = 'normal';
+  document.getElementById('notice-event-date').value = '';
   openModal('notice-write');
 }
 
@@ -2947,18 +3397,19 @@ async function submitNotice() {
   const title = document.getElementById('notice-title-input').value.trim();
   const body = document.getElementById('notice-body-input').value.trim();
   const type = document.getElementById('notice-type').value;
+  const event_date = document.getElementById('notice-event-date').value || null;
   if (!title) { alert('제목을 입력하세요'); return; }
   const editIdx = document.getElementById('notice-edit-idx').value;
   if (editIdx !== '') {
     const n = STATE.notices[parseInt(editIdx)];
-    await sb.update('notices', n._id, { title, body, type });
-    n.title = title; n.body = body; n.type = type;
+    await sb.update('notices', n._id, { title, body, type, event_date });
+    n.title = title; n.body = body; n.type = type; n.event_date = event_date;
     n.date = new Date().toLocaleDateString('ko-KR') + ' (수정)';
   } else {
-    const rows = await sb.insert('notices', { title, body, type, author: STATE.user.name });
+    const rows = await sb.insert('notices', { title, body, type, event_date, author: STATE.user.name });
     if (rows && rows[0]) {
       STATE.notices.unshift({
-        _id: rows[0].id, type, title, body,
+        _id: rows[0].id, type, title, body, event_date,
         author: STATE.user.name,
         date: new Date().toLocaleDateString('ko-KR')
       });
@@ -2975,6 +3426,7 @@ function openNoticeEditor(idx) {
   document.getElementById('notice-type').value = n.type;
   document.getElementById('notice-title-input').value = n.title;
   document.getElementById('notice-body-input').value = n.body || '';
+  document.getElementById('notice-event-date').value = n.event_date || '';
   document.getElementById('notice-edit-idx').value = idx;
   document.getElementById('notice-submit-btn').textContent = '수정 완료';
   openModal('notice-write');
@@ -2983,7 +3435,7 @@ function openNoticeEditor(idx) {
 async function deleteNotice(idx) {
   if (!confirm('이 공지사항을 삭제할까요?')) return;
   const n = STATE.notices[idx];
-  await sb.remove('notices', n._id);
+  await sb.update('notices', n._id, { deleted: true });
   STATE.notices.splice(idx, 1);
   renderNotices(); updateDashboard();
   showToast('삭제되었습니다');
@@ -3047,6 +3499,29 @@ function renderChecklist() {
     </div>`;
   }
 
+  // 정기업무 섹션 맨 위에 추가 (오늘만)
+  if (isToday) {
+    const todayRecurring = getTodayRecurring();
+    if (todayRecurring.length > 0) {
+      html += `<div class="checklist-section"><div class="checklist-section-title" style="color:var(--primary);">📋 정기업무</div>`;
+      todayRecurring.forEach(task => {
+        const key = `recurring-${viewDate}-${task.id}`;
+        const record = STATE.checklist.checked[key];
+        const isChecked = !!record;
+        if (isChecked) checkedCount++;
+        totalItems++;
+        html += `<div class="checklist-item" onclick="toggleRecurringCheck('${key}',this)">
+          <input type="checkbox" id="chk-${key}" ${isChecked?'checked':''} onchange="toggleRecurringCheck('${key}',this.parentElement)">
+          <div style="flex:1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <label for="chk-${key}" class="${isChecked?'checked':''}" style="margin:0;">${task.title}</label>
+            ${isChecked?`<span style="font-size:11px;color:var(--primary);font-weight:600;background:var(--primary-pale);padding:1px 8px;border-radius:10px;white-space:nowrap;">${record.role} · ${record.time}</span>`:''}
+          </div>
+        </div>`;
+      });
+      html += '</div>';
+    }
+  }
+
   for (const [sec, items] of Object.entries(STATE.checklist.items)) {
     html += `<div class="checklist-section"><div class="checklist-section-title">${SECTION_LABELS[sec]}</div>`;
     items.forEach((item) => {
@@ -3078,9 +3553,25 @@ function renderChecklist() {
     });
     html += '</div>';
   }
+
   container.innerHTML = html;
   updateChecklistProgress(checkedCount, totalItems);
   renderDateStrip();
+}
+
+async function toggleRecurringCheck(key, row) {
+  const cb = document.getElementById('chk-' + key);
+  if (!cb) return;
+  const today = new Date().toDateString();
+  const time = new Date().toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
+  const role = STATE.user.isAdmin ? STATE.user.name + ' 원장' : STATE.user.name;
+  if (cb.checked) {
+    STATE.checklist.checked[key] = { done: true, time, role };
+  } else {
+    delete STATE.checklist.checked[key];
+  }
+  renderChecklist();
+  updateDashboard();
 }
 
 async function toggleCheck(key, itemId, row) {
@@ -3188,11 +3679,13 @@ async function saveChecklistItems() {
     newItems[key] = sec.items.split(',').map(s => s.trim()).filter(Boolean);
   });
 
-  // Supabase에서 기존 항목 삭제 후 재삽입
+  // Supabase에서 기존 항목 소프트 삭제 후 재삽입
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/checklist_items`, {
-      method: 'DELETE',
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+    // 기존 항목 soft delete (deleted=true)
+    await fetch(`${SUPABASE_URL}/rest/v1/checklist_items?deleted=neq.true`, {
+      method: 'PATCH',
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ deleted: true })
     });
     let sortOrder = 0;
     for (const sec of clEditorSections) {
@@ -3224,8 +3717,7 @@ function updateDashboardChecklist() {
   const allItems = Object.entries(STATE.checklist.items).flatMap(([sec, items]) =>
     items.map(item => ({
       key: `${today}-${item.id || item}`,
-      label: item.label || item,
-      sec
+      label: item.label || item, sec
     }))
   );
   const total = allItems.length;
@@ -3233,43 +3725,41 @@ function updateDashboardChecklist() {
   updateChecklistProgress(done, total);
 
   const container = document.getElementById('dashboard-checklist-items');
-  const isAdmin = STATE.user && STATE.user.isAdmin;
+  if (!container) return;
 
-  if (isAdmin) {
-    // 원장: 전체 항목 + 체크 여부 + 시간 표시
-    const secOrder = ['morning', 'during', 'evening'];
-    const secLabel = { morning: '오전 준비', during: '진료 중', evening: '마감' };
-    let html = '';
-    for (const sec of secOrder) {
-      const secItems = allItems.filter(i => i.sec === sec);
-      const secDone = secItems.filter(i => STATE.checklist.checked[i.key]).length;
-      html += `<div style="margin-bottom:10px;">
-        <div style="font-size:11px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; padding-bottom:4px; border-bottom:1px solid var(--primary-pale);">
-          ${secLabel[sec]} <span style="font-weight:400; color:var(--text-muted);">${secDone}/${secItems.length}</span>
-        </div>`;
-      secItems.forEach(item => {
-        const record = STATE.checklist.checked[item.key];
-        const isDone = !!record;
-        html += `<div style="display:flex; align-items:center; justify-content:space-between; padding:5px 0; border-bottom:1px solid var(--border); font-size:13px;">
-          <span style="${isDone ? 'text-decoration:line-through; color:var(--text-muted);' : 'color:var(--text-primary);'}">${isDone ? '✓' : '□'} ${item.label}</span>
-          ${isDone ? `<span style="font-size:11px; color:var(--primary); font-weight:600; background:var(--primary-pale); padding:2px 8px; border-radius:10px;">${record.role} ${record.time}</span>` : '<span style="font-size:11px; color:var(--text-muted);">미완료</span>'}
-        </div>`;
-      });
-      html += '</div>';
-    }
-    container.innerHTML = html;
-  } else {
-    // 직원: 미완료 항목만 간단히
-    const pending = allItems.filter(i => !STATE.checklist.checked[i.key]).slice(0, 5);
-    if (pending.length === 0) {
-      container.innerHTML = '<div style="color:var(--primary); font-weight:700; padding:10px 0; text-align:center;">✓ 모든 항목 완료!</div>';
-    } else {
-      const remaining = allItems.filter(i => !STATE.checklist.checked[i.key]).length;
-      container.innerHTML = pending.map(i =>
-        `<div style="padding:6px 0; font-size:13px; color:var(--text-secondary); border-bottom:1px solid var(--border);">□ ${i.label}</div>`
-      ).join('') + (remaining > 5 ? `<div class="text-muted" style="padding-top:6px;">...외 ${remaining - 5}건 미완료</div>` : '');
-    }
+  // 섹션별 완료율만 표시
+  let html = '';
+  for (const [sec, items] of Object.entries(STATE.checklist.items)) {
+    const secItems = items.map(item => ({
+      key: `${today}-${item.id || item}`, label: item.label || item
+    }));
+    const secDone = secItems.filter(i => STATE.checklist.checked[i.key]).length;
+    const secTotal = secItems.length;
+    const pct = secTotal > 0 ? Math.round(secDone / secTotal * 100) : 0;
+    const color = pct === 100 ? 'var(--primary)' : pct >= 50 ? 'var(--warning)' : 'var(--danger)';
+    html += `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:12px;color:var(--text-secondary);flex:1;">${SECTION_LABELS[sec] || sec}</span>
+      <div style="width:80px;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden;">
+        <div style="width:${pct}%;height:100%;background:${color};border-radius:3px;transition:width 0.3s;"></div>
+      </div>
+      <span style="font-size:11px;font-weight:700;color:${color};min-width:36px;text-align:right;">${secDone}/${secTotal}</span>
+    </div>`;
   }
+  // 정기업무 완료율
+  const todayRecurring = getTodayRecurring();
+  if (todayRecurring.length > 0) {
+    const recDone = todayRecurring.filter(t => STATE.checklist.checked[`recurring-${today}-${t.id}`]).length;
+    const recPct = Math.round(recDone / todayRecurring.length * 100);
+    const color = recPct === 100 ? 'var(--primary)' : recPct >= 50 ? 'var(--warning)' : 'var(--danger)';
+    html += `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+      <span style="font-size:12px;color:var(--text-secondary);flex:1;">📋 정기업무</span>
+      <div style="width:80px;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden;">
+        <div style="width:${recPct}%;height:100%;background:${color};border-radius:3px;"></div>
+      </div>
+      <span style="font-size:11px;font-weight:700;color:${color};min-width:36px;text-align:right;">${recDone}/${todayRecurring.length}</span>
+    </div>`;
+  }
+  container.innerHTML = html || '<div style="font-size:12px;color:var(--text-muted);padding:8px 0;">항목 없음</div>';
 }
 
 /* ════════════════════════════════════
@@ -3470,7 +3960,7 @@ async function saveManualEditor() {
 
 async function deleteManual(id) {
   if (!confirm('이 매뉴얼을 삭제할까요?')) return;
-  await sb.remove('manuals', id);
+  await sb.update('manuals', id, { deleted: true });
   STATE.manualItems = STATE.manualItems.filter(m => m.id !== parseInt(id));
   renderManual();
   showToast('삭제되었습니다');
@@ -3534,23 +4024,28 @@ async function updateInventory(id) {
 }
 
 function updateInventoryAlerts() {
-  const low = STATE.inventory.filter(i => i.qty <= i.min);
-  const el = document.getElementById('dashboard-inventory-alerts');
-  if (low.length === 0) {
-    el.innerHTML = '<span class="text-muted">재고 부족 항목이 없습니다 ✓</span>';
-  } else {
+  function renderAlerts(items, elId) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    const low = items.filter(i => i.qty <= i.min);
+    if (!low.length) {
+      el.innerHTML = '<span class="text-muted" style="font-size:12px;">부족 항목 없음 ✓</span>';
+      return;
+    }
     el.innerHTML = low.map(i => {
       const isOut = i.qty === 0;
       const isDanger = !isOut && i.qty < i.min * 0.5;
       const cls = isOut ? 'stock-empty' : isDanger ? 'stock-danger' : 'stock-low';
       const lbl = isOut ? '재고 없음' : isDanger ? '위험' : '부족';
-      return `<div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border);">
+      return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
         <span class="stock-status ${cls}">${lbl}</span>
-        <span style="font-size:14px; font-weight:600;">${i.name}</span>
-        <span class="text-muted">현재 ${i.qty} / 기준 ${i.min}</span>
+        <span style="font-size:13px;font-weight:600;">${i.name}</span>
+        <span class="text-muted" style="font-size:11px;">${i.qty}/${i.min}</span>
       </div>`;
     }).join('');
   }
+  renderAlerts(STATE.inventory, 'dashboard-inventory-alerts');
+  renderAlerts(STATE.skinInventory, 'dashboard-skin-inventory-alerts');
 }
 
 function openInventoryModal() { openModal('inventory'); }
@@ -3609,7 +4104,7 @@ async function saveSkinInventoryEdit() {
 
 async function deleteInventoryItem(id) {
   if (!confirm('이 품목을 삭제할까요?')) return;
-  await sb.remove('inventory', id);
+  await sb.update('inventory', id, { deleted: true });
   STATE.inventory = STATE.inventory.filter(i => i.id !== id);
   renderInventory();
   showToast('삭제되었습니다');
@@ -3696,7 +4191,7 @@ async function saveSchedule() {
 ════════════════════════════════════ */
 async function loadSkinInventory() {
   try {
-    const rows = await sb.select('skin_inventory');
+    const rows = await sb.select('skin_inventory', 'deleted=neq.true');
     if (rows && rows.length > 0) {
       STATE.skinInventory = rows.map(r => ({
         id: r.id, name: r.name, cat: r.cat, qty: r.qty, min: r.min_qty,
@@ -3775,7 +4270,7 @@ async function updateSkinInventory(id) {
 
 async function deleteSkinInventoryItem(id) {
   if (!confirm('이 품목을 삭제할까요?')) return;
-  await sb.remove('skin_inventory', id);
+  await sb.update('skin_inventory', id, { deleted: true });
   STATE.skinInventory = STATE.skinInventory.filter(i => i.id !== id);
   renderSkinInventory();
   showToast('삭제되었습니다');
@@ -3786,7 +4281,7 @@ async function deleteSkinInventoryItem(id) {
 ════════════════════════════════════ */
 async function loadQAItems() {
   try {
-    const rows = await sb.select('qa_items', 'order=id.desc');
+    const rows = await sb.select('qa_items', 'deleted=neq.true&order=id.desc');
     STATE.qaItems = (rows || []).map(r => ({
       id: r.id, cat: r.cat, q: r.q, a: r.a,
       access: r.access || 'admin',
@@ -3891,21 +4386,433 @@ async function saveQA() {
 
 async function deleteQA(id) {
   if (!confirm('이 Q&A를 삭제할까요?')) return;
-  await sb.remove('qa_items', id);
+  await sb.update('qa_items', id, { deleted: true });
   STATE.qaItems = STATE.qaItems.filter(i => i.id !== id);
   renderQAAdmin(); renderQAStaff();
   showToast('삭제되었습니다');
 }
 
+/* ════════════════════════════════════
+   정기업무
+════════════════════════════════════ */
+let recurringCalDate = new Date();
+
+async function loadScheduledEvents() {
+  try {
+    const rows = await sb.select('scheduled_events', 'deleted=neq.true&order=date.asc');
+    STATE.scheduledEvents = rows || [];
+  } catch(e) { console.warn('loadScheduledEvents 오류:', e); }
+}
+
+function openEventModal(date) {
+  document.getElementById('event-modal-title').textContent = '일정 추가';
+  document.getElementById('event-edit-id').value = '';
+  document.getElementById('event-date').value = date || new Date().toISOString().slice(0,10);
+  document.getElementById('event-title').value = '';
+  document.getElementById('event-memo').value = '';
+  openModal('event');
+}
+
+function openEventEditModal(id) {
+  const e = STATE.scheduledEvents.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('event-modal-title').textContent = '일정 편집';
+  document.getElementById('event-edit-id').value = id;
+  document.getElementById('event-date').value = e.date;
+  document.getElementById('event-title').value = e.title;
+  document.getElementById('event-memo').value = e.memo || '';
+  openModal('event');
+}
+
+async function saveEvent() {
+  const editId = document.getElementById('event-edit-id').value;
+  const date = document.getElementById('event-date').value;
+  const title = document.getElementById('event-title').value.trim();
+  const memo = document.getElementById('event-memo').value.trim();
+  if (!date || !title) { alert('날짜와 내용을 입력하세요'); return; }
+  if (editId) {
+    await sb.update('scheduled_events', editId, { date, title, memo });
+    const e = STATE.scheduledEvents.find(x => x.id == editId);
+    if (e) { e.date = date; e.title = title; e.memo = memo; }
+  } else {
+    const rows = await sb.insert('scheduled_events', { date, title, memo, created_by: STATE.user.name });
+    if (rows && rows[0]) STATE.scheduledEvents.push(rows[0]);
+    STATE.scheduledEvents.sort((a,b) => a.date.localeCompare(b.date));
+  }
+  renderRecurringCalendar();
+  renderEventsList();
+  updateDashboard();
+  closeModal('event');
+  showToast('저장되었습니다');
+}
+
+async function deleteEvent(id) {
+  if (!confirm('이 일정을 삭제할까요?')) return;
+  await sb.update('scheduled_events', id, { deleted: true });
+  STATE.scheduledEvents = STATE.scheduledEvents.filter(x => x.id !== id);
+  renderRecurringCalendar();
+  renderEventsList();
+  updateDashboard();
+  showToast('삭제되었습니다');
+}
+
+function renderEventsList() {
+  const el = document.getElementById('events-list');
+  if (!el) return;
+  const isAdmin = STATE.user && STATE.user.isAdmin;
+  const today = new Date().toISOString().slice(0,10);
+  const upcoming = STATE.scheduledEvents.filter(e => e.date >= today);
+  if (!upcoming.length) {
+    el.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:8px 0;">예정된 단발성 일정이 없습니다</div>';
+    return;
+  }
+  el.innerHTML = upcoming.map(e => {
+    const d = new Date(e.date + 'T00:00:00');
+    const days = ['일','월','화','수','목','금','토'];
+    const dateStr = `${d.getMonth()+1}/${d.getDate()} (${days[d.getDay()]})`;
+    return `<div class="card" style="margin-bottom:8px;display:flex;align-items:center;gap:12px;">
+      <div style="font-size:13px;font-weight:700;color:var(--primary);min-width:70px;">${dateStr}</div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:600;color:var(--accent);">${e.title}</div>
+        ${e.memo ? `<div style="font-size:12px;color:var(--text-muted);">${e.memo}</div>` : ''}
+      </div>
+      ${isAdmin ? `<button class="btn btn-outline btn-sm" onclick="openEventEditModal(${e.id})">편집</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteEvent(${e.id})">삭제</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+let parsedRecurringData = null;
+
+function parseRecurringWithAI() {
+  const input = document.getElementById('recurring-natural-input').value.trim();
+  if (!input) { alert('업무 내용을 입력하세요'); return; }
+
+  const dayMap = { '일':0,'월':1,'화':2,'수':3,'목':4,'금':5,'토':6 };
+  let result = null;
+
+  // 제목 추출: 요일/날짜 패턴 제거 후 나머지
+  const titleClean = input
+    .replace(/매주\s*[일월화수목금토]요일?\s*/g, '')
+    .replace(/매월\s*\d+\s*[~\-]\s*\d+\s*일\s*/g, '')
+    .replace(/매월?\s*마지막\s*[일월화수목금토]요일?\s*/g, '')
+    .replace(/^\s*|\s*$/g, '')
+    .trim() || input;
+
+  // 패턴 1: 매주 X요일
+  const weeklyMatch = input.match(/매주\s*([일월화수목금토])요일?/);
+  if (weeklyMatch) {
+    result = { title: titleClean, type: 'weekly', weekday: dayMap[weeklyMatch[1]] };
+  }
+
+  // 패턴 2: 매월 N~M일
+  const monthRangeMatch = input.match(/매월?\s*(\d+)\s*[~\-]\s*(\d+)\s*일/);
+  if (!result && monthRangeMatch) {
+    result = { title: titleClean, type: 'monthly_date', date_from: parseInt(monthRangeMatch[1]), date_to: parseInt(monthRangeMatch[2]) };
+  }
+
+  // 패턴 3: 매월 N일 (단일)
+  const monthSingleMatch = input.match(/매월?\s*(\d+)\s*일/);
+  if (!result && monthSingleMatch) {
+    const d = parseInt(monthSingleMatch[1]);
+    result = { title: titleClean, type: 'monthly_date', date_from: d, date_to: d };
+  }
+
+  // 패턴 4: 마지막 X요일
+  const lastWeekdayMatch = input.match(/마지막\s*([일월화수목금토])요일?/);
+  if (!result && lastWeekdayMatch) {
+    result = { title: titleClean, type: 'monthly_last_weekday', last_weekday: dayMap[lastWeekdayMatch[1]] };
+  }
+
+  if (!result) {
+    alert('패턴을 인식하지 못했습니다.\n예시: "매주 월요일 소모품 확인" / "매월 1~5일 세탁" / "마지막 금요일 청소"');
+    return;
+  }
+
+  parsedRecurringData = result;
+  const dayNames = ['일','월','화','수','목','금','토'];
+  let scheduleText = '';
+  if (result.type === 'weekly') scheduleText = `매주 ${dayNames[result.weekday]}요일`;
+  else if (result.type === 'monthly_date') scheduleText = result.date_from === result.date_to ? `매월 ${result.date_from}일` : `매월 ${result.date_from}~${result.date_to}일`;
+  else if (result.type === 'monthly_last_weekday') scheduleText = `매월 마지막 ${dayNames[result.last_weekday]}요일`;
+
+  document.getElementById('recurring-parsed-text').innerHTML =
+    `<strong>${result.title}</strong> — ${scheduleText}`;
+  document.getElementById('recurring-parsed-preview').style.display = 'block';
+
+  // 수동 입력란 동기화
+  document.getElementById('recurring-title').value = result.title;
+  document.getElementById('recurring-type').value = result.type;
+  renderRecurringTypeFields();
+  if (result.type === 'weekly') document.getElementById('rt-weekday').value = result.weekday;
+  else if (result.type === 'monthly_date') {
+    document.getElementById('rt-from').value = result.date_from;
+    document.getElementById('rt-to').value = result.date_to;
+  } else if (result.type === 'monthly_last_weekday') document.getElementById('rt-last-weekday').value = result.last_weekday;
+}
+
+async function loadRecurringTasks() {
+  try {
+    const rows = await sb.select('recurring_tasks', 'deleted=neq.true&order=id.asc');
+    STATE.recurringTasks = rows || [];
+  } catch(e) { console.warn('loadRecurringTasks 오류:', e); }
+}
+
+/* 특정 날짜에 해당하는 정기업무 목록 반환 */
+function getRecurringForDate(date) {
+  const d = new Date(date);
+  const day = d.getDay();       // 0=일 1=월 ... 6=토
+  const dateNum = d.getDate();  // 1~31
+  const lastDay = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+
+  return STATE.recurringTasks.filter(t => {
+    if (t.type === 'weekly') {
+      return t.weekday === day;
+    }
+    if (t.type === 'monthly_date') {
+      return dateNum >= t.date_from && dateNum <= t.date_to;
+    }
+    if (t.type === 'monthly_last_weekday') {
+      // 마지막 특정 요일 계산
+      const lastWeekday = new Date(d.getFullYear(), d.getMonth()+1, 0);
+      while (lastWeekday.getDay() !== t.last_weekday) {
+        lastWeekday.setDate(lastWeekday.getDate() - 1);
+      }
+      return dateNum === lastWeekday.getDate();
+    }
+    return false;
+  });
+}
+
+/* 월간 캘린더 렌더 */
+function renderRecurringCalendar() {
+  const d = recurringCalDate;
+  const year = d.getFullYear(), month = d.getMonth();
+  document.getElementById('recurring-cal-month').textContent = `${year}년 ${month+1}월`;
+  const grid = document.getElementById('recurring-calendar-grid');
+  if (!grid) return;
+  const days = ['일','월','화','수','목','금','토'];
+  let html = days.map(d => `<div class="cal-header">${d}</div>`).join('');
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDate = new Date(year, month+1, 0).getDate();
+  const today = new Date();
+  const isAdmin = STATE.user && STATE.user.isAdmin;
+
+  for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+  for (let date = 1; date <= lastDate; date++) {
+    const thisDate = new Date(year, month, date);
+    const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===date;
+    const dow = thisDate.getDay();
+    const dowClass = dow===0?'sunday':dow===6?'saturday':'';
+    // 정기업무
+    const recurring = getRecurringForDate(thisDate);
+    // 단발성 일정
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(date).padStart(2,'0')}`;
+    const events = STATE.scheduledEvents.filter(e => e.date === dateStr);
+    const dateClick = isAdmin ? `onclick="openEventModal('${dateStr}')" style="cursor:pointer;"` : '';
+    html += `<div class="cal-day ${isToday?'today':''}" ${dateClick}>
+      <div class="day-num ${dowClass}">${date}</div>
+      ${recurring.map(t => `<div class="cal-event" style="background:var(--primary-pale);color:var(--primary);font-size:10px;padding:2px 4px;border-radius:3px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">🔄 ${t.title}</div>`).join('')}
+      ${events.map(e => `<div class="cal-event" style="background:#FEF9E7;color:#7D5A00;font-size:10px;padding:2px 4px;border-radius:3px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">📌 ${e.title}</div>`).join('')}
+    </div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function changeRecurringMonth(dir) {
+  recurringCalDate.setMonth(recurringCalDate.getMonth() + dir);
+  renderRecurringCalendar();
+}
+
+/* 정기업무 목록 렌더 */
+function renderRecurringList() {
+  const el = document.getElementById('recurring-list');
+  if (!el) return;
+  if (!STATE.recurringTasks.length) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);">정기업무가 없습니다</div>';
+    return;
+  }
+  const typeLabel = { weekly:'매주', monthly_date:'매월', monthly_last_weekday:'매월 마지막' };
+  const dayNames = ['일','월','화','수','목','금','토'];
+  el.innerHTML = STATE.recurringTasks.map(t => {
+    let schedule = '';
+    if (t.type==='weekly') schedule = `매주 ${dayNames[t.weekday]}요일`;
+    else if (t.type==='monthly_date') schedule = `매월 ${t.date_from}~${t.date_to}일`;
+    else if (t.type==='monthly_last_weekday') schedule = `매월 마지막 ${dayNames[t.last_weekday]}요일`;
+    const isAdmin = STATE.user && STATE.user.isAdmin;
+    return `<div class="card" style="margin-bottom:10px;display:flex;align-items:center;gap:12px;">
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:700;color:var(--accent);">${t.title}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">${schedule}</div>
+      </div>
+      ${isAdmin ? `<button class="btn btn-outline btn-sm" onclick="openRecurringEditModal(${t.id})">편집</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteRecurring(${t.id})">삭제</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+/* 모달 관련 */
+const WEEKDAY_OPTIONS = ['일','월','화','수','목','금','토'].map((d,i)=>`<option value="${i}">${d}요일</option>`).join('');
+
+function renderRecurringTypeFields() {
+  const type = document.getElementById('recurring-type').value;
+  const el = document.getElementById('recurring-type-fields');
+  if (type === 'weekly') {
+    el.innerHTML = `<div class="form-section"><label>요일</label><select id="rt-weekday">${WEEKDAY_OPTIONS}</select></div>`;
+  } else if (type === 'monthly_date') {
+    el.innerHTML = `<div class="form-section"><label>날짜 범위</label>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="number" id="rt-from" min="1" max="31" placeholder="시작일" style="width:80px;" class="ch-input">
+        <span style="color:var(--text-muted);">~</span>
+        <input type="number" id="rt-to" min="1" max="31" placeholder="종료일" style="width:80px;" class="ch-input">
+        <span style="font-size:12px;color:var(--text-muted);">일</span>
+      </div></div>`;
+  } else if (type === 'monthly_last_weekday') {
+    el.innerHTML = `<div class="form-section"><label>마지막 요일</label><select id="rt-last-weekday">${WEEKDAY_OPTIONS}</select></div>`;
+  }
+}
+
+function openRecurringModal() {
+  parsedRecurringData = null;
+  document.getElementById('recurring-modal-title').textContent = '정기업무 추가';
+  document.getElementById('recurring-edit-id').value = '';
+  document.getElementById('recurring-natural-input').value = '';
+  document.getElementById('recurring-title').value = '';
+  document.getElementById('recurring-parsed-preview').style.display = 'none';
+  document.getElementById('recurring-type').value = 'weekly';
+  renderRecurringTypeFields();
+  openModal('recurring');
+}
+
+function openRecurringEditModal(id) {
+  const t = STATE.recurringTasks.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('recurring-modal-title').textContent = '정기업무 편집';
+  document.getElementById('recurring-edit-id').value = id;
+  document.getElementById('recurring-title').value = t.title;
+  document.getElementById('recurring-type').value = t.type;
+  renderRecurringTypeFields();
+  // 값 세팅
+  if (t.type==='weekly') document.getElementById('rt-weekday').value = t.weekday;
+  else if (t.type==='monthly_date') {
+    document.getElementById('rt-from').value = t.date_from;
+    document.getElementById('rt-to').value = t.date_to;
+  } else if (t.type==='monthly_last_weekday') document.getElementById('rt-last-weekday').value = t.last_weekday;
+  openModal('recurring');
+}
+
+async function saveRecurring() {
+  let data;
+  if (parsedRecurringData) {
+    data = { ...parsedRecurringData, created_by: STATE.user.name };
+  } else {
+    const title = document.getElementById('recurring-title').value.trim();
+    const type = document.getElementById('recurring-type').value;
+    if (!title) { alert('업무명을 입력하세요'); return; }
+    data = { title, type, created_by: STATE.user.name };
+    if (type==='weekly') data.weekday = parseInt(document.getElementById('rt-weekday').value);
+    else if (type==='monthly_date') {
+      data.date_from = parseInt(document.getElementById('rt-from').value);
+      data.date_to = parseInt(document.getElementById('rt-to').value);
+    } else if (type==='monthly_last_weekday') data.last_weekday = parseInt(document.getElementById('rt-last-weekday').value);
+  }
+  const editId = document.getElementById('recurring-edit-id').value;
+  if (editId) {
+    await sb.update('recurring_tasks', editId, data);
+    const idx = STATE.recurringTasks.findIndex(x => x.id == editId);
+    if (idx >= 0) STATE.recurringTasks[idx] = { ...STATE.recurringTasks[idx], ...data };
+  } else {
+    const rows = await sb.insert('recurring_tasks', data);
+    if (rows && rows[0]) STATE.recurringTasks.push(rows[0]);
+  }
+  parsedRecurringData = null;
+  renderRecurringCalendar();
+  renderRecurringList();
+  updateDashboard();
+  closeModal('recurring');
+  showToast('저장되었습니다');
+}
+
+async function deleteRecurring(id) {
+  if (!confirm('이 정기업무를 삭제할까요?')) return;
+  await sb.update('recurring_tasks', id, { deleted: true });
+  STATE.recurringTasks = STATE.recurringTasks.filter(x => x.id !== id);
+  renderRecurringCalendar();
+  renderRecurringList();
+  showToast('삭제되었습니다');
+}
+
+/* 체크리스트에 오늘의 정기업무 섹션 자동 추가 */
+function getTodayRecurring() {
+  return getRecurringForDate(new Date());
+}
+
 function updateDashboard() {
   updateDashboardChecklist();
   updateInventoryAlerts();
+  updateDashboardRecurring();
 }
+
+let dashboardCalDate = new Date();
+
+function changeDashboardMonth(dir) {
+  dashboardCalDate.setMonth(dashboardCalDate.getMonth() + dir);
+  renderDashboardCalendar();
+}
+
+function renderDashboardCalendar() {
+  const d = dashboardCalDate;
+  const year = d.getFullYear(), month = d.getMonth();
+  const label = document.getElementById('dashboard-cal-month');
+  if (label) label.textContent = `${year}년 ${month+1}월`;
+  const grid = document.getElementById('dashboard-calendar-grid');
+  if (!grid) return;
+
+  const dayNames = ['일','월','화','수','목','금','토'];
+  let html = dayNames.map(d => `<div class="cal-header" style="font-size:10px;">${d}</div>`).join('');
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDate = new Date(year, month+1, 0).getDate();
+  const today = new Date();
+
+  for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+  for (let date = 1; date <= lastDate; date++) {
+    const thisDate = new Date(year, month, date);
+    const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===date;
+    const dow = thisDate.getDay();
+    const dowClass = dow===0?'sunday':dow===6?'saturday':'';
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(date).padStart(2,'0')}`;
+
+    // 정기업무
+    const recurring = getRecurringForDate(thisDate);
+    // 단발성 일정
+    const events = STATE.scheduledEvents.filter(e => e.date === dateStr);
+    // 공지사항 (날짜 있는 것)
+    const notices = STATE.notices.filter(n => n.event_date === dateStr);
+
+    html += `<div class="cal-day ${isToday?'today':''}" style="min-height:52px;">
+      <div class="day-num ${dowClass}" style="font-size:11px;">${date}</div>
+      ${notices.map(n => `<div class="cal-event" style="background:#FDEDEC;color:#C0392B;font-size:9px;padding:1px 4px;border-radius:3px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">📢 ${n.title}</div>`).join('')}
+      ${recurring.map(t => `<div class="cal-event" style="background:var(--primary-pale);color:var(--primary);font-size:9px;padding:1px 4px;border-radius:3px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">🔄 ${t.title}</div>`).join('')}
+      ${events.map(e => `<div class="cal-event" style="background:#FEF9E7;color:#7D5A00;font-size:9px;padding:1px 4px;border-radius:3px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">📌 ${e.title}</div>`).join('')}
+    </div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function updateDashboardRecurring() {
+  renderDashboardCalendar();
+}
+
 
 /* ════════════════════════════════════
    MODAL / TOAST UTILS
 ════════════════════════════════════ */
-function openModal(name) { document.getElementById('modal-' + name).classList.add('open'); }
+function openModal(name) {
+  const overlay = document.getElementById('modal-' + name);
+  overlay.classList.add('open');
+  // overlay 클릭 시 닫기 (modal 내부 클릭은 제외)
+  overlay.onclick = function(e) { if (e.target === overlay) closeModal(name); };
+}
 function closeModal(name) { document.getElementById('modal-' + name).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(el => {
   el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
