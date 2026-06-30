@@ -1405,6 +1405,7 @@
                   <div class="ch-card-hd">치료실 전달</div>
                   <div class="ch-card-bd" id="tx-body">
                     <div class="ch-input-row" style="margin-bottom:9px;flex-wrap:wrap;">
+                      <button class="chbtn-gold chbtn-sm" id="tx-jb" onclick="txToggle('jb',this)">JB</button>
                       <button class="chbtn-gold chbtn-sm active" id="tx-hp" onclick="txToggle('hp',this)">HP</button>
                       <input type="text" class="ch-input" id="tx-hp-part" placeholder="부위" style="width:90px;flex:none;" oninput="txState.hpPart=this.value">
                       <span class="tx-sep">|</span>
@@ -2002,7 +2003,7 @@ var P_CONFIG=[
   {k:'TA탕약',lbl:'TA 탕약',row:4},
 ];
 var P_DEFAULTS={테이핑:true};
-var pTaping={buyi:''};
+var pTaping={buyi:'',gae:'4'};
 var pBohumyak={company:'',name:'',days:''};
 var pChiyohanyak={name:'',cheop:'',days:''};
 var pTAtanyak={name:'',cheop:'',days:''};
@@ -2150,6 +2151,11 @@ function renderP(){
   if(pActive['테이핑']){
     var tapInp=makeInput('taping-buyi','부위',120,pTaping,'buyi');
     row1.appendChild(tapInp);
+    var tapGaeInp=makeNumInput('taping-gae','개수',pTaping,'gae');
+    tapGaeInp.style.width='52px';
+    row1.appendChild(tapGaeInp);
+    var tapGaeLbl=document.createElement('span');tapGaeLbl.textContent='개';tapGaeLbl.style.cssText='font-size:12px;color:var(--text-muted);';
+    row1.appendChild(tapGaeLbl);
     // 항상 활성화 상태로 focus 가능하게
     setTimeout(function(){if(!pTaping.buyi)tapInp.focus();},10);
   }
@@ -2288,7 +2294,7 @@ function generateResult(){
   out+='- 초기 통증 증가 가능성 및 경과에 따라서 추가 검사 필요성 설명함\n- 추정 진단, 치료 계획, 치료에 따른 효과 및 예상되는 부작용에 대해서 설명함\n';
   var pParts=[];
   out+='\nP)\n';
-  if(pActive['테이핑'])out+='■ 테이핑 : '+(pTaping.buyi?pTaping.buyi:'')+'\n';
+  if(pActive['테이핑']){var tapGae=pTaping.gae||'4';out+='■ 테이핑 : '+(pTaping.buyi?pTaping.buyi:'')+' ('+tapGae+'개)\n';}
   if(pActive['약침']){var 약종류=pInputVals['약침-종류']||'',약cc=pInputVals['약침-cc']||'',약부위=pInputVals['약침-부위']||'';var 약detail=[약종류+(약cc?' '+약cc:''),약부위].filter(Boolean).join(', ');out+='■ 약침 : '+약detail+'\n';}
   var chunaOut2=[],cs2={},ct2={};try{cs2=JSON.parse(pInputVals['chunaSelected']||'{}');}catch(e){}try{ct2=JSON.parse(pInputVals['chunaText']||'{}');}catch(e){}
   ['COX','MET','JS123','Lumbar roll','drop','경추 thrust','흉추 thrust','SCS','골타'].forEach(function(btn){if(!cs2[btn])return;var txt=ct2[btn]?'('+ct2[btn]+')':'';chunaOut2.push(btn+txt);});
@@ -2300,7 +2306,7 @@ function generateResult(){
   var now=new Date();out+='\n------------------------------------------------\n* '+(now.getMonth()+1)+'/'+now.getDate();
   document.getElementById('result-area').value=out;
 }
-var txState={hp:true,hpPart:'',i:true,iPart:'',pos:'',jeon:true,yak:false,yakType:'',needle:'인슐린',cc:'',gae:'',seup:'습부2',bc:true,chu:'',uson:false};
+var txState={jb:false,hp:true,hpPart:'',i:true,iPart:'',pos:'',jeon:true,yak:false,yakType:'',needle:'인슐린',cc:'',gae:'',seup:'습부2',bc:true,chu:'',uson:false};
 function txToggle(key,btn){txState[key]=!txState[key];btn.classList.toggle('active');}
 function txSelectPos(val,btn){
   if(txState.pos===val){txState.pos='';btn.classList.remove('active');}
@@ -2343,6 +2349,7 @@ function txSetYakType(t,btn){
 }
 function generateTxResult(){
   var parts=[];
+  if(txState.jb)parts.push('jb');
   if(txState.hp)parts.push('hp'+(txState.hpPart?'('+txState.hpPart+')':''));
   var seq=[];
   seq.push(txState.i?('i'+(txState.iPart?'('+txState.iPart+')':'')):null);
@@ -2363,7 +2370,7 @@ function generateTxResult(){
   seq.push(txState.uson?'초음파':null);
   var n=1;
   seq.forEach(function(s){if(s){parts.push(n+s);n++;}});
-  document.getElementById('tx-area').value=parts.join(' ');
+  document.getElementById('tx-area').value=parts.join(' ').toUpperCase();
 }
 
 /* ── 피부 SOAP ── */
