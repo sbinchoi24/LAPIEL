@@ -524,6 +524,15 @@
   .inventory-table tr:hover td { background: var(--surface-0); }
   .inventory-table td:first-child { white-space: nowrap; }
   .inventory-table td:last-child { white-space: nowrap; }
+  .inv-cat-section { border: 1px solid var(--border); }
+  .inv-cat-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 11px 16px; cursor: pointer; user-select: none;
+    background: var(--surface-2); font-weight: 700; font-size: 13.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .inv-cat-header:hover { background: var(--surface-1); }
+  .inv-cat-count { font-weight: 400; font-size: 12px; color: var(--text-muted); }
   .stock-status {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 12px; font-weight: 700;
@@ -1751,24 +1760,7 @@
         <button class="btn btn-green btn-sm admin-only" onclick="openInventoryModal()">항목 추가 (원장)</button>
       </div>
     </div>
-    <div class="card" style="padding:0; overflow:hidden;">
-      <table class="inventory-table">
-        <thead>
-          <tr>
-            <th>품목</th>
-            <th>분류</th>
-            <th>현재 수량</th>
-            <th>기준 수량</th>
-            <th>상태</th>
-            <th>수량 입력</th>
-            <th>저장</th>
-            <th class="admin-only" style="display:table-cell;">관리</th>
-            <th>최근 수정</th>
-          </tr>
-        </thead>
-        <tbody id="inventory-tbody"></tbody>
-      </table>
-    </div>
+    <div id="inventory-groups" style="display:flex;flex-direction:column;gap:16px;"></div>
   </div>
 
 
@@ -1835,24 +1827,7 @@
         <button class="btn btn-green btn-sm admin-only" onclick="openSkinInventoryModal()">항목 추가 (원장)</button>
       </div>
     </div>
-    <div class="card" style="padding:0; overflow:hidden;">
-      <table class="inventory-table">
-        <thead>
-          <tr>
-            <th>품목</th>
-            <th>분류</th>
-            <th>현재 수량</th>
-            <th>기준 수량</th>
-            <th>상태</th>
-            <th>수량 입력</th>
-            <th>저장</th>
-            <th class="admin-only" style="display:table-cell;">관리</th>
-            <th>최근 수정</th>
-          </tr>
-        </thead>
-        <tbody id="skin-inventory-tbody"></tbody>
-      </table>
-    </div>
+    <div id="skin-inventory-groups" style="display:flex;flex-direction:column;gap:16px;"></div>
   </div>
 
   <!-- ▸ Q&A 원장용 (원장+직원 모두 보임) -->
@@ -4229,38 +4204,44 @@ function toggleInvCatGroup(type, cat) {
   else renderSkinInventory(document.querySelector('#page-skin-inventory .search-input') ? document.querySelector('#page-skin-inventory .search-input').value : '');
 }
 
+function invStatusInfo(item) {
+  const pct = item.qty / item.min;
+  if (item.qty === 0) return { status: 'stock-empty', label: '재고 없음' };
+  if (pct < 0.5) return { status: 'stock-danger', label: '위험' };
+  if (pct < 1) return { status: 'stock-low', label: '부족' };
+  return { status: 'stock-ok', label: '정상' };
+}
+function invHeaderRow(showMgmt) {
+  return `<tr>
+    <th>품목</th><th>분류</th><th>현재 수량</th><th>기준 수량</th><th>상태</th>
+    <th>수량 입력</th><th>저장</th>
+    ${showMgmt ? '<th class="admin-only" style="display:table-cell;">관리</th>' : ''}
+    <th>최근 수정</th>
+  </tr>`;
+}
+
 function renderInventory(filter = '') {
-  const tbody = document.getElementById('inventory-tbody');
+  const container = document.getElementById('inventory-groups');
   const items = STATE.inventory.filter(i =>
-    !filter || i.name.toLowerCase().includes(filter.toLowerCase()) || i.cat.includes(filter)
+    !filter || i.name.toLowerCase().includes(filter.toLowerCase()) || (i.cat || '').includes(filter)
   );
   const groups = {};
-  items.forEach(i => { const c = i.cat || '(미분류)'; (groups[c] = groups[c] || []).push(i); });
+  items.forEach(i => { const c = (i.cat || '').trim() || '(미분류)'; (groups[c] = groups[c] || []).push(i); });
   const catNames = Object.keys(groups).sort((a,b) => a.localeCompare(b, 'ko'));
-  let html = '';
-  catNames.forEach(cat => {
+  container.innerHTML = catNames.map(cat => {
     const list = groups[cat].slice().sort((a,b) => a.name.localeCompare(b.name, 'ko'));
     const collapsed = invCollapsed.general.has(cat);
-    html += `<tr class="inv-cat-row" style="cursor:pointer;background:var(--surface-2);" onclick="toggleInvCatGroup('general','${cat}')">
-      <td colspan="9" style="font-weight:700;">${collapsed ? '▶' : '▼'} ${cat} <span style="color:var(--text-muted);font-weight:400;">(${list.length})</span></td>
-    </tr>`;
-    if (collapsed) return;
-    list.forEach(item => {
-      const pct = item.qty / item.min;
-      let status, statusLabel;
-      if (item.qty === 0) { status = 'stock-empty'; statusLabel = '재고 없음'; }
-      else if (pct < 0.5) { status = 'stock-danger'; statusLabel = '위험'; }
-      else if (pct < 1) { status = 'stock-low'; statusLabel = '부족'; }
-      else { status = 'stock-ok'; statusLabel = '정상'; }
+    const rows = list.map(item => {
+      const { status, label } = invStatusInfo(item);
       const updaterInfo = item.updatedBy
         ? `<span style="font-size:11px;color:var(--text-muted);">${item.updatedBy}<br>${item.updatedAt}</span>`
         : '<span style="font-size:11px;color:var(--border-strong);">-</span>';
-      html += `<tr>
+      return `<tr>
         <td><strong>${item.name}</strong></td>
         <td style="color:var(--text-muted)">${item.cat}</td>
         <td>${item.qty}</td>
         <td style="color:var(--text-muted)">${item.min}</td>
-        <td><span class="stock-status ${status}">${statusLabel}</span></td>
+        <td><span class="stock-status ${status}">${label}</span></td>
         <td><input type="number" class="qty-input" id="qty-${item.id}" value="${item.qty}" min="0"></td>
         <td><button class="btn btn-green btn-sm" onclick="updateInventory(${item.id})">저장</button></td>
         <td class="admin-only" style="display:table-cell;">
@@ -4271,9 +4252,15 @@ function renderInventory(filter = '') {
         </td>
         <td>${updaterInfo}</td>
       </tr>`;
-    });
-  });
-  tbody.innerHTML = html;
+    }).join('');
+    return `<div class="card inv-cat-section" style="padding:0;overflow:hidden;">
+      <div class="inv-cat-header" onclick="toggleInvCatGroup('general','${cat}')">
+        <span>${collapsed ? '▶' : '▼'} ${cat}</span>
+        <span class="inv-cat-count">${list.length}개</span>
+      </div>
+      ${collapsed ? '' : `<table class="inventory-table"><thead>${invHeaderRow(true)}</thead><tbody>${rows}</tbody></table>`}
+    </div>`;
+  }).join('');
   updateInventoryAlerts();
 }
 
@@ -4477,39 +4464,29 @@ async function loadSkinInventory() {
 }
 
 function renderSkinInventory(filter = '') {
-  const tbody = document.getElementById('skin-inventory-tbody');
-  if (!tbody) return;
+  const container = document.getElementById('skin-inventory-groups');
+  if (!container) return;
   const isAdmin = STATE.user && STATE.user.isAdmin;
   const items = STATE.skinInventory.filter(i =>
     !filter || i.name.toLowerCase().includes(filter.toLowerCase())
   );
   const groups = {};
-  items.forEach(i => { const c = i.cat || '(미분류)'; (groups[c] = groups[c] || []).push(i); });
+  items.forEach(i => { const c = (i.cat || '').trim() || '(미분류)'; (groups[c] = groups[c] || []).push(i); });
   const catNames = Object.keys(groups).sort((a,b) => a.localeCompare(b, 'ko'));
-  let html = '';
-  catNames.forEach(cat => {
+  container.innerHTML = catNames.map(cat => {
     const list = groups[cat].slice().sort((a,b) => a.name.localeCompare(b.name, 'ko'));
     const collapsed = invCollapsed.skin.has(cat);
-    html += `<tr class="inv-cat-row" style="cursor:pointer;background:var(--surface-2);" onclick="toggleInvCatGroup('skin','${cat}')">
-      <td colspan="9" style="font-weight:700;">${collapsed ? '▶' : '▼'} ${cat} <span style="color:var(--text-muted);font-weight:400;">(${list.length})</span></td>
-    </tr>`;
-    if (collapsed) return;
-    list.forEach(item => {
-      const pct = item.qty / item.min;
-      let status, statusLabel;
-      if (item.qty === 0) { status = 'stock-empty'; statusLabel = '재고 없음'; }
-      else if (pct < 0.5) { status = 'stock-danger'; statusLabel = '위험'; }
-      else if (pct < 1) { status = 'stock-low'; statusLabel = '부족'; }
-      else { status = 'stock-ok'; statusLabel = '정상'; }
+    const rows = list.map(item => {
+      const { status, label } = invStatusInfo(item);
       const updaterInfo = item.updatedBy
         ? `<span style="font-size:11px;color:var(--text-muted);">${item.updatedBy}<br>${item.updatedAt}</span>`
         : '<span style="font-size:11px;color:var(--border-strong);">-</span>';
-      html += `<tr>
+      return `<tr>
         <td><strong>${item.name}</strong></td>
         <td style="color:var(--text-muted)">${item.cat}</td>
         <td>${item.qty}</td>
         <td style="color:var(--text-muted)">${item.min}</td>
-        <td><span class="stock-status ${status}">${statusLabel}</span></td>
+        <td><span class="stock-status ${status}">${label}</span></td>
         <td><input type="number" class="qty-input" id="skin-qty-${item.id}" value="${item.qty}" min="0"></td>
         <td><button class="btn btn-green btn-sm" onclick="updateSkinInventory(${item.id})">저장</button></td>
         ${isAdmin ? `<td>
@@ -4520,9 +4497,15 @@ function renderSkinInventory(filter = '') {
         </td>` : '<td></td>'}
         <td>${updaterInfo}</td>
       </tr>`;
-    });
-  });
-  tbody.innerHTML = html;
+    }).join('');
+    return `<div class="card inv-cat-section" style="padding:0;overflow:hidden;">
+      <div class="inv-cat-header" onclick="toggleInvCatGroup('skin','${cat}')">
+        <span>${collapsed ? '▶' : '▼'} ${cat}</span>
+        <span class="inv-cat-count">${list.length}개</span>
+      </div>
+      ${collapsed ? '' : `<table class="inventory-table"><thead>${invHeaderRow(isAdmin)}</thead><tbody>${rows}</tbody></table>`}
+    </div>`;
+  }).join('');
 }
 
 function filterSkinInventory(q) { renderSkinInventory(q); }
