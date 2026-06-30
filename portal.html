@@ -747,6 +747,7 @@
   }
   .chbtn:hover { border-color: var(--primary); background: var(--primary-pale); }
   .chbtn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .chbtn.viewing { border-color: var(--primary); background: var(--primary-pale); }
   .chbtn-sm { padding: 4px 9px; font-size: 12px; }
 
   .chbtn-gold {
@@ -758,6 +759,7 @@
   }
   .chbtn-gold:hover { background: #FEF9E7; border-color: #A07840; }
   .chbtn-gold.active { background: #A07840; border-color: #A07840; color: #fff; }
+  .chbtn-gold.chbtn-sm { padding: 4px 9px; font-size: 12px; }
 
   .chbtn-side {
     padding: 5px 10px; border-radius: 6px;
@@ -770,6 +772,7 @@
   .chbtn-side.active { background: #A07840; border-color: #A07840; color: #fff; }
 
   .btn-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .tx-sep { color: var(--border-strong); font-weight: 300; margin: 0 2px; user-select: none; }
 
   .ch-input {
     width: 100%; padding: 6px 10px;
@@ -936,11 +939,21 @@
     display: flex; align-items: center; gap: 6px;
   }
   .ch-gen-btn {
-    padding: 4px 12px; background: var(--primary-light);
+    padding: 4px 12px; background: #2D8A4E;
     border: none; border-radius: 6px; color: #fff;
     font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
   }
   .ch-gen-btn:hover { opacity: 0.88; }
+  .chbtn-wine {
+    padding: 6px 12px; border-radius: var(--radius);
+    border: 1.5px solid #8E3B53;
+    background: var(--surface-1); color: #7A1F38;
+    font-family: inherit; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.14s; white-space: nowrap;
+  }
+  .chbtn-wine:hover { background: #FBEFF2; border-color: #7A1F38; }
+  .chbtn-wine.active { background: #7A1F38; border-color: #7A1F38; color: #fff; }
+  .chbtn-wine.chbtn-sm { padding: 4px 9px; font-size: 12px; }
   .ch-copy-btn {
     padding: 4px 12px; background: #A07840;
     border: none; border-radius: 6px; color: #fff;
@@ -1391,7 +1404,38 @@
                 <div class="ch-card">
                   <div class="ch-card-hd">치료실 전달</div>
                   <div class="ch-card-bd" id="tx-body">
-                    <div style="color:var(--text-muted);font-size:12px;padding:8px 0;">버튼은 추후 추가 예정</div>
+                    <div class="ch-input-row" style="margin-bottom:9px;flex-wrap:wrap;">
+                      <button class="chbtn-gold chbtn-sm active" id="tx-hp" onclick="txToggle('hp',this)">HP</button>
+                      <input type="text" class="ch-input" id="tx-hp-part" placeholder="부위" style="width:90px;flex:none;" oninput="txState.hpPart=this.value">
+                      <span class="tx-sep">|</span>
+                      <button class="chbtn-gold chbtn-sm active" id="tx-i" onclick="txToggle('i',this)">I</button>
+                      <input type="text" class="ch-input" id="tx-i-part" placeholder="부위" style="width:90px;flex:none;" oninput="txState.iPart=this.value">
+                    </div>
+                    <div class="ch-input-row" style="margin-bottom:9px;flex-wrap:wrap;">
+                      <button class="chbtn chbtn-sm" id="tx-pos-앞침" onclick="txSelectPos('앞침',this)">앞침</button>
+                      <button class="chbtn chbtn-sm" id="tx-pos-엎침" onclick="txSelectPos('엎침',this)">엎침</button>
+                      <button class="chbtn chbtn-sm" id="tx-pos-옆침" onclick="txSelectPos('옆침',this)">옆침</button>
+                      <button class="chbtn-gold chbtn-sm active" id="tx-jeon" onclick="txToggle('jeon',this)">전침</button>
+                      <span class="tx-sep">|</span>
+                      <button class="chbtn-gold chbtn-sm" id="tx-yak" onclick="txToggleYak(this)">약침</button>
+                      <span id="tx-yak-detail" style="display:none;flex-wrap:wrap;gap:5px;align-items:center;"></span>
+                    </div>
+                    <div class="ch-input-row" style="flex-wrap:wrap;">
+                      <button class="chbtn chbtn-sm" id="tx-seup-습부1" onclick="txSelectSeup('습부1',this)">습부1</button>
+                      <button class="chbtn chbtn-sm active" id="tx-seup-습부2" onclick="txSelectSeup('습부2',this)">습부2</button>
+                      <button class="chbtn chbtn-sm" id="tx-seup-건부" onclick="txSelectSeup('건부',this)">건부</button>
+                      <span class="tx-sep">|</span>
+                      <button class="chbtn-gold chbtn-sm active" id="tx-bc" onclick="txToggle('bc',this)">BC</button>
+                      <span class="tx-sep">|</span>
+                      <button class="chbtn chbtn-sm" id="tx-chu-단추" onclick="txSelectChu('단추',this)">단추</button>
+                      <button class="chbtn chbtn-sm" id="tx-chu-복추" onclick="txSelectChu('복추',this)">복추</button>
+                      <span class="tx-sep">|</span>
+                      <button class="chbtn chbtn-sm" id="tx-uson" onclick="txToggle('uson',this)">초음파</button>
+                    </div>
+                    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px;">
+                      <button class="ch-gen-btn" onclick="generateTxResult()">생성</button>
+                      <button class="ch-copy-btn" onclick="chCopyResult('tx-area')">복사</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1422,13 +1466,56 @@
       </div><!-- /근골격계 -->
 
       <!-- 피부/다이어트/내과 -->
-      <div id="chtab-피부" class="chtab-panel"><div style="padding:60px;text-align:center;color:var(--text-muted);">피부 탭 — 추후 설정 예정</div></div>
+      <div id="chtab-피부" class="chtab-panel">
+        <div class="ch-body" style="grid-template-columns:1300px 300px;">
+          <div class="ch-left" style="display:grid;grid-template-columns:280px 1fr;gap:14px;align-items:stretch;min-width:0;">
+            <div style="display:flex;flex-direction:column;gap:12px;min-width:0;height:100%;">
+              <div class="ch-card" style="flex:1;display:flex;flex-direction:column;">
+                <div class="ch-card-hd">S)</div>
+                <div class="ch-card-bd" style="flex:1;display:flex;"><textarea id="skin-s" class="ch-input" style="width:100%;flex:1;resize:none;" placeholder="환자 니즈 입력"></textarea></div>
+              </div>
+              <div class="ch-card" style="flex:1;display:flex;flex-direction:column;">
+                <div class="ch-card-hd">O)</div>
+                <div class="ch-card-bd" style="flex:1;display:flex;"><textarea id="skin-o" class="ch-input" style="width:100%;flex:1;resize:none;" placeholder="상담 내용 입력"></textarea></div>
+              </div>
+              <div class="ch-card" style="flex:1;display:flex;flex-direction:column;">
+                <div class="ch-card-hd">A)</div>
+                <div class="ch-card-bd" style="flex:1;display:flex;"><textarea id="skin-a" class="ch-input" style="width:100%;flex:1;resize:none;" placeholder="상담 내용 입력"></textarea></div>
+              </div>
+            </div>
+            <div class="ch-card" style="min-width:0;">
+              <div class="ch-card-hd">P)</div>
+              <div class="ch-card-bd">
+                <div id="skin-p-buttons"></div>
+              </div>
+            </div>
+          </div>
+          <div class="ch-right" style="position:static;height:auto;">
+            <div class="ch-result-card" style="flex:6;">
+              <div class="ch-result-hd">
+                <span style="flex:1;font-size:13px;font-weight:700;color:#fff;">차팅 결과</span>
+                <button class="ch-gen-btn" onclick="skinGenerate()">생성</button>
+                <button class="ch-copy-btn" onclick="chCopyResult('skin-result-area')">복사</button>
+              </div>
+              <textarea class="ch-result-area" id="skin-result-area" placeholder="생성 버튼을 눌러주세요." style="min-height:280px;"></textarea>
+            </div>
+            <div class="ch-result-card" style="flex:2;">
+              <div class="ch-result-hd">
+                <span style="flex:1;font-size:13px;font-weight:700;color:#fff;">치료실 전달</span>
+                <button class="ch-gen-btn" onclick="generateSkinTxResult()">생성</button>
+                <button class="ch-copy-btn" onclick="chCopyResult('skin-tx-area')">복사</button>
+              </div>
+              <textarea class="ch-result-area" id="skin-tx-area" placeholder="추후 설정 예정"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
       <div id="chtab-다이어트" class="chtab-panel"><div style="padding:60px;text-align:center;color:var(--text-muted);">다이어트 탭 — 추후 설정 예정</div></div>
       <div id="chtab-내과" class="chtab-panel"><div style="padding:60px;text-align:center;color:var(--text-muted);">내과 탭 — 추후 설정 예정</div></div>
 
       <!-- 안면신경마비 탭 -->
       <div id="chtab-안면신경마비" class="chtab-panel">
-        <div class="ch-body">
+        <div class="ch-body" style="grid-template-columns:1300px 300px;">
           <div class="ch-left">
             <div class="ch-3col">
 
@@ -2213,7 +2300,157 @@ function generateResult(){
   var now=new Date();out+='\n------------------------------------------------\n* '+(now.getMonth()+1)+'/'+now.getDate();
   document.getElementById('result-area').value=out;
 }
-function generateTxResult(){document.getElementById('tx-area').value='(치료실 전달 문구 - 추후 설정 예정)';}
+var txState={hp:true,hpPart:'',i:true,iPart:'',pos:'',jeon:true,yak:false,yakType:'',needle:'인슐린',cc:'',gae:'',seup:'습부2',bc:true,chu:'',uson:false};
+function txToggle(key,btn){txState[key]=!txState[key];btn.classList.toggle('active');}
+function txSelectPos(val,btn){
+  if(txState.pos===val){txState.pos='';btn.classList.remove('active');}
+  else{['앞침','엎침','옆침'].forEach(function(p){var b=document.getElementById('tx-pos-'+p);if(b)b.classList.remove('active');});txState.pos=val;btn.classList.add('active');}
+}
+function txSelectSeup(val,btn){
+  if(txState.seup===val){txState.seup='';btn.classList.remove('active');}
+  else{['습부1','습부2','건부'].forEach(function(p){var b=document.getElementById('tx-seup-'+p);if(b)b.classList.remove('active');});txState.seup=val;btn.classList.add('active');}
+}
+function txSelectChu(val,btn){
+  if(txState.chu===val){txState.chu='';btn.classList.remove('active');}
+  else{['단추','복추'].forEach(function(p){var b=document.getElementById('tx-chu-'+p);if(b)b.classList.remove('active');});txState.chu=val;btn.classList.add('active');}
+}
+function txToggleYak(btn){
+  txState.yak=!txState.yak;btn.classList.toggle('active');
+  var d=document.getElementById('tx-yak-detail');
+  if(txState.yak){d.style.display='inline-flex';txRenderYakDetail();}
+  else{d.style.display='none';d.innerHTML='';}
+}
+function txRenderYakDetail(){
+  var d=document.getElementById('tx-yak-detail');
+  var types=['T','B','죽','중','심'];
+  var needles=['인슐린','26G 90mm','27G 38mm','29G 38mm','29G 60mm','30G 25mm'];
+  var h='<span style="display:inline-flex;gap:4px;flex-wrap:wrap" id="tx-yaktype-wrap">';
+  types.forEach(function(t){h+='<button class="chbtn chbtn-sm'+(txState.yakType===t?' active':'')+'" onclick="txSetYakType(\''+t+'\',this)">'+t+'</button>';});
+  h+='</span>';
+  h+='<select class="ch-input" style="width:118px" onchange="txState.needle=this.value;txRenderYakDetail();"><option value="">바늘 선택</option>';
+  needles.forEach(function(n){h+='<option value="'+n+'"'+(txState.needle===n?' selected':'')+'>'+n+'</option>';});
+  h+='</select>';
+  if(txState.needle && txState.needle!=='인슐린'){
+    h+='<input type="text" class="ch-num" style="width:44px" value="'+(txState.cc||'')+'" oninput="txState.cc=this.value"><span style="font-size:11px;color:var(--text-muted)">cc</span>';
+  }
+  h+='<input type="text" class="ch-num" style="width:40px" value="'+(txState.gae||'')+'" oninput="txState.gae=this.value"><span style="font-size:11px;color:var(--text-muted)">개</span>';
+  d.innerHTML=h;
+}
+function txSetYakType(t,btn){
+  txState.yakType=t;
+  Array.prototype.forEach.call(btn.parentNode.querySelectorAll('button'),function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+}
+function generateTxResult(){
+  var parts=[];
+  if(txState.hp)parts.push('hp'+(txState.hpPart?'('+txState.hpPart+')':''));
+  var seq=[];
+  seq.push(txState.i?('i'+(txState.iPart?'('+txState.iPart+')':'')):null);
+  var needleLine='';
+  if(txState.pos||txState.yak){
+    needleLine=txState.pos?(txState.pos+(txState.jeon?'(전)':'')):'';
+    if(txState.yak){
+      var suffix=txState.needle==='인슐린'
+        ? (txState.yakType||'')+'*'+(txState.gae||'')
+        : (txState.yakType||'')+'('+(txState.cc||'')+'cc '+(txState.needle||'')+')*'+(txState.gae||'');
+      needleLine=needleLine?(needleLine+'+'+suffix):suffix;
+    }
+  }
+  seq.push(needleLine||null);
+  seq.push(txState.seup||null);
+  seq.push(txState.bc?'BC':null);
+  seq.push(txState.chu||null);
+  seq.push(txState.uson?'초음파':null);
+  var n=1;
+  seq.forEach(function(s){if(s){parts.push(n+s);n++;}});
+  document.getElementById('tx-area').value=parts.join(' ');
+}
+
+/* ── 피부 SOAP ── */
+var PROC_GROUPS={
+  '토닝':['제네시스 체험','제네시스 1회','제네시스 10회','듀얼 체험','듀얼 1회','듀얼 10회'],
+  '슈링크':['100샷 체험','100샷 1회','100샷 3회','300샷 체험','300샷 1회','300샷 3회'],
+  '볼뉴머':['300샷 체험','300샷 1회','300샷 패키지','600샷 체험','600샷 1회','600샷 패키지'],
+  '볼링크':['Light (300+100) 체험','Light (300+100) 1회','Light (300+100) 3회','Standard (300+300) 체험','Standard (300+300) 1회','Standard (300+300) 3회','Premium (300+600) 체험','Premium (300+600) 1회','Premium (300+600) 3회'],
+  'RF 시크릿':['RF+ASCE 체험','RF+ASCE 1회','RF+ASCE 3회','RF+엑소좀 체험','RF+엑소좀 1회','RF+엑소좀 3회'],
+  'AMTS':['AMTS 풀페이스 체험','AMTS 풀페이스 1회','AMTS 풀페이스 3회','AMTS+PLAA 체험','AMTS+PLAA 1회','AMTS+PLAA 3회','AMTS+라디쥬 체험','AMTS+라디쥬 1회','AMTS+라디쥬 3회'],
+  '스킨부스터':['ASCE','엑소좀','미주안','라디쥬','GFC CELL','PLAA'],
+  '여드름':['압출 체험','압출 1회','압출 4회','압출 8회','압출 12회','베이직 체험','베이직 1회','베이직 4회','베이직 8회','베이직 12회','프리미엄 체험','프리미엄 1회','프리미엄 4회','프리미엄 6회','프리미엄 8회'],
+  '바디관리':['베이직 체험','베이직 1회','베이직 5회','베이직 10회','플러스 체험','플러스 1회','플러스 5회','플러스 10회']
+};
+var procCascade={};
+var skinSelection={};
+var PROC_COL1=['토닝','슈링크','볼뉴머','RF 시크릿'];
+var PROC_COL2=['볼링크','AMTS','여드름','바디관리','스킨부스터'];
+function buildProcGroupHTML(containerId,g){
+  var items=PROC_GROUPS[g];
+  var html='<div style="margin-bottom:14px;"><div class="ch-sub-hd" style="margin-bottom:5px;font-size:12px;padding-bottom:4px;">'+g+'</div>';
+  if(g==='스킨부스터'){
+    html+='<div class="btn-group">';
+    items.forEach(function(it){html+='<button class="chbtn-wine chbtn-sm'+(skinSelection[g]===it?' active':'')+'" data-group="'+g+'" data-label="'+it+'" onclick="procToggleSuffix(this)">'+it+'</button>';});
+    html+='</div>';
+  } else {
+    var map={};
+    items.forEach(function(it){var p=it.split(' ');var suf=p.pop();var pre=p.join(' ');if(!map[pre])map[pre]=[];map[pre].push(suf);});
+    html+='<div class="btn-group" id="'+containerId+'-'+encodeURIComponent(g)+'-row">';
+    Object.keys(map).forEach(function(pre){html+='<button class="chbtn chbtn-sm" onclick="procSelectPrefix(\''+containerId+'\',\''+g+'\',\''+pre+'\',this)">'+pre+'</button>';});
+    html+='</div>';
+    html+='<div id="'+containerId+'-'+encodeURIComponent(g)+'-suffix" class="btn-group" style="min-height:28px;"></div>';
+  }
+  html+='</div>';
+  return html;
+}
+function buildProcUI(containerId){
+  var h1='';PROC_COL1.forEach(function(g){h1+=buildProcGroupHTML(containerId,g);});
+  var h2='';PROC_COL2.forEach(function(g){h2+=buildProcGroupHTML(containerId,g);});
+  document.getElementById(containerId).innerHTML=
+    '<div style="display:flex;gap:18px;align-items:flex-start;">'
+    +'<div style="flex:1;min-width:0;">'+h1+'</div>'
+    +'<div style="flex:1;min-width:0;">'+h2+'</div>'
+    +'</div>';
+}
+function procSelectPrefix(containerId,g,pre,btn){
+  Array.prototype.forEach.call(btn.parentNode.querySelectorAll('button.chbtn'),function(b){b.classList.remove('viewing');});
+  btn.classList.add('viewing');
+  var sufWrap=document.getElementById(containerId+'-'+encodeURIComponent(g)+'-suffix');
+  var suffixes=PROC_GROUPS[g].filter(function(it){return it.indexOf(pre+' ')===0;}).map(function(it){return it.slice(pre.length+1);});
+  var h='';
+  suffixes.forEach(function(suf){
+    var label=pre+' '+suf;
+    h+='<button class="chbtn-gold chbtn-sm'+(skinSelection[g]===label?' active':'')+'" data-group="'+g+'" data-label="'+label+'" onclick="procToggleSuffix(this)">'+suf+'</button>';
+  });
+  sufWrap.innerHTML=h;
+}
+function procToggleSuffix(btn){
+  var group=btn.getAttribute('data-group');
+  var label=btn.getAttribute('data-label');
+  var nowActive=!btn.classList.contains('active');
+  Array.prototype.forEach.call(document.querySelectorAll('#skin-p-buttons button[data-group="'+group+'"]'),function(b){b.classList.remove('active');});
+  if(nowActive){btn.classList.add('active');skinSelection[group]=label;}
+  else{skinSelection[group]=null;}
+}
+function skinTodayMD(){var d=new Date();return (d.getMonth()+1)+'/'+d.getDate();}
+function generateSkinTxResult(){document.getElementById('skin-tx-area').value='(치료실 전달 문구 - 추후 설정 예정)';}
+function skinGenerate(){
+  var s=document.getElementById('skin-s').value.trim();
+  var o=document.getElementById('skin-o').value.trim();
+  var a=document.getElementById('skin-a').value.trim();
+  var date=skinTodayMD();
+  var lines=[];
+  lines.push('S)');
+  lines.push('* '+date+(s?' '+s:''));
+  lines.push('');
+  lines.push('O) JANUS PRO');
+  lines.push('* '+date+(o?' '+o:''));
+  lines.push('');
+  lines.push('A)');
+  lines.push('* '+date+(a?' '+a:''));
+  lines.push('');
+  lines.push('P)');
+  Object.keys(PROC_GROUPS).forEach(function(g){if(skinSelection[g])lines.push('* '+date+' '+skinSelection[g]+' 결제');});
+  document.getElementById('skin-result-area').value=lines.join('\n');
+}
+buildProcUI('skin-p-buttons');
 function chCopyResult(id){
   var text=document.getElementById(id).value;
   if(navigator.clipboard){navigator.clipboard.writeText(text);}else{var ta=document.getElementById(id);ta.select();document.execCommand('copy');}
