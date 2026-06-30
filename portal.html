@@ -1083,7 +1083,7 @@
 <!-- ══ SIDEBAR ══ -->
 <div id="app" style="display:none;">
 <div id="sidebar">
-  <div class="sidebar-logo">
+  <div class="sidebar-logo" onclick="goToDashboard()" style="cursor:pointer;">
     <div class="clinic-name">경희 라피엘 한의원</div>
     <div class="clinic-sub">내부 포털 v1.0</div>
   </div>
@@ -3180,6 +3180,16 @@ const PAGE_TITLES = {
   'qa-admin': 'Q&A [원장용]', 'qa-staff': 'Q&A [직원용]',
   resources: '자료'
 };
+
+function goToDashboard() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-dashboard').classList.add('active');
+  document.getElementById('page-title').textContent = '대시보드';
+  const dashNav = document.querySelector('.nav-item[onclick*="dashboard"]');
+  if (dashNav) dashNav.classList.add('active');
+  updateDashboard();
+}
 
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
