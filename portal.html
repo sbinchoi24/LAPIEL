@@ -2059,7 +2059,6 @@ function renderP(){
   // 테이핑
   var row1=document.createElement('div');row1.className='p-row';
   var tapBtn=makeBtn('테이핑','테이핑',false);
-  tapBtn.textContent=(pActive['테이핑']?'☑ ':'☐ ')+'테이핑';
   row1.appendChild(tapBtn);
   if(pActive['테이핑']){
     var tapInp=makeInput('taping-buyi','부위',120,pTaping,'buyi');
