@@ -1763,7 +1763,6 @@
             <th>수량 입력</th>
             <th>저장</th>
             <th class="admin-only" style="display:table-cell;">관리</th>
-            <th class="admin-only" style="display:table-cell;">순서</th>
             <th>최근 수정</th>
           </tr>
         </thead>
@@ -1848,7 +1847,6 @@
             <th>수량 입력</th>
             <th>저장</th>
             <th class="admin-only" style="display:table-cell;">관리</th>
-            <th class="admin-only" style="display:table-cell;">순서</th>
             <th>최근 수정</th>
           </tr>
         </thead>
@@ -4222,63 +4220,61 @@ async function deleteManual(id) {
 /* ════════════════════════════════════
    INVENTORY
 ════════════════════════════════════ */
-function renderInventory(filter = '') {
-  const tbody = document.getElementById('inventory-tbody');
-  const items = STATE.inventory
-    .slice()
-    .sort((a,b) => (a.sortOrder ?? a.id) - (b.sortOrder ?? b.id))
-    .filter(i =>
-      !filter || i.name.toLowerCase().includes(filter.toLowerCase()) || i.cat.includes(filter)
-    );
-  tbody.innerHTML = items.map((item, idx) => {
-    const pct = item.qty / item.min;
-    let status, statusLabel;
-    if (item.qty === 0) { status = 'stock-empty'; statusLabel = '재고 없음'; }
-    else if (pct < 0.5) { status = 'stock-danger'; statusLabel = '위험'; }
-    else if (pct < 1) { status = 'stock-low'; statusLabel = '부족'; }
-    else { status = 'stock-ok'; statusLabel = '정상'; }
-    const updaterInfo = item.updatedBy
-      ? `<span style="font-size:11px;color:var(--text-muted);">${item.updatedBy}<br>${item.updatedAt}</span>`
-      : '<span style="font-size:11px;color:var(--border-strong);">-</span>';
-    return `<tr>
-      <td><strong>${item.name}</strong></td>
-      <td style="color:var(--text-muted)">${item.cat}</td>
-      <td>${item.qty}</td>
-      <td style="color:var(--text-muted)">${item.min}</td>
-      <td><span class="stock-status ${status}">${statusLabel}</span></td>
-      <td><input type="number" class="qty-input" id="qty-${item.id}" value="${item.qty}" min="0"></td>
-      <td><button class="btn btn-green btn-sm" onclick="updateInventory(${item.id})">저장</button></td>
-      <td class="admin-only" style="display:table-cell;">
-        <div style="display:flex;gap:4px;">
-          <button class="btn btn-outline btn-sm" onclick="openInventoryEditModal(${item.id})">품목 편집</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteInventoryItem(${item.id})">품목 삭제</button>
-        </div>
-      </td>
-      <td class="admin-only" style="display:table-cell;">
-        <div style="display:flex;gap:2px;">
-          <button class="btn btn-outline btn-sm" style="padding:3px 7px;" ${idx===0?'disabled':''} onclick="moveInventoryItem(${item.id},'up')">▲</button>
-          <button class="btn btn-outline btn-sm" style="padding:3px 7px;" ${idx===items.length-1?'disabled':''} onclick="moveInventoryItem(${item.id},'down')">▼</button>
-        </div>
-      </td>
-      <td>${updaterInfo}</td>
-    </tr>`;
-  }).join('');
-  updateInventoryAlerts();
+var invCollapsed = { general: new Set(), skin: new Set() };
+
+function toggleInvCatGroup(type, cat) {
+  const set = invCollapsed[type];
+  if (set.has(cat)) set.delete(cat); else set.add(cat);
+  if (type === 'general') renderInventory(document.querySelector('#page-inventory .search-input') ? document.querySelector('#page-inventory .search-input').value : '');
+  else renderSkinInventory(document.querySelector('#page-skin-inventory .search-input') ? document.querySelector('#page-skin-inventory .search-input').value : '');
 }
 
-async function moveInventoryItem(id, dir) {
-  const sorted = STATE.inventory.slice().sort((a,b) => (a.sortOrder ?? a.id) - (b.sortOrder ?? b.id));
-  const idx = sorted.findIndex(i => i.id === id);
-  const swapIdx = dir === 'up' ? idx - 1 : idx + 1;
-  if (swapIdx < 0 || swapIdx >= sorted.length) return;
-  const a = sorted[idx], b = sorted[swapIdx];
-  const aOrder = a.sortOrder ?? a.id, bOrder = b.sortOrder ?? b.id;
-  a.sortOrder = bOrder; b.sortOrder = aOrder;
-  try {
-    await sb.update('inventory', a.id, { sort_order: a.sortOrder });
-    await sb.update('inventory', b.id, { sort_order: b.sortOrder });
-  } catch(e) { console.warn('순서 저장 실패(sort_order 컬럼 미생성 가능):', e); }
-  renderInventory(document.querySelector('#page-inventory .search-input') ? document.querySelector('#page-inventory .search-input').value : '');
+function renderInventory(filter = '') {
+  const tbody = document.getElementById('inventory-tbody');
+  const items = STATE.inventory.filter(i =>
+    !filter || i.name.toLowerCase().includes(filter.toLowerCase()) || i.cat.includes(filter)
+  );
+  const groups = {};
+  items.forEach(i => { const c = i.cat || '(미분류)'; (groups[c] = groups[c] || []).push(i); });
+  const catNames = Object.keys(groups).sort((a,b) => a.localeCompare(b, 'ko'));
+  let html = '';
+  catNames.forEach(cat => {
+    const list = groups[cat].slice().sort((a,b) => a.name.localeCompare(b.name, 'ko'));
+    const collapsed = invCollapsed.general.has(cat);
+    html += `<tr class="inv-cat-row" style="cursor:pointer;background:var(--surface-2);" onclick="toggleInvCatGroup('general','${cat}')">
+      <td colspan="9" style="font-weight:700;">${collapsed ? '▶' : '▼'} ${cat} <span style="color:var(--text-muted);font-weight:400;">(${list.length})</span></td>
+    </tr>`;
+    if (collapsed) return;
+    list.forEach(item => {
+      const pct = item.qty / item.min;
+      let status, statusLabel;
+      if (item.qty === 0) { status = 'stock-empty'; statusLabel = '재고 없음'; }
+      else if (pct < 0.5) { status = 'stock-danger'; statusLabel = '위험'; }
+      else if (pct < 1) { status = 'stock-low'; statusLabel = '부족'; }
+      else { status = 'stock-ok'; statusLabel = '정상'; }
+      const updaterInfo = item.updatedBy
+        ? `<span style="font-size:11px;color:var(--text-muted);">${item.updatedBy}<br>${item.updatedAt}</span>`
+        : '<span style="font-size:11px;color:var(--border-strong);">-</span>';
+      html += `<tr>
+        <td><strong>${item.name}</strong></td>
+        <td style="color:var(--text-muted)">${item.cat}</td>
+        <td>${item.qty}</td>
+        <td style="color:var(--text-muted)">${item.min}</td>
+        <td><span class="stock-status ${status}">${statusLabel}</span></td>
+        <td><input type="number" class="qty-input" id="qty-${item.id}" value="${item.qty}" min="0"></td>
+        <td><button class="btn btn-green btn-sm" onclick="updateInventory(${item.id})">저장</button></td>
+        <td class="admin-only" style="display:table-cell;">
+          <div style="display:flex;gap:4px;">
+            <button class="btn btn-outline btn-sm" onclick="openInventoryEditModal(${item.id})">품목 편집</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteInventoryItem(${item.id})">품목 삭제</button>
+          </div>
+        </td>
+        <td>${updaterInfo}</td>
+      </tr>`;
+    });
+  });
+  tbody.innerHTML = html;
+  updateInventoryAlerts();
 }
 
 function filterInventory(q) { renderInventory(q); }
@@ -4484,63 +4480,52 @@ function renderSkinInventory(filter = '') {
   const tbody = document.getElementById('skin-inventory-tbody');
   if (!tbody) return;
   const isAdmin = STATE.user && STATE.user.isAdmin;
-  const items = STATE.skinInventory
-    .slice()
-    .sort((a,b) => (a.sortOrder ?? a.id) - (b.sortOrder ?? b.id))
-    .filter(i =>
-      !filter || i.name.toLowerCase().includes(filter.toLowerCase())
-    );
-  tbody.innerHTML = items.map((item, idx) => {
-    const pct = item.qty / item.min;
-    let status, statusLabel;
-    if (item.qty === 0) { status = 'stock-empty'; statusLabel = '재고 없음'; }
-    else if (pct < 0.5) { status = 'stock-danger'; statusLabel = '위험'; }
-    else if (pct < 1) { status = 'stock-low'; statusLabel = '부족'; }
-    else { status = 'stock-ok'; statusLabel = '정상'; }
-    const updaterInfo = item.updatedBy
-      ? `<span style="font-size:11px;color:var(--text-muted);">${item.updatedBy}<br>${item.updatedAt}</span>`
-      : '<span style="font-size:11px;color:var(--border-strong);">-</span>';
-    return `<tr>
-      <td><strong>${item.name}</strong></td>
-      <td style="color:var(--text-muted)">${item.cat}</td>
-      <td>${item.qty}</td>
-      <td style="color:var(--text-muted)">${item.min}</td>
-      <td><span class="stock-status ${status}">${statusLabel}</span></td>
-      <td><input type="number" class="qty-input" id="skin-qty-${item.id}" value="${item.qty}" min="0"></td>
-      <td><button class="btn btn-green btn-sm" onclick="updateSkinInventory(${item.id})">저장</button></td>
-      ${isAdmin ? `<td>
-        <div style="display:flex;gap:4px;">
-          <button class="btn btn-outline btn-sm" onclick="openSkinInventoryEditModal(${item.id})">품목 편집</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteSkinInventoryItem(${item.id})">품목 삭제</button>
-        </div>
-      </td>` : '<td></td>'}
-      ${isAdmin ? `<td>
-        <div style="display:flex;gap:2px;">
-          <button class="btn btn-outline btn-sm" style="padding:3px 7px;" ${idx===0?'disabled':''} onclick="moveSkinInventoryItem(${item.id},'up')">▲</button>
-          <button class="btn btn-outline btn-sm" style="padding:3px 7px;" ${idx===items.length-1?'disabled':''} onclick="moveSkinInventoryItem(${item.id},'down')">▼</button>
-        </div>
-      </td>` : '<td></td>'}
-      <td>${updaterInfo}</td>
+  const items = STATE.skinInventory.filter(i =>
+    !filter || i.name.toLowerCase().includes(filter.toLowerCase())
+  );
+  const groups = {};
+  items.forEach(i => { const c = i.cat || '(미분류)'; (groups[c] = groups[c] || []).push(i); });
+  const catNames = Object.keys(groups).sort((a,b) => a.localeCompare(b, 'ko'));
+  let html = '';
+  catNames.forEach(cat => {
+    const list = groups[cat].slice().sort((a,b) => a.name.localeCompare(b.name, 'ko'));
+    const collapsed = invCollapsed.skin.has(cat);
+    html += `<tr class="inv-cat-row" style="cursor:pointer;background:var(--surface-2);" onclick="toggleInvCatGroup('skin','${cat}')">
+      <td colspan="9" style="font-weight:700;">${collapsed ? '▶' : '▼'} ${cat} <span style="color:var(--text-muted);font-weight:400;">(${list.length})</span></td>
     </tr>`;
-  }).join('');
+    if (collapsed) return;
+    list.forEach(item => {
+      const pct = item.qty / item.min;
+      let status, statusLabel;
+      if (item.qty === 0) { status = 'stock-empty'; statusLabel = '재고 없음'; }
+      else if (pct < 0.5) { status = 'stock-danger'; statusLabel = '위험'; }
+      else if (pct < 1) { status = 'stock-low'; statusLabel = '부족'; }
+      else { status = 'stock-ok'; statusLabel = '정상'; }
+      const updaterInfo = item.updatedBy
+        ? `<span style="font-size:11px;color:var(--text-muted);">${item.updatedBy}<br>${item.updatedAt}</span>`
+        : '<span style="font-size:11px;color:var(--border-strong);">-</span>';
+      html += `<tr>
+        <td><strong>${item.name}</strong></td>
+        <td style="color:var(--text-muted)">${item.cat}</td>
+        <td>${item.qty}</td>
+        <td style="color:var(--text-muted)">${item.min}</td>
+        <td><span class="stock-status ${status}">${statusLabel}</span></td>
+        <td><input type="number" class="qty-input" id="skin-qty-${item.id}" value="${item.qty}" min="0"></td>
+        <td><button class="btn btn-green btn-sm" onclick="updateSkinInventory(${item.id})">저장</button></td>
+        ${isAdmin ? `<td>
+          <div style="display:flex;gap:4px;">
+            <button class="btn btn-outline btn-sm" onclick="openSkinInventoryEditModal(${item.id})">품목 편집</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteSkinInventoryItem(${item.id})">품목 삭제</button>
+          </div>
+        </td>` : '<td></td>'}
+        <td>${updaterInfo}</td>
+      </tr>`;
+    });
+  });
+  tbody.innerHTML = html;
 }
 
 function filterSkinInventory(q) { renderSkinInventory(q); }
-
-async function moveSkinInventoryItem(id, dir) {
-  const sorted = STATE.skinInventory.slice().sort((a,b) => (a.sortOrder ?? a.id) - (b.sortOrder ?? b.id));
-  const idx = sorted.findIndex(i => i.id === id);
-  const swapIdx = dir === 'up' ? idx - 1 : idx + 1;
-  if (swapIdx < 0 || swapIdx >= sorted.length) return;
-  const a = sorted[idx], b = sorted[swapIdx];
-  const aOrder = a.sortOrder ?? a.id, bOrder = b.sortOrder ?? b.id;
-  a.sortOrder = bOrder; b.sortOrder = aOrder;
-  try {
-    await sb.update('skin_inventory', a.id, { sort_order: a.sortOrder });
-    await sb.update('skin_inventory', b.id, { sort_order: b.sortOrder });
-  } catch(e) { console.warn('순서 저장 실패(sort_order 컬럼 미생성 가능):', e); }
-  renderSkinInventory(document.querySelector('#page-skin-inventory .search-input') ? document.querySelector('#page-skin-inventory .search-input').value : '');
-}
 function openSkinInventoryModal() { renderCatOptions('skin-inv-cat','skin'); openModal('skin-inventory'); }
 
 async function saveSkinInventoryItem() {
