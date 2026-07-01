@@ -1184,6 +1184,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
       <span>피부 소모품 재고</span>
     </div>
+    <div class="nav-item" onclick="showPage('herb-inventory')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0 1 0 20"/><path d="M12 2C6.48 2 2 6.48 2 12"/><path d="M12 12c0-4 2-7 5-9"/><path d="M12 12c-3 0-6-1-8-3"/></svg>
+      <span>약재 관리</span>
+    </div>
   </nav>
   <div class="sidebar-footer">
     <div id="backup-btn-wrap" style="display:none;margin-bottom:12px;">
@@ -1846,6 +1850,20 @@
       </div>
     </div>
     <div id="skin-inventory-groups" style="columns:2;column-gap:16px;"></div>
+  </div>
+
+  <!-- ▸ 약재 관리 -->
+  <div id="page-herb-inventory" class="page" style="max-width:100%;">
+    <div class="flex items-center justify-between" style="margin-bottom:20px;">
+      <div class="search-bar" style="margin-bottom:0; flex:1; max-width:320px;">
+        <input type="text" class="search-input" placeholder="약재 검색..." oninput="filterHerbInventory(this.value)">
+      </div>
+      <div style="display:flex;gap:8px;">
+        <a class="btn btn-outline btn-sm admin-only" href="https://docs.google.com/spreadsheets/d/1Rco7GhhX_yP15bTJow7u-eO3AhC1J5OhGXUcmEvQV6M/edit?usp=sharing" target="_blank" style="text-decoration:none;">Google Sheets</a>
+        <button class="btn btn-outline btn-sm admin-only" onclick="reloadInventory('herb')">새로고침</button>
+      </div>
+    </div>
+    <div id="herb-inventory-groups" style="columns:2;column-gap:16px;"></div>
   </div>
 
   <!-- ▸ Q&A 원장용 (원장+직원 모두 보임) -->
@@ -2964,6 +2982,7 @@ const STATE = {
   metrics: {},
   calendarDate: new Date(),
   skinInventory: [],
+  herbInventory: [],
   qaItems: [],
   recurringTasks: [],
   scheduledEvents: [],
@@ -3074,7 +3093,7 @@ function doLogin() {
   }
 }
 document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && selectedRole) doLogin();
+  if (e.key === 'Enter' && selectedRole && !STATE.user) doLogin();
 });
 
 /* ════════════════════════════════════
@@ -3321,6 +3340,7 @@ async function initApp() {
       loadManuals(),
       loadInventory(),
       loadSkinInventory(),
+      loadHerbInventory(),
       loadInvCategories(),
       loadSchedules(),
       loadChecklistItems(),
@@ -3540,7 +3560,7 @@ const PAGE_TITLES = {
   dashboard: '대시보드', charting: '차팅', billing: '청구 수가 조회',
   notice: '공지사항', checklist: '체크리스트', recurring: '일정', schedule: '근무표',
   manual: '매뉴얼', schedule: '스케줄',
-  inventory: '일반 소모품 재고', 'skin-inventory': '피부 소모품 재고',
+  inventory: '일반 소모품 재고', 'skin-inventory': '피부 소모품 재고', 'herb-inventory': '약재 관리',
   'qa-admin': 'Q&A [원장용]', 'qa-staff': 'Q&A [직원용]',
   resources: '자료'
 };
@@ -3569,6 +3589,8 @@ function showPage(name) {
     renderEventsList();
   } else if (name === 'skin-inventory') {
     renderSkinInventory();
+  } else if (name === 'herb-inventory') {
+    renderHerbInventory();
   } else if (name === 'resources') {
     renderResources();
   } else if (name === 'qa-admin') {
@@ -4269,9 +4291,12 @@ async function reloadInventory(type) {
     if (type === 'general') {
       await loadInventory();
       renderInventory();
-    } else {
+    } else if (type === 'skin') {
       await loadSkinInventory();
       renderSkinInventory();
+    } else {
+      await loadHerbInventory();
+      renderHerbInventory();
     }
     showToast('최신 데이터를 불러왔습니다');
   } catch(e) {
@@ -4536,6 +4561,93 @@ async function saveSchedule() {
 /* ════════════════════════════════════
    피부 재고
 ════════════════════════════════════ */
+async function loadHerbInventory() {
+  try {
+    const rows = await sb.select('herb_inventory', 'deleted=neq.true');
+    if (rows && rows.length > 0) {
+      STATE.herbInventory = rows.map(r => ({
+        id: r.id, name: r.name, cat: r.cat || '', qty: r.qty, min: r.min_qty,
+        updatedBy: r.updated_by || '', updatedAt: r.updated_at || ''
+      }));
+    }
+  } catch(e) { console.warn('loadHerbInventory 오류:', e); }
+}
+
+function renderHerbInventory(filter = '') {
+  const container = document.getElementById('herb-inventory-groups');
+  if (!container) return;
+  const isAdmin = STATE.user && STATE.user.isAdmin;
+  const items = STATE.herbInventory.filter(i =>
+    !filter || i.name.toLowerCase().includes(filter.toLowerCase())
+  );
+  const groups = {};
+  items.forEach(i => { const c = (i.cat || '').trim() || '(미분류)'; (groups[c] = groups[c] || []).push(i); });
+  const catNames = sortCatNames(Object.keys(groups));
+  container.innerHTML = catNames.map(cat => {
+    const list = groups[cat].slice().sort((a,b) => a.name.localeCompare(b.name, 'ko'));
+    const collapsed = invCollapsed['herb'] ? invCollapsed['herb'].has(cat) : false;
+    const rows = list.map(item => {
+      const { status, label } = invStatusInfo(item);
+      const updaterInfo = item.updatedBy
+        ? `<span style="font-size:11px;color:var(--text-muted);">${item.updatedBy}<br>${item.updatedAt}</span>`
+        : '<span style="font-size:11px;color:var(--border-strong);">-</span>';
+      return `<tr>
+        <td><strong>${item.name}</strong></td>
+        <td style="color:var(--text-muted)">${item.cat}</td>
+        <td>${item.qty}</td>
+        <td style="color:var(--text-muted)">${item.min}</td>
+        <td><span class="stock-status ${status}">${label}</span></td>
+        <td><input type="number" class="qty-input" id="herb-qty-${item.id}" value="${item.qty}" min="0"></td>
+        <td><button class="btn btn-green btn-sm" onclick="updateHerbInventory(${item.id})">저장</button></td>
+        ${isAdmin ? `<td><div style="display:flex;gap:4px;">
+          <button class="btn btn-danger btn-sm" onclick="deleteHerbInventoryItem(${item.id})">삭제</button>
+        </div></td>` : '<td></td>'}
+        <td>${updaterInfo}</td>
+      </tr>`;
+    }).join('');
+    return `<div class="card inv-cat-section" style="padding:0;overflow:hidden;">
+      <div class="inv-cat-header" onclick="toggleHerbCatGroup('${cat}')">
+        <span class="inv-cat-header-left"><span class="inv-chevron${collapsed?' collapsed':''}">▾</span>${cat}</span>
+        <span class="inv-cat-count">${list.length}개</span>
+      </div>
+      ${collapsed ? '' : `<table class="inventory-table"><thead>${invHeaderRow(isAdmin)}</thead><tbody>${rows}</tbody></table>`}
+    </div>`;
+  }).join('');
+}
+
+function filterHerbInventory(q) { renderHerbInventory(q); }
+
+function toggleHerbCatGroup(cat) {
+  if (!invCollapsed['herb']) invCollapsed['herb'] = new Set();
+  const s = invCollapsed['herb'];
+  s.has(cat) ? s.delete(cat) : s.add(cat);
+  renderHerbInventory(document.querySelector('#page-herb-inventory .search-input')?.value || '');
+}
+
+async function updateHerbInventory(id) {
+  const inp = document.getElementById('herb-qty-' + id);
+  if (!inp) return;
+  const qty = parseInt(inp.value);
+  const item = STATE.herbInventory.find(i => i.id === id);
+  if (!item) return;
+  try {
+    await sb.update('herb_inventory', id, { qty, updated_by: STATE.user?.name || '', updated_at: new Date().toLocaleDateString('ko-KR') });
+    item.qty = qty;
+    renderHerbInventory(document.querySelector('#page-herb-inventory .search-input')?.value || '');
+    showToast('수량이 저장되었습니다');
+  } catch(e) { showToast('저장 실패'); }
+}
+
+async function deleteHerbInventoryItem(id) {
+  if (!confirm('이 항목을 삭제할까요?')) return;
+  try {
+    await sb.update('herb_inventory', id, { deleted: true });
+    STATE.herbInventory = STATE.herbInventory.filter(i => i.id !== id);
+    renderHerbInventory();
+    showToast('삭제되었습니다');
+  } catch(e) { showToast('삭제 실패'); }
+}
+
 async function loadSkinInventory() {
   try {
     const rows = await sb.select('skin_inventory', 'deleted=neq.true');
