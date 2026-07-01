@@ -524,15 +524,21 @@
   .inventory-table tr:hover td { background: var(--surface-0); }
   .inventory-table td:first-child { white-space: nowrap; }
   .inventory-table td:last-child { white-space: nowrap; }
-  .inv-cat-section { border: 1px solid var(--border); }
+  .inv-cat-section { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
   .inv-cat-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 11px 16px; cursor: pointer; user-select: none;
-    background: var(--surface-2); font-weight: 700; font-size: 13.5px;
-    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px; justify-content: space-between;
+    padding: 12px 16px; cursor: pointer; user-select: none;
+    background: var(--accent); color: #fff; font-weight: 700; font-size: 13.5px;
+    letter-spacing: 0.2px;
   }
-  .inv-cat-header:hover { background: var(--surface-1); }
-  .inv-cat-count { font-weight: 400; font-size: 12px; color: var(--text-muted); }
+  .inv-cat-header:hover { background: #5C1428; }
+  .inv-cat-header-left { display: flex; align-items: center; gap: 9px; }
+  .inv-chevron {
+    display: inline-block; font-size: 11px; transition: transform 0.15s ease;
+    transform: rotate(0deg);
+  }
+  .inv-chevron.collapsed { transform: rotate(-90deg); }
+  .inv-cat-count { font-weight: 400; font-size: 12px; color: rgba(255,255,255,0.75); }
   .stock-status {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 12px; font-weight: 700;
@@ -1756,11 +1762,11 @@
         <input type="text" class="search-input" placeholder="소모품 검색..." oninput="filterInventory(this.value)">
       </div>
       <div style="display:flex;gap:8px;">
-        <button class="btn btn-outline btn-sm admin-only" onclick="openCatManageModal('general')">분류 관리</button>
-        <button class="btn btn-green btn-sm admin-only" onclick="openInventoryModal()">항목 추가 (원장)</button>
+        <a class="btn btn-outline btn-sm admin-only" href="https://docs.google.com/spreadsheets/d/1Rco7GhhX_yP15bTJow7u-eO3AhC1J5OhGXUcmEvQV6M/edit?usp=sharing" target="_blank" style="text-decoration:none;">Google Sheets</a>
+        <button class="btn btn-outline btn-sm admin-only" onclick="reloadInventory('general')">새로고침</button>
       </div>
     </div>
-    <div id="inventory-groups" style="display:flex;flex-direction:column;gap:16px;"></div>
+    <div id="inventory-groups" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;"></div>
   </div>
 
 
@@ -1823,11 +1829,11 @@
         <input type="text" class="search-input" placeholder="피부 소모품 검색..." oninput="filterSkinInventory(this.value)">
       </div>
       <div style="display:flex;gap:8px;">
-        <button class="btn btn-outline btn-sm admin-only" onclick="openCatManageModal('skin')">분류 관리</button>
-        <button class="btn btn-green btn-sm admin-only" onclick="openSkinInventoryModal()">항목 추가 (원장)</button>
+        <a class="btn btn-outline btn-sm admin-only" href="https://docs.google.com/spreadsheets/d/1Rco7GhhX_yP15bTJow7u-eO3AhC1J5OhGXUcmEvQV6M/edit?usp=sharing" target="_blank" style="text-decoration:none;">Google Sheets</a>
+        <button class="btn btn-outline btn-sm admin-only" onclick="reloadInventory('skin')">새로고침</button>
       </div>
     </div>
-    <div id="skin-inventory-groups" style="display:flex;flex-direction:column;gap:16px;"></div>
+    <div id="skin-inventory-groups" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;"></div>
   </div>
 
   <!-- ▸ Q&A 원장용 (원장+직원 모두 보임) -->
@@ -3359,7 +3365,7 @@ async function loadInventory() {
 
 async function loadInvCategories() {
   try {
-    const rows = await sb.select('inventory_categories', 'deleted=neq.true&order=sort_order.asc');
+    const rows = await sb.select('inventory_categories', 'deleted=neq.true');
     const list = rows || [];
     STATE.invCats.general = list.filter(r => r.type === 'general').map(r => ({ id: r.id, name: r.name }));
     STATE.invCats.skin = list.filter(r => r.type === 'skin').map(r => ({ id: r.id, name: r.name }));
@@ -3403,10 +3409,12 @@ async function addInvCategory() {
   if (invCatList(type).some(c => c.name === name)) { alert('이미 있는 분류명입니다'); return; }
   const sortOrder = invCatList(type).length;
   let newEntry = { id: null, name };
+  let saved = false;
   try {
     const rows = await sb.insert('inventory_categories', { type, name, sort_order: sortOrder });
-    if (rows && rows[0]) newEntry = { id: rows[0].id, name };
-  } catch(e) { console.warn('카테고리 저장 실패(테이블 미생성 가능):', e); }
+    if (rows && rows[0]) { newEntry = { id: rows[0].id, name }; saved = true; }
+  } catch(e) { console.warn('카테고리 저장 실패:', e); }
+  if (!saved) { alert('분류 저장에 실패했습니다. Supabase에 inventory_categories 테이블이 정상 생성되었는지 확인해주세요.'); return; }
   STATE.invCats[type] = invCatList(type).concat([newEntry]);
   document.getElementById('cat-manage-new').value = '';
   renderCatManageList(type);
@@ -4195,6 +4203,49 @@ async function deleteManual(id) {
 /* ════════════════════════════════════
    INVENTORY
 ════════════════════════════════════ */
+var INV_CAT_ORDER = ['검사실', '치료실', '(미분류)', '추나실', '탕전실'];
+
+function sortCatNames(names) {
+  return names.slice().sort((a, b) => {
+    const ai = INV_CAT_ORDER.indexOf(a);
+    const bi = INV_CAT_ORDER.indexOf(b);
+    if (ai !== -1 && bi !== -1) return ai - bi;
+    if (ai !== -1) return -1;
+    if (bi !== -1) return 1;
+    return a.localeCompare(b, 'ko');
+  });
+}
+
+function copyInvToClipboard(type) {
+  const items = (type === 'general' ? STATE.inventory : STATE.skinInventory)
+    .slice()
+    .sort((a,b) => (a.cat||'').localeCompare(b.cat||'','ko') || a.name.localeCompare(b.name,'ko'));
+  const header = '품목명\t분류\t기준수량';
+  const rows = items.map(i => `${i.name}\t${i.cat||''}\t${i.min}`).join('\n');
+  navigator.clipboard.writeText(header + '\n' + rows).then(() => {
+    showToast('클립보드에 복사됐습니다. 시트에 붙여넣기(Ctrl+V) 해주세요.');
+  });
+}
+
+async function reloadInventory(type) {
+  const btn = event.target;
+  btn.disabled = true; btn.textContent = '불러오는 중...';
+  try {
+    if (type === 'general') {
+      await loadInventory();
+      renderInventory();
+    } else {
+      await loadSkinInventory();
+      renderSkinInventory();
+    }
+    showToast('최신 데이터를 불러왔습니다');
+  } catch(e) {
+    showToast('새로고침 실패: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '새로고침';
+  }
+}
+
 var invCollapsed = { general: new Set(), skin: new Set() };
 
 function toggleInvCatGroup(type, cat) {
@@ -4227,7 +4278,7 @@ function renderInventory(filter = '') {
   );
   const groups = {};
   items.forEach(i => { const c = (i.cat || '').trim() || '(미분류)'; (groups[c] = groups[c] || []).push(i); });
-  const catNames = Object.keys(groups).sort((a,b) => a.localeCompare(b, 'ko'));
+  const catNames = sortCatNames(Object.keys(groups));
   container.innerHTML = catNames.map(cat => {
     const list = groups[cat].slice().sort((a,b) => a.name.localeCompare(b.name, 'ko'));
     const collapsed = invCollapsed.general.has(cat);
@@ -4255,7 +4306,7 @@ function renderInventory(filter = '') {
     }).join('');
     return `<div class="card inv-cat-section" style="padding:0;overflow:hidden;">
       <div class="inv-cat-header" onclick="toggleInvCatGroup('general','${cat}')">
-        <span>${collapsed ? '▶' : '▼'} ${cat}</span>
+        <span class="inv-cat-header-left"><span class="inv-chevron${collapsed ? ' collapsed' : ''}">▾</span>${cat}</span>
         <span class="inv-cat-count">${list.length}개</span>
       </div>
       ${collapsed ? '' : `<table class="inventory-table"><thead>${invHeaderRow(true)}</thead><tbody>${rows}</tbody></table>`}
@@ -4472,7 +4523,7 @@ function renderSkinInventory(filter = '') {
   );
   const groups = {};
   items.forEach(i => { const c = (i.cat || '').trim() || '(미분류)'; (groups[c] = groups[c] || []).push(i); });
-  const catNames = Object.keys(groups).sort((a,b) => a.localeCompare(b, 'ko'));
+  const catNames = sortCatNames(Object.keys(groups));
   container.innerHTML = catNames.map(cat => {
     const list = groups[cat].slice().sort((a,b) => a.name.localeCompare(b.name, 'ko'));
     const collapsed = invCollapsed.skin.has(cat);
@@ -4500,7 +4551,7 @@ function renderSkinInventory(filter = '') {
     }).join('');
     return `<div class="card inv-cat-section" style="padding:0;overflow:hidden;">
       <div class="inv-cat-header" onclick="toggleInvCatGroup('skin','${cat}')">
-        <span>${collapsed ? '▶' : '▼'} ${cat}</span>
+        <span class="inv-cat-header-left"><span class="inv-chevron${collapsed ? ' collapsed' : ''}">▾</span>${cat}</span>
         <span class="inv-cat-count">${list.length}개</span>
       </div>
       ${collapsed ? '' : `<table class="inventory-table"><thead>${invHeaderRow(isAdmin)}</thead><tbody>${rows}</tbody></table>`}
