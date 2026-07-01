@@ -524,7 +524,7 @@
   .inventory-table tr:hover td { background: var(--surface-0); }
   .inventory-table td:first-child { white-space: nowrap; }
   .inventory-table td:last-child { white-space: nowrap; }
-  .inv-cat-section { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .inv-cat-section { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; break-inside: avoid; margin-bottom: 16px; }
   .inv-cat-header {
     display: flex; align-items: center; gap: 8px; justify-content: space-between;
     padding: 12px 16px; cursor: pointer; user-select: none;
@@ -1766,7 +1766,7 @@
         <button class="btn btn-outline btn-sm admin-only" onclick="reloadInventory('general')">새로고침</button>
       </div>
     </div>
-    <div id="inventory-groups" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;"></div>
+    <div id="inventory-groups" style="columns:2;column-gap:16px;"></div>
   </div>
 
 
@@ -1833,7 +1833,7 @@
         <button class="btn btn-outline btn-sm admin-only" onclick="reloadInventory('skin')">새로고침</button>
       </div>
     </div>
-    <div id="skin-inventory-groups" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;"></div>
+    <div id="skin-inventory-groups" style="columns:2;column-gap:16px;"></div>
   </div>
 
   <!-- ▸ Q&A 원장용 (원장+직원 모두 보임) -->
