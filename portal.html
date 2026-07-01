@@ -1422,17 +1422,23 @@
                   <div class="ch-card-hd">치료실 전달</div>
                   <div class="ch-card-bd" id="tx-body">
                     <div class="ch-input-row" style="margin-bottom:9px;flex-wrap:wrap;">
+                      <input type="text" class="ch-input" id="tx-patient" placeholder="환자명" style="width:100px;flex:none;" oninput="txState.patient=this.value">
+                      <span class="tx-sep">|</span>
                       <button class="chbtn-gold chbtn-sm" id="tx-jb" onclick="txToggle('jb',this)">JB</button>
                       <button class="chbtn-gold chbtn-sm active" id="tx-hp" onclick="txToggle('hp',this)">HP</button>
-                      <input type="text" class="ch-input" id="tx-hp-part" placeholder="부위" style="width:90px;flex:none;" oninput="txState.hpPart=this.value">
+                      <input type="text" class="ch-input" id="tx-hp-part" placeholder="부위" style="width:80px;flex:none;" oninput="txState.hpPart=this.value">
                       <span class="tx-sep">|</span>
                       <button class="chbtn-gold chbtn-sm active" id="tx-i" onclick="txToggle('i',this)">I</button>
-                      <input type="text" class="ch-input" id="tx-i-part" placeholder="부위" style="width:90px;flex:none;" oninput="txState.iPart=this.value">
+                      <input type="text" class="ch-input" id="tx-i-part" placeholder="부위" style="width:80px;flex:none;" oninput="txState.iPart=this.value">
                     </div>
-                    <div class="ch-input-row" style="margin-bottom:9px;flex-wrap:wrap;">
+                    <div class="ch-input-row" style="margin-bottom:9px;flex-wrap:wrap;align-items:center;">
                       <button class="chbtn chbtn-sm" id="tx-pos-앞침" onclick="txSelectPos('앞침',this)">앞침</button>
                       <button class="chbtn chbtn-sm" id="tx-pos-엎침" onclick="txSelectPos('엎침',this)">엎침</button>
                       <button class="chbtn chbtn-sm" id="tx-pos-옆침" onclick="txSelectPos('옆침',this)">옆침</button>
+                      <span id="tx-side-btns" style="display:none;gap:4px;align-items:center;">
+                        <button class="chbtn chbtn-sm" id="tx-side-좌" onclick="txSelectSide('좌',this)">좌</button>
+                        <button class="chbtn chbtn-sm" id="tx-side-우" onclick="txSelectSide('우',this)">우</button>
+                      </span>
                       <button class="chbtn-gold chbtn-sm active" id="tx-jeon" onclick="txToggle('jeon',this)">전침</button>
                       <span class="tx-sep">|</span>
                       <button class="chbtn-gold chbtn-sm" id="tx-yak" onclick="txToggleYak(this)">약침</button>
@@ -2223,7 +2229,7 @@ function makeYakchimExpand(){
   ccRow.appendChild(부위Label);ccRow.appendChild(부위Input);div.appendChild(ccRow);return div;
 }
 
-var CHUNA_BTNS=['COX','MET','JS123','Lumbar roll','drop','경추 thrust','흉추 thrust','SCS','골타'];
+var CHUNA_BTNS=['COX','drop','Lumbar roll','MET','SCS','골타','JS123','경추 thrust','흉추 thrust'];
 var CHUNA_TEXT_BTNS=['MET','SCS'];
 function makeChunaExpand(){
   var chunaSelected={};var chunaText={};
@@ -2231,7 +2237,7 @@ function makeChunaExpand(){
   try{chunaText=JSON.parse(pInputVals['chunaText']||'{}');}catch(e){}
   var div=document.createElement('div');div.style.cssText='background:#FEF9E7;border:1.5px solid #D4B080;border-radius:9px;padding:10px 12px;margin-top:4px;';
   var presetRow=document.createElement('div');presetRow.style.cssText='display:flex;gap:6px;margin-bottom:8px;';
-  var presets=[{lbl:'C 경추',keys:['MET','SCS','JS123','경추 thrust'],texts:{MET:'사각근, 견갑거근, 승모근',SCS:'견갑거근'}},{lbl:'C 요추',keys:['MET','SCS','Lumbar roll','COX'],texts:{MET:'둔근, 대퇴사두근, 장요근, 내전근',SCS:'장요근'}}];
+  var presets=[{lbl:'C 경추',keys:['COX','MET','JS123','SCS'],texts:{MET:'사각근, 견갑거근, 승모근',SCS:'견갑거근'}},{lbl:'C 요추',keys:['COX','MET','SCS'],texts:{MET:'햄스트링, 둔근, 이상근, 내전근',SCS:'장요근'}}];
   presets.forEach(function(p){var btn=document.createElement('button');btn.className='btn-preset';btn.textContent=p.lbl;btn.onclick=function(){var cs={};p.keys.forEach(function(k){cs[k]=true;});var ct={};Object.keys(p.texts).forEach(function(k){ct[k]=p.texts[k];});pInputVals['chunaSelected']=JSON.stringify(cs);pInputVals['chunaText']=JSON.stringify(ct);renderP();};presetRow.appendChild(btn);});
   div.appendChild(presetRow);
   var btnRow=document.createElement('div');btnRow.style.cssText='display:flex;flex-wrap:wrap;gap:5px;';
@@ -2280,7 +2286,7 @@ function generateResult(){
   if(pActive['테이핑']){var tapGae=pTaping.gae||'4';out+='■ 테이핑 : '+(pTaping.buyi?pTaping.buyi:'')+' ('+tapGae+'개)\n';}
   if(pActive['약침']){var 약종류=pInputVals['약침-종류']||'',약cc=pInputVals['약침-cc']||'',약부위=pInputVals['약침-부위']||'';var 약detail=[약종류+(약cc?' '+약cc:''),약부위].filter(Boolean).join(', ');out+='■ 약침 : '+약detail+'\n';}
   var chunaOut2=[],cs2={},ct2={};try{cs2=JSON.parse(pInputVals['chunaSelected']||'{}');}catch(e){}try{ct2=JSON.parse(pInputVals['chunaText']||'{}');}catch(e){}
-  ['COX','MET','JS123','Lumbar roll','drop','경추 thrust','흉추 thrust','SCS','골타'].forEach(function(btn){if(!cs2[btn])return;var txt=ct2[btn]?'('+ct2[btn]+')':'';chunaOut2.push(btn+txt);});
+  ['COX','drop','Lumbar roll','MET','SCS','골타','JS123','경추 thrust','흉추 thrust'].forEach(function(btn){if(!cs2[btn])return;var txt=ct2[btn]?'('+ct2[btn]+')':'';chunaOut2.push(btn+txt);});
   var chunaType=pActive['단순추나']?'단순추나':(pActive['복잡추나']?'복잡추나':'');
   if(chunaType){out+='■ '+chunaType+(chunaOut2.length?' : '+chunaOut2.join(' - '):'')+'\n';}
   if(pActive['보험약']){var bhStr=[pBohumyak.company,pBohumyak.name,pBohumyak.days?pBohumyak.days+'일분':''].filter(Boolean).join(', ');out+='■ 보험약'+(bhStr?' : '+bhStr:'')+'\n';}
@@ -2289,11 +2295,19 @@ function generateResult(){
   var now=new Date();out+='\n------------------------------------------------\n* '+(now.getMonth()+1)+'/'+now.getDate();
   document.getElementById('result-area').value=out;
 }
-var txState={jb:false,hp:true,hpPart:'',i:true,iPart:'',pos:'',jeon:true,yak:false,yakType:'',needle:'인슐린',cc:'',gae:'',seup:'습부2',bc:true,chu:'',uson:false};
+var txState={patient:'',jb:false,hp:true,hpPart:'',i:true,iPart:'',pos:'',side:'',jeon:true,yak:false,yakType:'',needle:'인슐린',cc:'',gae:'',seup:'습부2',bc:true,chu:'',uson:false};
 function txToggle(key,btn){txState[key]=!txState[key];btn.classList.toggle('active');}
 function txSelectPos(val,btn){
-  if(txState.pos===val){txState.pos='';btn.classList.remove('active');}
-  else{['앞침','엎침','옆침'].forEach(function(p){var b=document.getElementById('tx-pos-'+p);if(b)b.classList.remove('active');});txState.pos=val;btn.classList.add('active');}
+  if(txState.pos===val){txState.pos='';txState.side='';btn.classList.remove('active');document.getElementById('tx-side-btns').style.display='none';}
+  else{['앞침','엎침','옆침'].forEach(function(p){var b=document.getElementById('tx-pos-'+p);if(b)b.classList.remove('active');});txState.pos=val;btn.classList.add('active');
+    var sideBtns=document.getElementById('tx-side-btns');
+    if(val==='옆침'){sideBtns.style.display='inline-flex';txState.side='';}
+    else{sideBtns.style.display='none';txState.side='';['좌','우'].forEach(function(s){var b=document.getElementById('tx-side-'+s);if(b)b.classList.remove('active');});}
+  }
+}
+function txSelectSide(val,btn){
+  if(txState.side===val){txState.side='';btn.classList.remove('active');}
+  else{['좌','우'].forEach(function(s){var b=document.getElementById('tx-side-'+s);if(b)b.classList.remove('active');});txState.side=val;btn.classList.add('active');}
 }
 function txSelectSeup(val,btn){
   if(txState.seup===val){txState.seup='';btn.classList.remove('active');}
@@ -2338,7 +2352,10 @@ function generateTxResult(){
   seq.push(txState.i?('i'+(txState.iPart?'('+txState.iPart+')':'')):null);
   var needleLine='';
   if(txState.pos||txState.yak){
-    needleLine=txState.pos?(txState.pos+(txState.jeon?'(전)':'')):'';
+    if(txState.pos){
+      var posLabel=txState.pos+(txState.pos==='옆침'&&txState.side?'/'+txState.side:'');
+      needleLine=posLabel+(txState.jeon?'(전)':'');
+    }
     if(txState.yak){
       var suffix=txState.needle==='인슐린'
         ? (txState.yakType||'')+'*'+(txState.gae||'')
@@ -2353,7 +2370,9 @@ function generateTxResult(){
   seq.push(txState.uson?'초음파':null);
   var n=1;
   seq.forEach(function(s){if(s){parts.push(n+s);n++;}});
-  document.getElementById('tx-area').value=parts.join(' ').toUpperCase();
+  var result=parts.join(' ').toUpperCase();
+  if(txState.patient)result=txState.patient+'\n'+result;
+  document.getElementById('tx-area').value=result;
 }
 
 /* ── 피부 SOAP ── */
@@ -2442,9 +2461,19 @@ function skinGenerate(){
 }
 buildProcUI('skin-p-buttons');
 function chCopyResult(id){
-  var text=document.getElementById(id).value;
-  if(navigator.clipboard){navigator.clipboard.writeText(text);}else{var ta=document.getElementById(id);ta.select();document.execCommand('copy');}
-  showToast('복사되었습니다');
+  var el=document.getElementById(id);
+  var text=el?el.value:'';
+  if(!text){showToast('복사할 내용이 없습니다');return;}
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(text).then(function(){showToast('복사되었습니다');}).catch(function(){fallbackCopy(el);});
+  } else {
+    fallbackCopy(el);
+  }
+}
+function fallbackCopy(el){
+  el.select();el.setSelectionRange(0,99999);
+  try{document.execCommand('copy');showToast('복사되었습니다');}
+  catch(e){showToast('복사 실패 — 직접 선택 후 Ctrl+C 해주세요');}
 }
 
 /* ── 안면신경마비 JS ── */
