@@ -462,7 +462,7 @@
     padding: 8px 0;
   }
   #dashboard-calendar-grid .cal-header { padding: 4px 0; font-size: 11px; }
-  #dashboard-calendar-grid .cal-day { min-height: 52px; }
+  #dashboard-calendar-grid .cal-day { min-height: 92px; }
   .cal-day {
     min-height: 72px;
     border-radius: 8px;
@@ -1111,7 +1111,7 @@
   </div>
 
   <!-- ▸ DASHBOARD -->
-  <div id="page-dashboard" class="page active">
+  <div id="page-dashboard" class="page active" style="max-width:1440px;">
     <!-- 캘린더 -->
     <div class="card" style="margin-bottom:16px;">
       <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
@@ -1129,7 +1129,7 @@
         <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#EBF2FB;border:1px solid #2E5C9A;display:inline-block;"></span>반복 업무</span>
         <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#FEF9E7;border:1px solid #C07D2A;display:inline-block;"></span>일정</span>
       </div>
-      <div class="calendar-grid" id="dashboard-calendar-grid" style="font-size:11px; --cal-min-height:52px;"></div>
+      <div class="calendar-grid" id="dashboard-calendar-grid" style="font-size:11px; --cal-min-height:92px;"></div>
     </div>
 
   </div>
@@ -2719,13 +2719,6 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
       </select>
     </div>
     <div class="form-section">
-      <label>열람 권한</label>
-      <select id="me-access">
-        <option value="all">원장 + 직원</option>
-        <option value="admin">원장 전용</option>
-      </select>
-    </div>
-    <div class="form-section">
       <label>제목</label>
       <input type="text" id="me-title" placeholder="매뉴얼 제목">
     </div>
@@ -3857,8 +3850,7 @@ let manualOpenIds = new Set();
 function renderManual() {
   const list = document.getElementById('manual-list');
   const q = manualSearchQuery.toLowerCase();
-  const isAdmin = STATE.user && STATE.user.isAdmin;
-  let items = STATE.manualItems.filter(m => isAdmin || (m.access || 'all') === 'all');
+  let items = STATE.manualItems;
   if (manualCatFilter !== 'all') items = items.filter(m => m.cat === manualCatFilter);
   if (q) items = items.filter(m => m.title.toLowerCase().includes(q) || m.content.toLowerCase().includes(q));
   document.getElementById('manual-search-info').textContent =
@@ -3871,18 +3863,15 @@ function renderManual() {
     if (q && !m.content.startsWith('[GDOCS:')) {
       rendered = rendered.replace(new RegExp(manualSearchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), match => `<mark class="highlight">${match}</mark>`);
     }
-    const accessLabel = (m.access || 'all') === 'admin'
-      ? '<span class="manual-category" style="background:#FEF9E7;color:#8B6914;flex-shrink:0;">원장 전용</span>' : '';
-    const adminBtns = isAdmin ? `
+    const adminBtns = `
       <div style="display:flex;gap:6px;flex-shrink:0;" onclick="event.stopPropagation()">
         <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();openManualEditor(${m.id})">편집</button>
         <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteManual(${m.id})">삭제</button>
-      </div>` : '';
+      </div>`;
     return `<div class="manual-item${isOpen ? ' open' : ''}" id="manual-${m.id}">
       <div style="display:flex;align-items:center;gap:8px;">
         <div class="manual-item-header" style="flex:1;" onclick="toggleManual(${m.id})">
           <span class="manual-category ${catClasses[m.cat]}">${catLabels[m.cat]}</span>
-          ${accessLabel}
           <div style="flex:1;">
             <div class="manual-item-title">${m.title}</div>
 
@@ -3917,7 +3906,6 @@ function openManualEditor(id) {
   const m = id ? STATE.manualItems.find(x => x.id === id) : null;
   document.getElementById('me-id').value = m ? m.id : '';
   document.getElementById('me-cat').value = m ? m.cat : 'treatment';
-  document.getElementById('me-access').value = m ? (m.access || 'all') : 'all';
   document.getElementById('me-title').value = m ? m.title : '';
   document.getElementById('me-content').value = m ? m.content : '';
   document.getElementById('manual-editor-modal-title').textContent = m ? '매뉴얼 편집' : '새 매뉴얼 추가';
@@ -3927,18 +3915,17 @@ function openManualEditor(id) {
 async function saveManualEditor() {
   const id = document.getElementById('me-id').value;
   const cat = document.getElementById('me-cat').value;
-  const access = document.getElementById('me-access').value;
   const title = document.getElementById('me-title').value.trim();
   const content = document.getElementById('me-content').value.trim();
   if (!title) { alert('제목을 입력하세요'); return; }
   if (id) {
-    await sb.update('manuals', id, { cat, access, title, content });
+    await sb.update('manuals', id, { cat, title, content });
     const m = STATE.manualItems.find(x => x.id == id);
-    if (m) { m.cat = cat; m.access = access; m.title = title; m.content = content; }
+    if (m) { m.cat = cat; m.title = title; m.content = content; }
   } else {
-    const rows = await sb.insert('manuals', { cat, access, title, content });
+    const rows = await sb.insert('manuals', { cat, title, content });
     if (rows && rows[0]) {
-      STATE.manualItems.push({ id: rows[0].id, cat, access, title, content });
+      STATE.manualItems.push({ id: rows[0].id, cat, title, content });
     }
   }
   renderManual();
