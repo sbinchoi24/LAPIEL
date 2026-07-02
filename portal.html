@@ -778,6 +778,12 @@
   .chbtn-gold.active { background: #A07840; border-color: #A07840; color: #fff; }
   .chbtn-gold.chbtn-sm { padding: 4px 9px; font-size: 12px; }
 
+  .seg-toggle { display: inline-flex; border: 1.5px solid #D4B080; border-radius: 8px; overflow: hidden; }
+  .seg-btn { padding: 6px 16px; border: none; background: var(--surface-1); color: #8B6914; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.14s; }
+  .seg-btn + .seg-btn { border-left: 1.5px solid #D4B080; }
+  .seg-btn.active { background: #A07840; color: #fff; }
+  .seg-btn:hover:not(.active) { background: #FEF9E7; }
+
   .chbtn-side {
     padding: 5px 10px; border-radius: 6px;
     border: 1.5px solid #D4B080;
@@ -1299,6 +1305,7 @@
         <div class="ch-tab active" onclick="chSwitchTab('근골격계',this)">근골격계</div>
         <div class="ch-tab" onclick="chSwitchTab('피부',this)">피부</div>
         <div class="ch-tab" onclick="chSwitchTab('다이어트',this)">다이어트</div>
+        <div class="ch-tab" onclick="chSwitchTab('다이어트추이',this)">다이어트 추이</div>
         <div class="ch-tab" onclick="chSwitchTab('내과',this)">내과</div>
         <div class="ch-tab" onclick="chSwitchTab('안면신경마비',this)">안면신경마비</div>
       </div>
@@ -1493,7 +1500,62 @@
           </div>
         </div>
       </div>
-      <div id="chtab-다이어트" class="chtab-panel"><div style="padding:60px;text-align:center;color:var(--text-muted);">다이어트 탭 — 추후 설정 예정</div></div>
+      <div id="chtab-다이어트" class="chtab-panel" style="padding:16px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:210px;gap:16px;max-width:900px;">
+          <div class="ch-card" style="display:flex;flex-direction:column;overflow:hidden;">
+            <div class="ch-card-hd">스프레드시트 붙여넣기</div>
+            <div class="ch-card-bd" style="flex:1;">
+              <textarea id="diet-paste" class="ch-input" style="width:100%;height:100%;resize:none;" placeholder="구글 시트에서 응답 행을 그대로 복사해서 붙여넣으세요 (탭으로 구분된 한 줄)"></textarea>
+            </div>
+          </div>
+          <div class="ch-card" style="display:flex;flex-direction:column;overflow:hidden;">
+            <div class="ch-card-hd" style="display:flex;align-items:center;">
+              <span style="flex:1;">차팅 결과</span>
+              <button class="ch-gen-btn" onclick="dietGenerate()">생성</button>
+              <button class="ch-copy-btn" style="margin-left:6px;" onclick="chCopyResult('diet-result-area')">복사</button>
+            </div>
+            <textarea class="ch-result-area" id="diet-result-area" placeholder="생성 버튼을 눌러주세요."></textarea>
+          </div>
+          <div class="ch-card" style="display:flex;flex-direction:column;overflow:hidden;">
+            <div class="ch-card-hd">인바디 검사 결과 기입하기</div>
+            <div class="ch-card-bd" style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;align-content:center;">
+              <div class="ch-input-row"><span class="ch-lbl" style="min-width:60px;">신장</span><input type="text" class="ch-input" id="inbody-height"></div>
+              <div class="ch-input-row"><span class="ch-lbl" style="min-width:60px;">체중</span><input type="text" class="ch-input" id="inbody-weight"></div>
+              <div class="ch-input-row"><span class="ch-lbl" style="min-width:60px;">골격근량</span><input type="text" class="ch-input" id="inbody-smm"></div>
+              <div class="ch-input-row"><span class="ch-lbl" style="min-width:60px;">체지방량</span><input type="text" class="ch-input" id="inbody-fm"></div>
+              <div class="ch-input-row"><span class="ch-lbl" style="min-width:60px;">BMI</span><input type="text" class="ch-input" id="inbody-bmi"></div>
+              <div class="ch-input-row"><span class="ch-lbl" style="min-width:60px;">체지방률</span><input type="text" class="ch-input" id="inbody-pbf"></div>
+            </div>
+          </div>
+          <div class="ch-card" style="display:flex;flex-direction:column;overflow:hidden;">
+            <div class="ch-card-hd" style="display:flex;align-items:center;">
+              <span style="flex:1;">인바디 차팅 결과</span>
+              <button class="ch-gen-btn" onclick="inbodyGenerate()">생성</button>
+              <button class="ch-copy-btn" style="margin-left:6px;" onclick="chCopyResult('inbody-result-area')">복사</button>
+            </div>
+            <textarea class="ch-result-area" id="inbody-result-area" placeholder="생성 버튼을 눌러주세요."></textarea>
+          </div>
+        </div>
+      </div>
+      <div id="chtab-다이어트추이" class="chtab-panel" style="padding:16px;">
+        <div class="ch-card" style="margin-bottom:14px;">
+          <div class="ch-card-hd">차트 붙여넣기</div>
+          <div class="ch-card-bd" style="display:flex;align-items:center;gap:16px;padding:16px 20px;">
+            <textarea id="trend-paste" class="ch-input" style="width:920px;flex:none;height:96px;resize:none;" placeholder="예) 7/2 : 신장 165.7 - 체중 65.7 - 골격근량 33 - 체지방량 5 - BMI 24 - 체지방률 30 (줄바꿈으로 여러 건)"></textarea>
+            <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
+              <div class="seg-toggle">
+                <button class="seg-btn active" id="trend-gender-여" onclick="trendSetGender('여')" style="height:34px;padding:0 18px;">여</button>
+                <button class="seg-btn" id="trend-gender-남" onclick="trendSetGender('남')" style="height:34px;padding:0 18px;">남</button>
+              </div>
+              <button class="ch-gen-btn" onclick="trendGenerate()" style="height:34px;padding:0 18px;width:100%;">그래프 생성</button>
+            </div>
+          </div>
+        </div>
+        <div class="ch-card">
+          <div class="ch-card-hd">지표별 변화 추이</div>
+          <div id="trend-chart" style="padding:18px;color:var(--text-muted);font-size:13px;">데이터를 붙여넣고 그래프 생성을 눌러주세요.</div>
+        </div>
+      </div>
       <div id="chtab-내과" class="chtab-panel"><div style="padding:60px;text-align:center;color:var(--text-muted);">내과 탭 — 추후 설정 예정</div></div>
 
       <!-- 안면신경마비 탭 -->
@@ -2585,6 +2647,138 @@ function fallbackCopy(el){
   el.select();el.setSelectionRange(0,99999);
   try{document.execCommand('copy');showToast('복사되었습니다');}
   catch(e){showToast('복사 실패 — 직접 선택 후 Ctrl+C 해주세요');}
+}
+
+/* ── 다이어트 JS ── */
+var DIET_LABELS=["타임스탬프", "이름", "성별", "나이", "결혼 여부", "자녀수", "마지막 출산", "직업", "근무 패턴", "활동 패턴", "최고 체중", "당시 나이", "최저 체중", "당시 나이", "어떤 계기로 체중이 증가했습니까?", "다이어트 횟수", "다이어트 방법", "양방 치료 경험", "한방 치료 경험", "효과가 있었던 치료", "다이어트 약을 복용하는 동안 경험한 부작용", "다이어트 할 때 가장 힘든 방해 요인", "원하는 체중이 되면 꼭 하고 싶은 것", "현재 임신 중이거나 임신 계획이 있습니까?", "3일 이내 건강검진 또는 3개월 이내 수술 예정이 있습니까?", "최종 목표 체중", "총 감량 목표", "희망 감량 기간", "다이어트 동기", "감량 스타일", "대사질환", "여성질환", "통증/관절질환", "순환장애", "소아/청소년", "섭식장애", "기타", "수술 경험", "복용 중인 약물 및 건강기능식품", "식욕", "소화", "대변", "갈증", "수면", "수면 시간", "한열", "생리주기", "최근 몇 개월 간 생리가 없으셨나요?", "생리통", "최근 생리 시작일", "임신 관련", "부종 정도", "부종 부위", "식욕 조절", "평소 식습관", "식사 속도", "식사량", "음식 선호", "간식 횟수", "간식 섭취 시간", "음주 횟수", "주종/주량", "수분 섭취", "커피", "카페인 민감성", "운동", "운동 횟수", "궁금한 것에 모두 표시해주세요", "방문 계기"];
+var DIET_GROUPS=[0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7];
+function dietGenerate(){
+  var raw=document.getElementById('diet-paste').value;
+  var rows=raw.split('\n').filter(function(r){return r.trim().length>0;});
+  if(!rows.length){showToast('붙여넣은 데이터가 없습니다');return;}
+  var row=rows[rows.length-1];
+  var cells=row.split('\t');
+  var lines=[];
+  var lastGroup=null;
+  for(var i=0;i<DIET_LABELS.length;i++){
+    var g=DIET_GROUPS[i];
+    if(g===0)continue;
+    var val=cells[i]?cells[i].trim():'';
+    if(!val)continue;
+    if(lastGroup!==null&&g!==lastGroup)lines.push('');
+    var label=DIET_LABELS[i].replace(/\?$/,'');
+    lines.push(label+' : '+val);
+    lastGroup=g;
+  }
+  document.getElementById('diet-result-area').value=lines.length?lines.join('\n'):'';
+  if(!lines.length)showToast('인식된 응답이 없습니다');
+}
+function inbodyGenerate(){
+  var h=document.getElementById('inbody-height').value.trim();
+  var w=document.getElementById('inbody-weight').value.trim();
+  var smm=document.getElementById('inbody-smm').value.trim();
+  var fm=document.getElementById('inbody-fm').value.trim();
+  var bmi=document.getElementById('inbody-bmi').value.trim();
+  var pbf=document.getElementById('inbody-pbf').value.trim();
+  if(!h&&!w&&!smm&&!fm&&!bmi&&!pbf){showToast('입력된 값이 없습니다');return;}
+  var date=skinTodayMD();
+  var text=date+' : 신장 '+h+' - 체중 '+w+' - 골격근량 '+smm+' - 체지방량 '+fm+' - BMI '+bmi+' - 체지방률 '+pbf;
+  document.getElementById('inbody-result-area').value=text;
+}
+var TREND_METRICS=[
+  {key:'weight',label:'체중',unit:'kg',color:'#7A1F3D'},
+  {key:'smm',label:'골격근량',unit:'kg',color:'#2D8A4E'},
+  {key:'fm',label:'체지방량',unit:'kg',color:'#A07840'},
+  {key:'bmi',label:'BMI',unit:'',color:'#4A0F25'},
+  {key:'pbf',label:'체지방률',unit:'%',color:'#B08060'}
+];
+var trendGender='여';
+var trendData=null;
+function trendSetGender(g){
+  trendGender=g;
+  document.getElementById('trend-gender-여').classList.toggle('active',g==='여');
+  document.getElementById('trend-gender-남').classList.toggle('active',g==='남');
+  if(trendData)trendRender();
+}
+function trendGenerate(){
+  var raw=document.getElementById('trend-paste').value;
+  var rows=raw.split('\n').map(function(r){return r.trim();}).filter(function(r){return r.length>0;});
+  var re=/^(\S+)\s*:\s*신장\s*([\d.]+)\s*-\s*체중\s*([\d.]+)\s*-\s*골격근량\s*([\d.]+)\s*-\s*체지방량\s*([\d.]+)\s*-\s*BMI\s*([\d.]+)\s*-\s*체지방률\s*([\d.]+)/;
+  var dates=[],height=[],weight=[],smm=[],fm=[],bmi=[],pbf=[];
+  rows.forEach(function(r){
+    var m=r.match(re);
+    if(!m)return;
+    dates.push(m[1]);height.push(parseFloat(m[2]));weight.push(parseFloat(m[3]));smm.push(parseFloat(m[4]));
+    fm.push(parseFloat(m[5]));bmi.push(parseFloat(m[6]));pbf.push(parseFloat(m[7]));
+  });
+  if(!dates.length){document.getElementById('trend-chart').innerHTML='인식된 데이터가 없습니다. 형식을 확인해주세요.';return;}
+  trendData={dates:dates,height:height,weight:weight,smm:smm,fm:fm,bmi:bmi,pbf:pbf};
+  trendRender();
+}
+function trendStdRanges(heightCm){
+  var h=heightCm/100;
+  var stdWeight=h*h*22;
+  var pbfRange=trendGender==='남'?[10,20]:[18,28];
+  return {
+    weight:[stdWeight*0.9,stdWeight*1.1],
+    smm:[stdWeight*0.35,stdWeight*0.40],
+    fm:[stdWeight*pbfRange[0]/100,stdWeight*pbfRange[1]/100],
+    bmi:[18.5,23],
+    pbf:pbfRange
+  };
+}
+function trendClassify(val,range){
+  if(val<range[0])return{label:'표준이하',color:'#B08060'};
+  if(val>range[1])return{label:'표준이상',color:'#7A1F3D'};
+  return{label:'표준',color:'#2D8A4E'};
+}
+function trendRender(){
+  if(!trendData)return;
+  var d=trendData;
+  var lastHeight=d.height[d.height.length-1];
+  var ranges=trendStdRanges(lastHeight);
+  var n=d.dates.length;
+  var W=300,H=140,padL=34,padR=12,padT=12,padB=24;
+  var innerW=W-padL-padR,innerH=H-padT-padB;
+  var xStep=n>1?innerW/(n-1):0;
+  var html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">';
+  TREND_METRICS.forEach(function(met){
+    var vals=d[met.key];
+    var range=ranges[met.key];
+    var last=vals[vals.length-1];
+    var status=trendClassify(last,range);
+    var min=Math.min.apply(null,vals.concat([range[0]]));
+    var max=Math.max.apply(null,vals.concat([range[1]]));
+    if(min===max){min-=1;max+=1;}
+    var pad=(max-min)*0.1;min-=pad;max+=pad;
+    function yOf(v){return padT+innerH-((v-min)/(max-min))*innerH;}
+    var bandY1=yOf(range[1]),bandY2=yOf(range[0]);
+    var svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;">';
+    svg+='<rect x="'+padL+'" y="'+bandY1+'" width="'+innerW+'" height="'+(bandY2-bandY1)+'" fill="'+met.color+'" opacity="0.08"/>';
+    svg+='<line x1="'+padL+'" y1="'+bandY1+'" x2="'+(padL+innerW)+'" y2="'+bandY1+'" stroke="'+met.color+'" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>';
+    svg+='<line x1="'+padL+'" y1="'+bandY2+'" x2="'+(padL+innerW)+'" y2="'+bandY2+'" stroke="'+met.color+'" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>';
+    svg+='<text x="'+(padL+3)+'" y="'+(bandY1-3)+'" font-size="8" fill="'+met.color+'">표준 '+range[0].toFixed(1)+'~'+range[1].toFixed(1)+met.unit+'</text>';
+    svg+='<line x1="'+padL+'" y1="'+(padT+innerH)+'" x2="'+(padL+innerW)+'" y2="'+(padT+innerH)+'" stroke="var(--border)" stroke-width="1"/>';
+    for(var i=0;i<n;i++){
+      var x=padL+xStep*i;
+      svg+='<text x="'+x+'" y="'+(padT+innerH+14)+'" font-size="8" fill="var(--text-muted)" text-anchor="middle">'+d.dates[i]+'</text>';
+    }
+    var pts=vals.map(function(v,i){return (padL+xStep*i)+','+yOf(v);});
+    svg+='<polyline points="'+pts.join(' ')+'" fill="none" stroke="'+met.color+'" stroke-width="2"/>';
+    vals.forEach(function(v,i){
+      var x=padL+xStep*i,y=yOf(v);
+      svg+='<circle cx="'+x+'" cy="'+y+'" r="3" fill="'+met.color+'"><title>'+met.label+' '+v+met.unit+' ('+d.dates[i]+')</title></circle>';
+    });
+    svg+='</svg>';
+    html+='<div style="border:1px solid var(--border);border-radius:8px;padding:10px 12px;">'
+      +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;flex-wrap:wrap;">'
+      +'<span style="font-size:12.5px;font-weight:700;color:var(--text-primary);">'+met.label+'</span>'
+      +'<span style="font-size:11px;color:var(--text-muted);">현재 '+last+met.unit+'</span>'
+      +'<span style="font-size:10px;font-weight:700;color:#fff;background:'+status.color+';padding:1px 7px;border-radius:10px;">'+status.label+'</span>'
+      +'</div>'+svg+'</div>';
+  });
+  html+='</div>';
+  document.getElementById('trend-chart').innerHTML=html;
 }
 
 /* ── 안면신경마비 JS ── */
