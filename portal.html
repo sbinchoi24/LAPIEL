@@ -2151,9 +2151,19 @@ function renderP(){
   });
   body.appendChild(areaRow1);
 
-  // 부위 선택 행 2 (상지부~하지부)
+  // 부위 선택 행 2 (상지부(견)~상지부(완) | 하지부(고)~하지부(족))
   var areaRow2=document.createElement('div');areaRow2.className='p-row';areaRow2.style.flexWrap='wrap';
-  ACU_AREAS.slice(3).forEach(function(area){
+  ACU_AREAS.slice(3,6).forEach(function(area){
+    var sel=acuAreas.indexOf(area)>=0;
+    areaRow2.appendChild(acuBtn(area,sel,false,function(){
+      var idx=acuAreas.indexOf(area);
+      if(idx>=0){acuAreas.splice(idx,1);}
+      else{if(acuAreas.length>=2)acuAreas.shift();acuAreas.push(area);}
+      renderP();
+    }));
+  });
+  areaRow2.appendChild(acuSep());
+  ACU_AREAS.slice(6).forEach(function(area){
     var sel=acuAreas.indexOf(area)>=0;
     areaRow2.appendChild(acuBtn(area,sel,false,function(){
       var idx=acuAreas.indexOf(area);
@@ -2290,13 +2300,18 @@ function makeYakchimExpand(){
   kinds.forEach(function(k){var btn=document.createElement('button');btn.className='chbtn-gold'+(pInputVals['약침-종류']===k?' active':'');btn.textContent=k;btn.style.cssText='font-size:12px;padding:4px 10px;';btn.onclick=(function(kk){return function(){pInputVals['약침-종류']=kk;renderP();};})(k);kindRow.appendChild(btn);});
   div.appendChild(kindRow);
   var ccRow=document.createElement('div');ccRow.style.cssText='display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
-  var ccLabel=document.createElement('span');ccLabel.textContent='용량';ccLabel.style.cssText='font-size:12px;font-weight:700;color:#8B6914;min-width:30px;';
-  ccRow.appendChild(ccLabel);
-  [1,2,3,4].forEach(function(n){var btn=document.createElement('button');var ccVal=n+'cc';btn.className='chbtn-gold'+(pInputVals['약침-cc']===ccVal?' active':'');btn.textContent=ccVal;btn.style.cssText='font-size:12px;padding:4px 10px;';btn.onclick=(function(v){return function(){pInputVals['약침-cc']=v;renderP();};})(ccVal);ccRow.appendChild(btn);});
-  var sep=document.createElement('span');sep.textContent='|';sep.style.cssText='color:#D4B080;margin:0 2px;';ccRow.appendChild(sep);
   var 부위Label=document.createElement('span');부위Label.textContent='부위';부위Label.style.cssText='font-size:12px;font-weight:700;color:#8B6914;min-width:30px;';
   var 부위Input=document.createElement('input');부위Input.type='text';부위Input.placeholder='부위 입력';부위Input.style.cssText='padding:5px 9px;border:1.5px solid #D4B080;border-radius:7px;font-family:inherit;font-size:12px;outline:none;background:var(--surface-1);width:140px;';부위Input.value=pInputVals['약침-부위']||'';부위Input.oninput=function(){pInputVals['약침-부위']=this.value;};
-  ccRow.appendChild(부위Label);ccRow.appendChild(부위Input);div.appendChild(ccRow);return div;
+  ccRow.appendChild(부위Label);ccRow.appendChild(부위Input);
+  var sep1=document.createElement('span');sep1.textContent='|';sep1.style.cssText='color:#D4B080;margin:0 2px;';ccRow.appendChild(sep1);
+  var ccLabel=document.createElement('span');ccLabel.textContent='용량';ccLabel.style.cssText='font-size:12px;font-weight:700;color:#8B6914;min-width:30px;';
+  ccRow.appendChild(ccLabel);
+  [0.5,1,2,3,4].forEach(function(n){var btn=document.createElement('button');var ccVal=n+'cc';btn.className='chbtn-gold'+(pInputVals['약침-cc']===ccVal?' active':'');btn.textContent=ccVal;btn.style.cssText='font-size:12px;padding:4px 10px;';btn.onclick=(function(v){return function(){pInputVals['약침-cc']=v;renderP();};})(ccVal);ccRow.appendChild(btn);});
+  var sep2=document.createElement('span');sep2.textContent='|';sep2.style.cssText='color:#D4B080;margin:0 2px;';ccRow.appendChild(sep2);
+  var gaeLabel=document.createElement('span');gaeLabel.textContent='개수';gaeLabel.style.cssText='font-size:12px;font-weight:700;color:#8B6914;min-width:30px;';
+  ccRow.appendChild(gaeLabel);
+  [1,2,3,4].forEach(function(n){var btn=document.createElement('button');btn.className='chbtn-gold'+(pInputVals['약침-gae']===n?' active':'');btn.textContent=n;btn.style.cssText='font-size:12px;padding:4px 10px;';btn.onclick=(function(v){return function(){pInputVals['약침-gae']=v;renderP();};})(n);ccRow.appendChild(btn);});
+  div.appendChild(ccRow);return div;
 }
 
 var CHUNA_BTNS=['COX','drop','Lumbar roll','MET','SCS','골타','JS123','경추 thrust','흉추 thrust'];
@@ -2376,7 +2391,7 @@ function generateResult(){
     out+=parts.join(', ')+'\n';
   })();
   if(pActive['테이핑']){var tapGae=pTaping.gae||'4';out+='■ 테이핑 : '+(pTaping.buyi?pTaping.buyi:'')+' ('+tapGae+'개)\n';}
-  if(pActive['약침']){var 약종류=pInputVals['약침-종류']||'',약cc=pInputVals['약침-cc']||'',약부위=pInputVals['약침-부위']||'';var 약detail=[약종류+(약cc?' '+약cc:''),약부위].filter(Boolean).join(', ');out+='■ 약침 : '+약detail+'\n';}
+  if(pActive['약침']){var 약종류=pInputVals['약침-종류']||'',약cc=pInputVals['약침-cc']||'',약부위=pInputVals['약침-부위']||'',약gae=pInputVals['약침-gae'];var 약main=약종류+(약cc?' '+약cc:'')+(약gae?'*'+약gae:'');var 약detail=약main+(약부위?' ('+약부위+')':'');out+='■ 약침 : '+약detail+'\n';}
   var chunaOut2=[],cs2={},ct2={};try{cs2=JSON.parse(pInputVals['chunaSelected']||'{}');}catch(e){}try{ct2=JSON.parse(pInputVals['chunaText']||'{}');}catch(e){}
   ['COX','drop','Lumbar roll','MET','SCS','골타','JS123','경추 thrust','흉추 thrust'].forEach(function(btn){if(!cs2[btn])return;var txt=ct2[btn]?'('+ct2[btn]+')':'';chunaOut2.push(btn+txt);});
   var chunaType=pActive['단순추나']?'단순추나':(pActive['복잡추나']?'복잡추나':'');
