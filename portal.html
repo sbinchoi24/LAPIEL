@@ -1428,50 +1428,6 @@
                   <div class="ch-card-bd" id="p-body"></div>
                 </div>
 
-                <div class="ch-card">
-                  <div class="ch-card-hd">치료실 전달</div>
-                  <div class="ch-card-bd" id="tx-body">
-                    <div class="ch-input-row" style="margin-bottom:9px;flex-wrap:wrap;">
-                      <input type="text" class="ch-input" id="tx-patient" placeholder="환자명" style="width:100px;flex:none;" oninput="txState.patient=this.value">
-                      <span class="tx-sep">|</span>
-                      <button class="chbtn-gold chbtn-sm" id="tx-jb" onclick="txToggle('jb',this)">JB</button>
-                      <button class="chbtn-gold chbtn-sm active" id="tx-hp" onclick="txToggle('hp',this)">HP</button>
-                      <input type="text" class="ch-input" id="tx-hp-part" placeholder="부위" style="width:80px;flex:none;" oninput="txState.hpPart=this.value">
-                      <span class="tx-sep">|</span>
-                      <button class="chbtn-gold chbtn-sm active" id="tx-i" onclick="txToggle('i',this)">I</button>
-                      <input type="text" class="ch-input" id="tx-i-part" placeholder="부위" style="width:80px;flex:none;" oninput="txState.iPart=this.value">
-                    </div>
-                    <div class="ch-input-row" style="margin-bottom:9px;flex-wrap:wrap;align-items:center;">
-                      <button class="chbtn chbtn-sm" id="tx-pos-앞침" onclick="txSelectPos('앞침',this)">앞침</button>
-                      <button class="chbtn chbtn-sm" id="tx-pos-엎침" onclick="txSelectPos('엎침',this)">엎침</button>
-                      <button class="chbtn chbtn-sm" id="tx-pos-옆침" onclick="txSelectPos('옆침',this)">옆침</button>
-                      <span id="tx-side-btns" style="display:none;gap:4px;align-items:center;">
-                        <button class="chbtn chbtn-sm" id="tx-side-좌" onclick="txSelectSide('좌',this)">좌</button>
-                        <button class="chbtn chbtn-sm" id="tx-side-우" onclick="txSelectSide('우',this)">우</button>
-                      </span>
-                      <button class="chbtn-gold chbtn-sm active" id="tx-jeon" onclick="txToggle('jeon',this)">전침</button>
-                      <span class="tx-sep">|</span>
-                      <button class="chbtn-gold chbtn-sm" id="tx-yak" onclick="txToggleYak(this)">약침</button>
-                      <span id="tx-yak-detail" style="display:none;flex-wrap:wrap;gap:5px;align-items:center;"></span>
-                    </div>
-                    <div class="ch-input-row" style="flex-wrap:wrap;">
-                      <button class="chbtn chbtn-sm" id="tx-seup-습부1" onclick="txSelectSeup('습부1',this)">습부1</button>
-                      <button class="chbtn chbtn-sm active" id="tx-seup-습부2" onclick="txSelectSeup('습부2',this)">습부2</button>
-                      <button class="chbtn chbtn-sm" id="tx-seup-건부" onclick="txSelectSeup('건부',this)">건부</button>
-                      <span class="tx-sep">|</span>
-                      <button class="chbtn-gold chbtn-sm active" id="tx-bc" onclick="txToggle('bc',this)">BC</button>
-                      <span class="tx-sep">|</span>
-                      <button class="chbtn chbtn-sm" id="tx-chu-단추" onclick="txSelectChu('단추',this)">단추</button>
-                      <button class="chbtn chbtn-sm" id="tx-chu-복추" onclick="txSelectChu('복추',this)">복추</button>
-                      <span class="tx-sep">|</span>
-                      <button class="chbtn chbtn-sm" id="tx-uson" onclick="txToggle('uson',this)">초음파</button>
-                    </div>
-                    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px;">
-                      <button class="ch-gen-btn" onclick="generateTxResult()">생성</button>
-                      <button class="ch-copy-btn" onclick="chCopyResult('tx-area')">복사</button>
-                    </div>
-                  </div>
-                </div>
               </div>
 
             </div><!-- /ch-3col -->
@@ -1487,14 +1443,7 @@
               </div>
               <textarea class="ch-result-area" id="result-area" placeholder="생성 버튼을 눌러주세요."></textarea>
             </div>
-            <div class="ch-result-card" style="flex:2;">
-              <div class="ch-result-hd">
-                <span style="flex:1;font-size:13px;font-weight:700;color:#fff;">치료실 전달</span>
-                <button class="ch-gen-btn" onclick="generateTxResult()">생성</button>
-                <button class="ch-copy-btn" onclick="chCopyResult('tx-area')">복사</button>
-              </div>
-              <textarea class="ch-result-area" id="tx-area" placeholder="추후 설정 예정"></textarea>
-            </div>
+
           </div>
         </div>
       </div><!-- /근골격계 -->
@@ -2156,6 +2105,12 @@ function renderP(){
     inp.oninput=(function(s,f){return function(){s[f]=this.value;};})(store,field);
     return inp;
   }
+
+  // 안내 문구
+  var notice=document.createElement('div');
+  notice.style.cssText='font-size:12px;color:var(--text-muted);background:var(--surface-2);border-radius:6px;padding:7px 10px;margin-bottom:8px;';
+  notice.textContent='시그마차트에서 처방 입력 후 F8을 누르시면 처방 내역이 자동 연동됩니다';
+  body.appendChild(notice);
 
   // 테이핑
   var row1=document.createElement('div');row1.className='p-row';
@@ -4563,7 +4518,7 @@ async function saveSchedule() {
 ════════════════════════════════════ */
 async function loadHerbInventory() {
   try {
-    const rows = await sb.select('herb_inventory', 'deleted=neq.true');
+    const rows = await sb.select('herb_inventory', 'deleted=is.false,deleted=is.null');
     if (rows && rows.length > 0) {
       STATE.herbInventory = rows.map(r => ({
         id: r.id, name: r.name, cat: r.cat || '', qty: r.qty, min: r.min_qty,
