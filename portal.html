@@ -1967,6 +1967,23 @@ var P_CONFIG=[
 var P_DEFAULTS={테이핑:true};
 var pTaping={buyi:'',gae:'4'};
 var pBohumyak={company:'',name:'',days:''};
+
+/* ── 침구 섹션 상태 ── */
+var ACU_AREAS=['두경부','흉복부','요배부','상지부(견)','상지부(주)','상지부(완)','하지부(고)','하지부(슬)','하지부(족)'];
+var ACU_MAP={
+  '두경부':    {경혈:'천주',   투자:['풍부','풍지'],      관절:null,  척추:'대추',   복강:null,  간접구:'대추'  },
+  '흉복부':    {경혈:'단중',   투자:null,                  관절:null,  척추:null,     복강:'중완', 간접구:'중완'  },
+  '요배부':    {경혈:'신수',   투자:null,                  관절:null,  척추:'요양관', 복강:null,  간접구:'명문'  },
+  '상지부(견)':{경혈:'견우',   투자:['견료','극천'],       관절:'노수',척추:null,     복강:null,  간접구:'견우'  },
+  '상지부(주)':{경혈:'수삼리', 투자:['곡지','척택'],       관절:'소해',척추:null,     복강:null,  간접구:'수삼리'},
+  '상지부(완)':{경혈:'열결',   투자:['내관','외관'],       관절:'양지',척추:null,     복강:null,  간접구:'외관'  },
+  '하지부(고)':{경혈:'풍시',   투자:null,                  관절:'환도',척추:null,     복강:null,  간접구:'풍시'  },
+  '하지부(슬)':{경혈:'족삼리', 투자:['양릉천','음릉천'],   관절:'독비',척추:null,     복강:null,  간접구:'내슬안'},
+  '하지부(족)':{경혈:'태충',   투자:['삼음교','현종'],     관절:'신맥',척추:null,     복강:null,  간접구:'해계'  }
+};
+function acuShortName(a){return a.replace(/\(.*\)$/,'');}
+var acuAreas=[];
+var acuSt={경혈:'경혈2',투자:false,관절:false,척추:false,복강:false,전침:true,건부:false,습부1:false,습부2:true,간접구:false,핫팩:true,ir:true,ict:true};
 var pChiyohanyak={name:'',cheop:'',days:''};
 var pTAtanyak={name:'',cheop:'',days:''};
 var ccState={},osType='direct',phState={HTN:false,DM:false,HL:false,Hepa:false,Tb:false};
@@ -2084,7 +2101,13 @@ function renderP(){
     btn.textContent=lbl;
     btn.onclick=(function(key){return function(){
       if(key==='단순추나'&&!pActive['단순추나'])pActive['복잡추나']=false;
-      if(key==='복잡추나'&&!pActive['복잡추나'])pActive['단순추나']=false;
+      if(key==='복잡추나'&&!pActive['복잡추나']){
+        pActive['단순추나']=false;
+        if(!pInputVals['chunaSelected']||pInputVals['chunaSelected']==='{}'){
+          pInputVals['chunaSelected']=JSON.stringify({COX:true,MET:true,SCS:true});
+          pInputVals['chunaText']=JSON.stringify({MET:'햄스트링, 둔근, 이상근, 내전근',SCS:'장요근'});
+        }
+      }
       pActive[key]=!pActive[key];renderP();
     };})(k);
     return btn;
@@ -2106,11 +2129,79 @@ function renderP(){
     return inp;
   }
 
-  // 안내 문구
-  var notice=document.createElement('div');
-  notice.style.cssText='font-size:12px;color:var(--text-muted);background:var(--surface-2);border-radius:6px;padding:7px 10px;margin-bottom:8px;';
-  notice.textContent='시그마차트에서 처방 입력 후 F8을 누르시면 처방 내역이 자동 연동됩니다';
-  body.appendChild(notice);
+  /* ── 침구 섹션 ── */
+  function acuBtn(lbl,isActive,gold,onclick){
+    var b=document.createElement('button');
+    b.className=(gold?'chbtn-gold':'chbtn')+(isActive?' active':'');
+    b.textContent=lbl; b.onclick=onclick; return b;
+  }
+  function acuSep(){var s=document.createElement('span');s.textContent='|';s.style.cssText='color:var(--border-strong);margin:0 4px;';return s;}
+
+  // 부위 선택 행 1 (두경부~요배부)
+  var needs2=acuSt.경혈==='경혈2'||acuSt.습부2;
+  var areaRow1=document.createElement('div');areaRow1.className='p-row';areaRow1.style.flexWrap='wrap';
+  ACU_AREAS.slice(0,3).forEach(function(area){
+    var sel=acuAreas.indexOf(area)>=0;
+    areaRow1.appendChild(acuBtn(area,sel,false,function(){
+      var idx=acuAreas.indexOf(area);
+      if(idx>=0){acuAreas.splice(idx,1);}
+      else{if(acuAreas.length>=2)acuAreas.shift();acuAreas.push(area);}
+      renderP();
+    }));
+  });
+  body.appendChild(areaRow1);
+
+  // 부위 선택 행 2 (상지부~하지부)
+  var areaRow2=document.createElement('div');areaRow2.className='p-row';areaRow2.style.flexWrap='wrap';
+  ACU_AREAS.slice(3).forEach(function(area){
+    var sel=acuAreas.indexOf(area)>=0;
+    areaRow2.appendChild(acuBtn(area,sel,false,function(){
+      var idx=acuAreas.indexOf(area);
+      if(idx>=0){acuAreas.splice(idx,1);}
+      else{if(acuAreas.length>=2)acuAreas.shift();acuAreas.push(area);}
+      renderP();
+    }));
+  });
+  body.appendChild(areaRow2);
+  if(needs2&&acuAreas.length<2){
+    var warn=document.createElement('div');warn.style.cssText='font-size:11px;color:#C0392B;margin:2px 0 4px;';
+    warn.textContent='부위를 두 개 선택해주세요';body.appendChild(warn);
+  }
+  body.appendChild(div());
+
+  // 경혈1/2 | 투자 관절 척추 복강 | 전침
+  var r1=document.createElement('div');r1.className='p-row';
+  ['경혈1','경혈2'].forEach(function(k){
+    r1.appendChild(acuBtn(k,acuSt.경혈===k,false,function(){
+      acuSt.경혈=(acuSt.경혈===k)?null:k;renderP();
+    }));
+  });
+  r1.appendChild(acuSep());
+  ['투자','관절','척추','복강'].forEach(function(k){
+    r1.appendChild(acuBtn(k,!!acuSt[k],false,function(){acuSt[k]=!acuSt[k];renderP();}));
+  });
+  r1.appendChild(acuSep());
+  r1.appendChild(acuBtn('전침',acuSt.전침,false,function(){acuSt.전침=!acuSt.전침;renderP();}));
+  body.appendChild(r1);
+
+  // 건부 | 습부1 습부2 | 간접구 | 핫팩 | IR | ICT (한 줄)
+  var r2=document.createElement('div');r2.className='p-row';
+  r2.appendChild(acuBtn('건부',!!acuSt.건부,false,function(){acuSt.건부=!acuSt.건부;renderP();}));
+  r2.appendChild(acuSep());
+  ['습부1','습부2'].forEach(function(k){
+    r2.appendChild(acuBtn(k,!!acuSt[k],false,function(){acuSt[k]=!acuSt[k];renderP();}));
+  });
+  r2.appendChild(acuSep());
+  r2.appendChild(acuBtn('간접구',acuSt.간접구,false,function(){acuSt.간접구=!acuSt.간접구;renderP();}));
+  r2.appendChild(acuSep());
+  r2.appendChild(acuBtn('핫팩',acuSt.핫팩,true,function(){acuSt.핫팩=!acuSt.핫팩;renderP();}));
+  r2.appendChild(acuSep());
+  r2.appendChild(acuBtn('IR',acuSt.ir,true,function(){acuSt.ir=!acuSt.ir;renderP();}));
+  r2.appendChild(acuSep());
+  r2.appendChild(acuBtn('ICT',acuSt.ict,true,function(){acuSt.ict=!acuSt.ict;renderP();}));
+  body.appendChild(r2);
+  body.appendChild(div());
+  /* ── /침구 섹션 ── */
 
   // 테이핑
   var row1=document.createElement('div');row1.className='p-row';
@@ -2261,13 +2352,39 @@ function generateResult(){
   if(bijeungSel)out+=bijeungInfo.name+' / '+bijeungInfo.maek+' / '+bijeungInfo.seol+'\n';
   out+='- 초기 통증 증가 가능성 및 경과에 따라서 추가 검사 필요성 설명함\n- 추정 진단, 치료 계획, 치료에 따른 효과 및 예상되는 부작용에 대해서 설명함\n';
   var pParts=[];
-  out+='\nP)\n';
+  out+='\nP) ';
+  // 침구 출력
+  (function(){
+    var a0=acuAreas[0],a1=acuAreas[1];
+    var m0=a0?ACU_MAP[a0]:null,m1=a1?ACU_MAP[a1]:null;
+    var parts=[];
+    if(acuSt.경혈==='경혈2'&&m0&&m1) parts.push('경혈2부위('+m0.경혈+' '+m1.경혈+')');
+    else if(acuSt.경혈==='경혈1'&&m0) parts.push('경혈1부위('+m0.경혈+')');
+    if(acuSt.투자&&m0&&m0.투자) parts.push('투자('+m0.투자.join(' ')+')');
+    if(acuSt.관절&&m0&&m0.관절) parts.push('관절('+m0.관절+')');
+    if(acuSt.척추&&m0&&m0.척추) parts.push('척추('+m0.척추+')');
+    if(acuSt.복강&&m0&&m0.복강) parts.push('복강('+m0.복강+')');
+    if(acuSt.전침) parts.push('침전기자극술');
+    if(acuSt.습부2&&m0&&m1) parts.push('습부2부위('+acuShortName(a0)+' '+acuShortName(a1)+')');
+    else if(acuSt.습부2&&m0) parts.push('습부2부위('+acuShortName(a0)+')');
+    if(acuSt.습부1&&m0) parts.push('습부1부위('+acuShortName(a0)+')');
+    if(acuSt.건부&&m0) parts.push('건부('+acuShortName(a0)+')');
+    if(acuSt.간접구&&m0&&m0.간접구) parts.push('간접구('+m0.간접구+')');
+    if(acuSt.핫팩&&a0) parts.push('핫팩('+acuShortName(a0)+')');
+    if(acuSt.ir&&a0) parts.push('IR('+acuShortName(a0)+')');
+    if(acuSt.ict&&a0) parts.push('ICT('+acuShortName(a0)+')');
+    out+=parts.join(', ')+'\n';
+  })();
   if(pActive['테이핑']){var tapGae=pTaping.gae||'4';out+='■ 테이핑 : '+(pTaping.buyi?pTaping.buyi:'')+' ('+tapGae+'개)\n';}
   if(pActive['약침']){var 약종류=pInputVals['약침-종류']||'',약cc=pInputVals['약침-cc']||'',약부위=pInputVals['약침-부위']||'';var 약detail=[약종류+(약cc?' '+약cc:''),약부위].filter(Boolean).join(', ');out+='■ 약침 : '+약detail+'\n';}
   var chunaOut2=[],cs2={},ct2={};try{cs2=JSON.parse(pInputVals['chunaSelected']||'{}');}catch(e){}try{ct2=JSON.parse(pInputVals['chunaText']||'{}');}catch(e){}
   ['COX','drop','Lumbar roll','MET','SCS','골타','JS123','경추 thrust','흉추 thrust'].forEach(function(btn){if(!cs2[btn])return;var txt=ct2[btn]?'('+ct2[btn]+')':'';chunaOut2.push(btn+txt);});
   var chunaType=pActive['단순추나']?'단순추나':(pActive['복잡추나']?'복잡추나':'');
   if(chunaType){out+='■ '+chunaType+(chunaOut2.length?' : '+chunaOut2.join(' - '):'')+'\n';}
+  if(pActive['복잡추나']){
+    if(ccState['경추']){out+='- 상기 환자 경추 추간판 탈출증으로 인한 항강통 및 상지 방사통 호소하여 교정기법 포함한 복잡추나 시행함\n- 복잡추나 시행 이후 통증 감소 및 관절가동범위 증가를 확인함\n';}
+    if(ccState['요추']){out+='- 상기 환자 요추 추간판 탈출증으로 인한 요통 및 하지 방사통 호소하여 교정기법 포함한 복잡추나 시행함\n- 복잡추나 시행 이후 통증 감소 및 관절가동범위 증가를 확인함\n';}
+  }
   if(pActive['보험약']){var bhStr=[pBohumyak.company,pBohumyak.name,pBohumyak.days?pBohumyak.days+'일분':''].filter(Boolean).join(', ');out+='■ 보험약'+(bhStr?' : '+bhStr:'')+'\n';}
   if(pActive['치료한약']){var chStr=[pChiyohanyak.name,pChiyohanyak.cheop?pChiyohanyak.cheop+'첩':'',pChiyohanyak.days?pChiyohanyak.days+'일':''].filter(Boolean).join(' / ');out+='■ 치료한약'+(chStr?' : '+chStr:'')+'\n';}
   if(pActive['TA탕약']){var taStr=[pTAtanyak.name,pTAtanyak.cheop?pTAtanyak.cheop+'첩':'',pTAtanyak.days?pTAtanyak.days+'일':''].filter(Boolean).join(' / ');out+='■ TA 탕약'+(taStr?' : '+taStr:'')+'\n';}
