@@ -1050,88 +1050,15 @@
 </head>
 <body>
 
-<!-- ══ LOGIN SCREEN ══ -->
-<div id="login-screen">
-  <div class="login-card">
-    <h1>경희 라피엘 한의원</h1>
-    <div style="width:32px;height:3px;background:var(--primary);border-radius:2px;margin:8px 0 16px;"></div>
-    <p>로그인 유형을 선택하세요</p>
-
-    <!-- STEP 1: 역할 선택 -->
-    <div id="login-step1">
-      <div class="login-role-btns">
-        <button class="login-role-btn" onclick="selectRole('director')">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span class="role-btn-label">원장</span>
-          <span class="role-btn-sub">관리자 권한</span>
-        </button>
-        <button class="login-role-btn" onclick="selectRole('staff')">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span class="role-btn-label">직원</span>
-          <span class="role-btn-sub">일반 권한</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- STEP 1.5: 원장 이름 선택 -->
-    <div id="login-step-name" style="display:none;">
-      <div class="login-role-selected"><span class="role-chip role-chip-admin">원장 선택</span></div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin:14px 0;">
-        <button class="login-name-btn" onclick="selectDirectorName('김태은')">김태은 원장</button>
-        <button class="login-name-btn" onclick="selectDirectorName('최주원')">최주원 원장</button>
-        <button class="login-name-btn" onclick="selectDirectorName('최수빈')">최수빈 원장</button>
-      </div>
-      <button class="btn-back" onclick="backToStep1()">← 다시 선택</button>
-    </div>
-
-    <!-- STEP 1.5: 직원 이름 선택 -->
-    <div id="login-step-name-staff" style="display:none;">
-      <div class="login-role-selected"><span class="role-chip role-chip-staff">직원 선택</span></div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin:14px 0;">
-        <button class="login-name-btn" onclick="selectStaffName('김다은')">김다은</button>
-        <button class="login-name-btn" onclick="selectStaffName('김소리')">김소리</button>
-        <button class="login-name-btn" onclick="selectStaffName('김우태')">김우태</button>
-        <button class="login-name-btn" onclick="selectStaffName('김유빈')">김유빈</button>
-        <button class="login-name-btn" onclick="selectStaffName('남서연')">남서연</button>
-        <button class="login-name-btn" onclick="selectStaffName('박채린')">박채린</button>
-        <button class="login-name-btn" onclick="selectStaffName('이지예')">이지예</button>
-        <button class="login-name-btn" onclick="selectStaffName('장아름')">장아름</button>
-        <button class="login-name-btn" onclick="selectStaffName('최윤희')">최윤희</button>
-      </div>
-      <button class="btn-back" onclick="backToStep1()">← 다시 선택</button>
-    </div>
-
-    <!-- STEP 2: 비밀번호 입력 -->
-    <div id="login-step2" style="display:none;">
-      <div class="login-role-selected" id="login-role-indicator"></div>
-      <div class="form-group">
-        <label>비밀번호</label>
-        <input type="password" id="login-pw" placeholder="비밀번호 입력" autocomplete="current-password">
-      </div>
-      <button class="btn-primary" onclick="doLogin()">입장</button>
-      <button class="btn-back" onclick="backToNameStep()">← 다시 선택</button>
-    </div>
-
-    <p class="login-hint">※ 비밀번호 분실 시 원장에게 문의하세요</p>
-  </div>
-</div>
-
 <!-- ══ SIDEBAR ══ -->
-<div id="app" style="display:none;">
+<div id="app" style="display:flex;">
 <div id="sidebar">
   <div class="sidebar-logo" onclick="goToDashboard()" style="cursor:pointer;">
     <div class="clinic-name">경희 라피엘 한의원</div>
-    <div class="clinic-sub">내부 포털 v1.0</div>
-  </div>
-  <div class="sidebar-user">
-    <div class="user-avatar" id="user-avatar">?</div>
-    <div class="user-info">
-      <div class="user-name" id="user-name-display">-</div>
-      <div class="user-role" id="user-role-display">-</div>
-    </div>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section-label">메인</div>
+
     <div class="nav-item active" onclick="showPage('dashboard')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       <span>대시보드</span>
@@ -1150,28 +1077,12 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       <span>매뉴얼</span>
     </div>
-    <div class="nav-item admin-only" onclick="showPage('qa-admin')">
+    <div class="nav-item" onclick="showPage('qa-admin')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <span>Q&A [원장용]</span>
-    </div>
-    <div class="nav-item" onclick="showPage('qa-staff')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/></svg>
-      <span id="qa-staff-nav-label">Q&A</span>
-    </div>
-    <div class="nav-item" onclick="showPage('resources')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-      <span>자료</span>
+      <span>Q&A</span>
     </div>
 
     <div class="nav-section-label">업무</div>
-    <div class="nav-item" onclick="showPage('notice')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      <span>공지사항</span>
-    </div>
-    <div class="nav-item" onclick="showPage('checklist')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      <span>체크리스트</span>
-    </div>
     <div class="nav-item" onclick="showPage('recurring')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
       <span>일정</span>
@@ -1181,19 +1092,6 @@
       <span>근무표</span>
     </div>
 
-    <div class="nav-section-label">관리</div>
-    <div class="nav-item" onclick="showPage('inventory')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-      <span>일반 소모품 재고</span>
-    </div>
-    <div class="nav-item" onclick="showPage('skin-inventory')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-      <span>피부 소모품 재고</span>
-    </div>
-    <div class="nav-item" onclick="showPage('herb-inventory')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0 1 0 20"/><path d="M12 2C6.48 2 2 6.48 2 12"/><path d="M12 12c0-4 2-7 5-9"/><path d="M12 12c-3 0-6-1-8-3"/></svg>
-      <span>약재 관리</span>
-    </div>
   </nav>
   <div class="sidebar-footer">
     <div id="backup-btn-wrap" style="display:none;margin-bottom:12px;">
@@ -1202,10 +1100,6 @@
         <span id="backup-btn-label">데이터 추출</span>
       </button>
     </div>
-    <button class="logout-btn" onclick="doLogout()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      <span>로그아웃</span>
-    </button>
   </div>
 </div>
 
@@ -1218,82 +1112,26 @@
 
   <!-- ▸ DASHBOARD -->
   <div id="page-dashboard" class="page active">
-    <!-- 상단: 캘린더(좌) + 공지/체크리스트(우) -->
-    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;margin-bottom:16px;">
-      <!-- 좌: 월 캘린더 -->
-      <div class="card">
-        <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
-          <span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:6px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            일정
-          </span>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <button class="btn btn-outline btn-sm" onclick="changeDashboardMonth(-1)">←</button>
-            <span id="dashboard-cal-month" style="font-size:13px;font-weight:700;color:var(--accent);min-width:72px;text-align:center;"></span>
-            <button class="btn btn-outline btn-sm" onclick="changeDashboardMonth(1)">→</button>
-          </div>
-        </div>
-        <div style="display:flex;gap:14px;margin-bottom:8px;flex-wrap:wrap;">
-          <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#FDEDEC;border:1px solid #C0392B;display:inline-block;"></span>공지</span>
-          <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#EBF2FB;border:1px solid #2E5C9A;display:inline-block;"></span>반복 업무</span>
-          <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#FEF9E7;border:1px solid #C07D2A;display:inline-block;"></span>일정</span>
-        </div>
-        <div class="calendar-grid" id="dashboard-calendar-grid" style="font-size:11px; --cal-min-height:52px;"></div>
-      </div>
-
-      <!-- 우: 공지 + 체크리스트 완료율 -->
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <!-- 공지사항 -->
-        <div class="card" style="flex:1;overflow-y:auto;max-height:220px;">
-          <div class="card-title" style="font-size:13px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:4px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            최근 공지사항
-          </div>
-          <ul class="notice-list" id="dashboard-notices">
-            <li class="notice-item">
-              <span class="notice-badge badge-info">일반</span>
-              <div class="notice-content">
-                <div class="notice-title">공지사항이 없습니다</div>
-                <div class="notice-date">포털 초기 상태</div>
-              </div>
-            </li>
-          </ul>
-        </div>
-
-        <!-- 체크리스트 완료율 -->
-        <div class="card">
-          <div class="card-title" style="font-size:13px;display:flex;justify-content:space-between;align-items:center;">
-            <span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:4px;"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-              오늘의 체크리스트
-            </span>
-            <span id="dashboard-checklist-progress" style="font-size:12px;color:var(--text-muted);font-weight:400;">0 / 0</span>
-          </div>
-          <div class="checklist-progress" style="margin-bottom:10px;">
-            <div class="checklist-progress-bar" id="dashboard-progress-bar" style="width:0%"></div>
-          </div>
-          <div id="dashboard-checklist-items"></div>
+    <!-- 캘린더 -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:6px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          일정
+        </span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button class="btn btn-outline btn-sm" onclick="changeDashboardMonth(-1)">←</button>
+          <span id="dashboard-cal-month" style="font-size:13px;font-weight:700;color:var(--accent);min-width:72px;text-align:center;"></span>
+          <button class="btn btn-outline btn-sm" onclick="changeDashboardMonth(1)">→</button>
         </div>
       </div>
+      <div style="display:flex;gap:14px;margin-bottom:8px;flex-wrap:wrap;">
+        <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#EBF2FB;border:1px solid #2E5C9A;display:inline-block;"></span>반복 업무</span>
+        <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#FEF9E7;border:1px solid #C07D2A;display:inline-block;"></span>일정</span>
+      </div>
+      <div class="calendar-grid" id="dashboard-calendar-grid" style="font-size:11px; --cal-min-height:52px;"></div>
     </div>
 
-    <!-- 하단: 재고 부족 (일반/피부 나란히) -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-      <div class="card">
-        <div class="card-title" style="font-size:13px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:4px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-          일반 소모품 부족
-        </div>
-        <div id="dashboard-inventory-alerts"><span class="text-muted">부족 항목 없음 ✓</span></div>
-      </div>
-      <div class="card">
-        <div class="card-title" style="font-size:13px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:4px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-          피부 소모품 부족
-        </div>
-        <div id="dashboard-skin-inventory-alerts"><span class="text-muted">부족 항목 없음 ✓</span></div>
-      </div>
-    </div>
   </div>
 
   <!-- ▸ CHARTING -->
@@ -1707,41 +1545,6 @@
     <div id="cq-result-page"></div>
   </div>
 
-
-  <!-- ▸ NOTICE -->
-  <div id="page-notice" class="page">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div class="search-bar" style="margin-bottom:0;flex:1;max-width:360px;">
-        <input type="text" class="search-input" id="notice-search" placeholder="공지사항 검색..." oninput="filterNotices()">
-      </div>
-      <button class="btn btn-green btn-sm admin-only" onclick="openNoticeWriteModal()">+ 공지 작성</button>
-    </div>
-    <ul class="notice-list" id="notice-list-full"></ul>
-  </div>
-
-  <!-- ▸ CHECKLIST -->
-  <div id="page-checklist" class="page">
-    <!-- 2주 날짜 선택 -->
-    <div id="checklist-date-strip" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:12px;margin-bottom:16px;"></div>
-
-    <div class="flex items-center justify-between" style="margin-bottom:20px;">
-      <div>
-        <div class="progress-label">
-          <span id="checklist-progress-text">전체 진행률</span>
-          <span id="checklist-count">0 / 0</span>
-        </div>
-        <div class="checklist-progress" style="width:300px;">
-          <div class="checklist-progress-bar" id="main-progress-bar" style="width:0%"></div>
-        </div>
-      </div>
-      <div class="flex gap-8">
-        <button class="btn btn-outline btn-sm" onclick="resetChecklist()">오늘 초기화</button>
-        <button class="btn btn-green btn-sm admin-only" onclick="openChecklistEditor()">항목 편집 (원장)</button>
-      </div>
-    </div>
-    <div id="checklist-container"></div>
-  </div>
-
   <!-- ▸ MANUAL -->
   <div id="page-manual" class="page">
     <div class="search-bar">
@@ -1782,21 +1585,6 @@
     <div class="calendar-grid" id="calendar-grid"></div>
   </div>
 
-  <!-- ▸ INVENTORY -->
-  <div id="page-inventory" class="page" style="max-width:100%;">
-    <div class="flex items-center justify-between" style="margin-bottom:20px;">
-      <div class="search-bar" style="margin-bottom:0; flex:1; max-width:320px;">
-        <input type="text" class="search-input" placeholder="소모품 검색..." oninput="filterInventory(this.value)">
-      </div>
-      <div style="display:flex;gap:8px;">
-        <a class="btn btn-outline btn-sm admin-only" href="https://docs.google.com/spreadsheets/d/1Rco7GhhX_yP15bTJow7u-eO3AhC1J5OhGXUcmEvQV6M/edit?usp=sharing" target="_blank" style="text-decoration:none;">Google Sheets</a>
-        <button class="btn btn-outline btn-sm admin-only" onclick="reloadInventory('general')">새로고침</button>
-      </div>
-    </div>
-    <div id="inventory-groups" style="columns:2;column-gap:16px;"></div>
-  </div>
-
-
   <!-- ▸ 일정 -->
   <div id="page-recurring" class="page">
     <!-- 월간 캘린더 -->
@@ -1828,56 +1616,7 @@
     <div id="recurring-list"></div>
   </div>
 
-
-  <!-- ▸ 자료 -->
-  <div id="page-resources" class="page">
-    <div class="flex items-center justify-between" style="margin-bottom:14px;">
-      <div class="search-bar" style="margin-bottom:0;flex:1;max-width:320px;">
-        <input type="text" class="search-input" id="resource-search" placeholder="자료 검색..." oninput="filterResources(this.value)">
-      </div>
-      <button class="btn btn-green btn-sm admin-only" onclick="openResourceModal()">+ 자료 추가</button>
-    </div>
-    <div class="tab-bar" style="margin-bottom:16px;border:none;gap:8px;flex-wrap:wrap;">
-      <button class="tab-btn active" id="res-cat-all" onclick="filterResourceCat('all',this)">전체</button>
-      <button class="tab-btn" id="res-cat-홍보" onclick="filterResourceCat('홍보',this)">홍보</button>
-      <button class="tab-btn" id="res-cat-환자교육" onclick="filterResourceCat('환자교육',this)">환자 교육</button>
-      <button class="tab-btn" id="res-cat-직원교육" onclick="filterResourceCat('직원교육',this)">직원 교육</button>
-      <button class="tab-btn" id="res-cat-서식양식" onclick="filterResourceCat('서식양식',this)">서식/양식</button>
-      <button class="tab-btn" id="res-cat-설명서" onclick="filterResourceCat('설명서',this)">설명서</button>
-      <button class="tab-btn" id="res-cat-기타" onclick="filterResourceCat('기타',this)">기타</button>
-    </div>
-    <div id="resources-list" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;"></div>
-  </div>
-
-  <!-- ▸ 피부 재고 -->
-  <div id="page-skin-inventory" class="page" style="max-width:100%;">
-    <div class="flex items-center justify-between" style="margin-bottom:20px;">
-      <div class="search-bar" style="margin-bottom:0; flex:1; max-width:320px;">
-        <input type="text" class="search-input" placeholder="피부 소모품 검색..." oninput="filterSkinInventory(this.value)">
-      </div>
-      <div style="display:flex;gap:8px;">
-        <a class="btn btn-outline btn-sm admin-only" href="https://docs.google.com/spreadsheets/d/1Rco7GhhX_yP15bTJow7u-eO3AhC1J5OhGXUcmEvQV6M/edit?usp=sharing" target="_blank" style="text-decoration:none;">Google Sheets</a>
-        <button class="btn btn-outline btn-sm admin-only" onclick="reloadInventory('skin')">새로고침</button>
-      </div>
-    </div>
-    <div id="skin-inventory-groups" style="columns:2;column-gap:16px;"></div>
-  </div>
-
-  <!-- ▸ 약재 관리 -->
-  <div id="page-herb-inventory" class="page" style="max-width:100%;">
-    <div class="flex items-center justify-between" style="margin-bottom:20px;">
-      <div class="search-bar" style="margin-bottom:0; flex:1; max-width:320px;">
-        <input type="text" class="search-input" placeholder="약재 검색..." oninput="filterHerbInventory(this.value)">
-      </div>
-      <div style="display:flex;gap:8px;">
-        <a class="btn btn-outline btn-sm admin-only" href="https://docs.google.com/spreadsheets/d/1Rco7GhhX_yP15bTJow7u-eO3AhC1J5OhGXUcmEvQV6M/edit?usp=sharing" target="_blank" style="text-decoration:none;">Google Sheets</a>
-        <button class="btn btn-outline btn-sm admin-only" onclick="reloadInventory('herb')">새로고침</button>
-      </div>
-    </div>
-    <div id="herb-inventory-groups" style="columns:2;column-gap:16px;"></div>
-  </div>
-
-  <!-- ▸ Q&A 원장용 (원장+직원 모두 보임) -->
+  <!-- ▸ Q&A -->
   <div id="page-qa-admin" class="page">
     <div class="flex items-center justify-between" style="margin-bottom:16px;">
       <div class="tab-bar" style="margin-bottom:0;border:none;gap:8px;">
@@ -1890,16 +1629,6 @@
     </div>
     <div id="qa-admin-list"></div>
   </div>
-
-  <!-- ▸ Q&A 직원용 -->
-  <div id="page-qa-staff" class="page">
-    <div class="flex items-center justify-between" style="margin-bottom:16px;">
-      <div style="font-size:13px;color:var(--text-muted);">직원용 Q&A</div>
-      <button class="btn btn-green btn-sm admin-only" onclick="openQAModal('staff')">+ Q&A 등록</button>
-    </div>
-    <div id="qa-staff-list"></div>
-  </div>
-
 </div><!-- /main-content -->
 </div><!-- /app -->
 
@@ -1941,41 +1670,6 @@
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('schedule')">취소</button>
       <button class="btn btn-green" onclick="saveSchedule()">저장</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-inventory">
-  <div class="modal">
-    <div class="modal-title">소모품 항목 추가</div>
-    <div class="form-section">
-      <label>품목명</label>
-      <input type="text" id="inv-name" placeholder="예: 침 (0.20×40)">
-    </div>
-    <div class="form-section">
-      <label>분류</label>
-      <select id="inv-cat"></select>
-    </div>
-    <div class="form-section">
-      <label>기준(최소) 수량</label>
-      <input type="number" id="inv-min" placeholder="예: 100">
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('inventory')">취소</button>
-      <button class="btn btn-green" onclick="saveInventoryItem()">추가</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-checklist-editor">
-  <div class="modal" style="width:580px;max-height:80vh;display:flex;flex-direction:column;">
-    <div class="modal-title">체크리스트 편집</div>
-    <div style="overflow-y:auto;flex:1;padding-right:4px;" id="cl-editor-body"></div>
-    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn btn-outline btn-sm" onclick="addClSection()">+ 섹션 추가</button>
-      <div style="flex:1;"></div>
-      <button class="btn btn-outline" onclick="closeModal('checklist-editor')">취소</button>
-      <button class="btn btn-green" onclick="saveChecklistItems()">저장</button>
     </div>
   </div>
 </div>
@@ -2913,81 +2607,6 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
   </div>
 </div>
 
-<!-- 공지사항 작성/수정 모달 -->
-<div class="modal-overlay" id="modal-notice-write">
-  <div class="modal" style="width:520px;">
-    <div class="modal-title" id="notice-write-modal-title">공지사항 작성</div>
-    <div class="form-section">
-      <label>제목</label>
-      <input type="text" id="notice-title-input" placeholder="공지 제목을 입력하세요">
-    </div>
-    <div class="form-section">
-      <label>내용</label>
-      <textarea id="notice-body-input" placeholder="공지 내용을 입력하세요"></textarea>
-    </div>
-    <div class="form-section">
-      <label>캘린더 날짜 <span style="font-size:11px;color:var(--text-muted);">(선택 — 입력 시 일정 캘린더에 표시됩니다)</span></label>
-      <input type="date" id="notice-event-date">
-    </div>
-    <input type="hidden" id="notice-edit-idx" value="">
-    <input type="hidden" id="notice-type" value="normal">
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeNoticeWriteModal()">취소</button>
-      <button class="btn btn-green" id="notice-submit-btn" onclick="submitNotice()">공지 등록</button>
-    </div>
-  </div>
-</div>
-
-<!-- 일반 소모품 편집 모달 -->
-<div class="modal-overlay" id="modal-inventory-edit">
-  <div class="modal">
-    <div class="modal-title">품목 편집</div>
-    <input type="hidden" id="inv-edit-id">
-    <div class="form-section"><label>품목명</label><input type="text" id="inv-edit-name" placeholder="품목명"></div>
-    <div class="form-section">
-      <label>분류</label>
-      <select id="inv-edit-cat"></select>
-    </div>
-    <div class="form-section"><label>현재 수량</label><input type="number" id="inv-edit-qty" min="0"></div>
-    <div class="form-section"><label>기준(최소) 수량</label><input type="number" id="inv-edit-min" min="0"></div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('inventory-edit')">취소</button>
-      <button class="btn btn-green" onclick="saveInventoryEdit()">저장</button>
-    </div>
-  </div>
-</div>
-
-<!-- 소모품 분류 관리 모달 -->
-<div class="modal-overlay" id="modal-cat-manage">
-  <div class="modal" style="width:380px;">
-    <div class="modal-title" id="cat-manage-title">분류 관리</div>
-    <input type="hidden" id="cat-manage-type">
-    <div id="cat-manage-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:320px;overflow-y:auto;"></div>
-    <div class="form-section" style="display:flex;gap:6px;align-items:flex-end;">
-      <input type="text" id="cat-manage-new" placeholder="새 분류명" style="flex:1;" onkeydown="if(event.key==='Enter')addInvCategory()">
-      <button class="btn btn-green btn-sm" onclick="addInvCategory()">추가</button>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('cat-manage')">닫기</button>
-    </div>
-  </div>
-</div>
-
-<!-- 공지 상세 팝업 -->
-<div class="modal-overlay" id="modal-notice-detail">
-  <div class="modal" style="width:520px;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
-      <span id="notice-detail-badge" class="notice-badge"></span>
-      <div class="modal-title" id="notice-detail-title" style="margin:0;"></div>
-    </div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;" id="notice-detail-meta"></div>
-    <div style="font-size:14px;color:var(--text-secondary);line-height:1.85;white-space:pre-line;padding:14px;background:var(--surface-2);border-radius:8px;min-height:60px;" id="notice-detail-body"></div>
-    <div class="modal-actions">
-      <button class="btn btn-green" onclick="closeModal('notice-detail')">확인</button>
-    </div>
-  </div>
-</div>
-
 <!-- 단발성 일정 추가 모달 -->
 <div class="modal-overlay" id="modal-event">
   <div class="modal" style="width:420px;">
@@ -3059,77 +2678,6 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCQ();c
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('recurring')">취소</button>
       <button class="btn btn-green" onclick="saveRecurring()">저장</button>
-    </div>
-  </div>
-</div>
-
-<!-- 자료 추가 모달 -->
-<div class="modal-overlay" id="modal-resource">
-  <div class="modal" style="width:480px;">
-    <div class="modal-title" id="resource-modal-title">자료 추가</div>
-    <input type="hidden" id="resource-edit-id">
-    <div class="form-section">
-      <label>자료명</label>
-      <input type="text" id="resource-name" placeholder="예: 한의원 홍보 브로셔">
-    </div>
-    <div class="form-section">
-      <label>분류</label>
-      <select id="resource-cat">
-        <option value="홍보">홍보</option>
-        <option value="환자교육">환자 교육</option>
-        <option value="직원교육">직원 교육</option>
-        <option value="서식양식">서식/양식</option>
-        <option value="설명서">설명서</option>
-        <option value="기타">기타</option>
-      </select>
-    </div>
-    <div class="form-section">
-      <label>구글 드라이브 링크</label>
-      <input type="text" id="resource-url" placeholder="https://drive.google.com/...">
-    </div>
-    <div class="form-section">
-      <label>설명 (선택)</label>
-      <input type="text" id="resource-desc" placeholder="간단한 설명">
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('resource')">취소</button>
-      <button class="btn btn-green" onclick="saveResource()">저장</button>
-    </div>
-  </div>
-</div>
-
-<!-- 피부 소모품 편집 모달 -->
-<div class="modal-overlay" id="modal-skin-inventory-edit">
-  <div class="modal">
-    <div class="modal-title">피부 소모품 편집</div>
-    <input type="hidden" id="skin-inv-edit-id">
-    <div class="form-section"><label>품목명</label><input type="text" id="skin-inv-edit-name" placeholder="품목명"></div>
-    <div class="form-section">
-      <label>분류</label>
-      <select id="skin-inv-edit-cat"></select>
-    </div>
-    <div class="form-section"><label>현재 수량</label><input type="number" id="skin-inv-edit-qty" min="0"></div>
-    <div class="form-section"><label>기준(최소) 수량</label><input type="number" id="skin-inv-edit-min" min="0"></div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('skin-inventory-edit')">취소</button>
-      <button class="btn btn-green" onclick="saveSkinInventoryEdit()">저장</button>
-    </div>
-  </div>
-</div>
-
-<!-- 피부 소모품 추가 모달 -->
-<div class="modal-overlay" id="modal-skin-inventory">
-  <div class="modal">
-    <div class="modal-title">피부 소모품 항목 추가</div>
-    <div class="form-section"><label>품목명</label><input type="text" id="skin-inv-name" placeholder="예: 앰플 A"></div>
-    <div class="form-section">
-      <label>분류</label>
-      <select id="skin-inv-cat"></select>
-    </div>
-    <div class="form-section"><label>기준(최소) 수량</label><input type="number" id="skin-inv-min" placeholder="예: 10"></div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('skin-inventory')">취소</button>
-      <button class="btn btn-green" onclick="saveSkinInventoryItem()">추가</button>
     </div>
   </div>
 </div>
@@ -3274,108 +2822,22 @@ const STATE = {
   },
 };
 
-/* 비밀번호 설정 */
-const PASSWORDS = {
-  director: '1234',
-  staff: ['라피엘1**', 'fkvldpf1**', 'FKVLDPF1**'],
-};
-
 /* ════════════════════════════════════
-   LOGIN
+   자동 입장 (로그인 절차 없음)
 ════════════════════════════════════ */
-let selectedRole = null;
-let selectedName = null;
-
-function selectRole(role) {
-  selectedRole = role;
-  if (role === 'director') {
-    document.getElementById('login-step1').style.display = 'none';
-    document.getElementById('login-step-name').style.display = 'block';
-  } else {
-    document.getElementById('login-step1').style.display = 'none';
-    document.getElementById('login-step-name-staff').style.display = 'block';
+function autoEnter() {
+  STATE.user = { name: '원장', role: '원장', isAdmin: true };
+  document.body.classList.add('is-admin');
+  const backupWrap = document.getElementById('backup-btn-wrap');
+  if (backupWrap) {
+    backupWrap.style.display = 'block';
+    const now = new Date();
+    const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    document.getElementById('backup-btn-label').textContent = `${prevMonth.getMonth() + 1}월 데이터 추출`;
   }
+  initApp();
 }
-
-function selectDirectorName(name) {
-  selectedName = name;
-  document.getElementById('login-step-name').style.display = 'none';
-  showPasswordStep(name + ' 원장');
-}
-
-function selectStaffName(name) {
-  selectedName = name;
-  document.getElementById('login-step-name-staff').style.display = 'none';
-  showPasswordStep(name);
-}
-
-function showPasswordStep(label) {
-  document.getElementById('login-role-indicator').innerHTML =
-    `<span class="role-chip ${selectedRole === 'director' ? 'role-chip-admin' : 'role-chip-staff'}">${label}</span>`;
-  document.getElementById('login-step2').style.display = 'block';
-  document.getElementById('login-pw').value = '';
-  document.getElementById('login-pw').focus();
-}
-
-function backToStep1() {
-  selectedRole = null; selectedName = null;
-  document.getElementById('login-step-name').style.display = 'none';
-  document.getElementById('login-step-name-staff').style.display = 'none';
-  document.getElementById('login-step2').style.display = 'none';
-  document.getElementById('login-step1').style.display = 'block';
-}
-
-function backToNameStep() {
-  selectedName = null;
-  document.getElementById('login-step2').style.display = 'none';
-  if (selectedRole === 'director') {
-    document.getElementById('login-step-name').style.display = 'block';
-  } else {
-    document.getElementById('login-step-name-staff').style.display = 'block';
-  }
-}
-
-function doLogin() {
-  const pw = document.getElementById('login-pw').value;
-  if (!selectedRole) return;
-  if (pw === PASSWORDS[selectedRole] || (Array.isArray(PASSWORDS[selectedRole]) && PASSWORDS[selectedRole].includes(pw))) {
-    const isAdmin = selectedRole === 'director';
-    const displayName = selectedName || (isAdmin ? '원장' : '직원');
-    STATE.user = { name: displayName, role: isAdmin ? '원장' : '직원', isAdmin };
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    if (isAdmin) document.body.classList.add('is-admin');
-    document.getElementById('user-name-display').textContent = displayName;
-    document.getElementById('user-role-display').textContent = isAdmin ? '원장' : '직원';
-    document.getElementById('user-avatar').textContent = displayName.charAt(0);
-    // 최수빈 로그인 시에만 백업 버튼 표시
-    const backupWrap = document.getElementById('backup-btn-wrap');
-    if (backupWrap) {
-      if (displayName === '최수빈') {
-        backupWrap.style.display = 'block';
-        const now = new Date();
-        const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        const label = `${prevMonth.getMonth() + 1}월 데이터 추출`;
-        document.getElementById('backup-btn-label').textContent = label;
-      } else {
-        backupWrap.style.display = 'none';
-      }
-    }
-    initApp();
-  } else {
-    const pw_input = document.getElementById('login-pw');
-    pw_input.style.borderColor = 'var(--danger)';
-    pw_input.value = '';
-    pw_input.placeholder = '비밀번호가 틀렸습니다';
-    setTimeout(() => {
-      pw_input.style.borderColor = '';
-      pw_input.placeholder = '비밀번호 입력';
-    }, 1800);
-  }
-}
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && selectedRole && !STATE.user) doLogin();
-});
+document.addEventListener('DOMContentLoaded', autoEnter);
 
 /* ════════════════════════════════════
    자료
@@ -3586,61 +3048,25 @@ function downloadCSV(rows, filename) {
   URL.revokeObjectURL(url);
 }
 
-function doLogout() {
-  STATE.user = null; selectedRole = null; selectedName = null;
-  document.body.classList.remove('is-admin');
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-step1').style.display = 'block';
-  document.getElementById('login-step-name').style.display = 'none';
-  document.getElementById('login-step-name-staff').style.display = 'none';
-  document.getElementById('login-step2').style.display = 'none';
-  document.getElementById('login-pw').value = '';
-  const backupWrap = document.getElementById('backup-btn-wrap');
-  if (backupWrap) backupWrap.style.display = 'none';
-  // 다음 로그인 시 무조건 대시보드부터 시작하도록 페이지 상태 초기화
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-dashboard').classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const dashNav = document.querySelector('.nav-item[onclick*="dashboard"]');
-  if (dashNav) dashNav.classList.add('active');
-  const titleEl = document.getElementById('page-title');
-  if (titleEl) titleEl.textContent = '대시보드';
-}
-
 /* ════════════════════════════════════
    APP INIT
 ════════════════════════════════════ */
 async function initApp() {
   updateTodayDate();
-  loadResources();
   showLoadingOverlay(true);
   try {
     await Promise.all([
-      loadNotices(),
       loadManuals(),
-      loadInventory(),
-      loadSkinInventory(),
-      loadHerbInventory(),
-      loadInvCategories(),
       loadSchedules(),
-      loadChecklistItems(),
       loadQAItems(),
       loadRecurringTasks(),
       loadScheduledEvents(),
     ]);
-    await loadChecklistLogs();
   } catch(e) {
     console.warn('Supabase 로드 오류 (로컬 데이터로 진행):', e);
   }
   showLoadingOverlay(false);
-  // 직원 입장 시 Q&A 탭 이름 단순화
-  const qaLabel = document.getElementById('qa-staff-nav-label');
-  if (qaLabel) qaLabel.textContent = STATE.user.isAdmin ? 'Q&A [직원용]' : 'Q&A';
-  renderChecklist();
-  renderNotices();
   renderManual();
-  renderInventory();
   renderCalendar();
   renderDashboardCalendar();
   updateDashboard();
@@ -3839,11 +3265,9 @@ function updateTodayDate() {
 ════════════════════════════════════ */
 const PAGE_TITLES = {
   dashboard: '대시보드', charting: '차팅', billing: '청구 수가 조회',
-  notice: '공지사항', checklist: '체크리스트', recurring: '일정', schedule: '근무표',
-  manual: '매뉴얼', schedule: '스케줄',
-  inventory: '일반 소모품 재고', 'skin-inventory': '피부 소모품 재고', 'herb-inventory': '약재 관리',
-  'qa-admin': 'Q&A [원장용]', 'qa-staff': 'Q&A [직원용]',
-  resources: '자료'
+  recurring: '일정', schedule: '근무표',
+  manual: '매뉴얼',
+  'qa-admin': 'Q&A'
 };
 
 function goToDashboard() {
@@ -3868,16 +3292,8 @@ function showPage(name) {
     renderRecurringCalendar();
     renderRecurringList();
     renderEventsList();
-  } else if (name === 'skin-inventory') {
-    renderSkinInventory();
-  } else if (name === 'herb-inventory') {
-    renderHerbInventory();
-  } else if (name === 'resources') {
-    renderResources();
   } else if (name === 'qa-admin') {
     renderQAAdmin();
-  } else if (name === 'qa-staff') {
-    renderQAStaff();
   } else {
     const pageEl = document.getElementById('cq-result-page');
     if (pageEl) pageEl.innerHTML = '';
@@ -5498,7 +4914,6 @@ function getTodayRecurring() {
 }
 
 function updateDashboard() {
-  updateDashboardChecklist();
   updateInventoryAlerts();
   updateDashboardRecurring();
 }
