@@ -4878,8 +4878,10 @@ async function saveRecurring() {
     data = { title, type, created_by: STATE.user.name };
     if (type==='weekly') data.weekday = parseInt(document.getElementById('rt-weekday').value);
     else if (type==='monthly_date') {
-      data.date_from = parseInt(document.getElementById('rt-from').value);
-      data.date_to = parseInt(document.getElementById('rt-to').value);
+      const from = parseInt(document.getElementById('rt-from').value);
+      const toRaw = document.getElementById('rt-to').value.trim();
+      data.date_from = from;
+      data.date_to = toRaw === '' ? from : parseInt(toRaw);
     } else if (type==='monthly_last_weekday') data.last_weekday = parseInt(document.getElementById('rt-last-weekday').value);
   }
   const editId = document.getElementById('recurring-edit-id').value;
