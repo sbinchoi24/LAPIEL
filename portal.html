@@ -2363,7 +2363,7 @@ function makeYakchimExpand(){
   div.appendChild(kindRow);
   var ccRow=document.createElement('div');ccRow.style.cssText='display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
   var 부위Label=document.createElement('span');부위Label.textContent='부위';부위Label.style.cssText='font-size:12px;font-weight:700;color:#8B6914;min-width:30px;';
-  var 부위Input=document.createElement('input');부위Input.type='text';부위Input.placeholder='부위 입력';부위Input.style.cssText='padding:5px 9px;border:1.5px solid #D4B080;border-radius:7px;font-family:inherit;font-size:12px;outline:none;background:var(--surface-1);width:140px;';부위Input.value=pInputVals['약침-부위']||'';부위Input.oninput=function(){pInputVals['약침-부위']=this.value;};
+  var 부위Input=document.createElement('input');부위Input.type='text';부위Input.placeholder='부위';부위Input.style.cssText='padding:5px 9px;border:1.5px solid #D4B080;border-radius:7px;font-family:inherit;font-size:12px;outline:none;background:var(--surface-1);width:70px;';부위Input.value=pInputVals['약침-부위']||'';부위Input.oninput=function(){pInputVals['약침-부위']=this.value;};
   ccRow.appendChild(부위Label);ccRow.appendChild(부위Input);
   var sep1=document.createElement('span');sep1.textContent='|';sep1.style.cssText='color:#D4B080;margin:0 2px;';ccRow.appendChild(sep1);
   var ccLabel=document.createElement('span');ccLabel.textContent='용량';ccLabel.style.cssText='font-size:12px;font-weight:700;color:#8B6914;min-width:30px;';
