@@ -4736,7 +4736,8 @@ function getRecurringForDate(date) {
       return t.weekday === day;
     }
     if (t.type === 'monthly_date') {
-      return dateNum >= t.date_from && dateNum <= t.date_to;
+      const to = t.date_to == null ? t.date_from : t.date_to;
+      return dateNum >= t.date_from && dateNum <= to;
     }
     if (t.type === 'monthly_last_weekday') {
       // 마지막 특정 요일 계산
@@ -4803,7 +4804,10 @@ function renderRecurringList() {
   el.innerHTML = STATE.recurringTasks.map(t => {
     let schedule = '';
     if (t.type==='weekly') schedule = `매주 ${dayNames[t.weekday]}요일`;
-    else if (t.type==='monthly_date') schedule = `매월 ${t.date_from}~${t.date_to}일`;
+    else if (t.type==='monthly_date') {
+      const to = t.date_to == null ? t.date_from : t.date_to;
+      schedule = t.date_from === to ? `매월 ${t.date_from}일` : `매월 ${t.date_from}~${to}일`;
+    }
     else if (t.type==='monthly_last_weekday') schedule = `매월 마지막 ${dayNames[t.last_weekday]}요일`;
     const isAdmin = STATE.user && STATE.user.isAdmin;
     return `<div class="card" style="margin-bottom:10px;display:flex;align-items:center;gap:12px;">
